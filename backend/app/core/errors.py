@@ -1,0 +1,75 @@
+# Module: Core
+# Feature: Error Code Dictionary ตาม #24 + HTTP Status Rules ตาม #26
+
+from fastapi import HTTPException
+
+ERROR_DEFINITIONS: dict[str, tuple[int, str]] = {
+    # Auth
+    "AUTH_INVALID_CREDENTIALS": (401, "อีเมลหรือรหัสผ่านไม่ถูกต้อง"),
+    "AUTH_TOKEN_EXPIRED": (401, "Token หมดอายุ กรุณา Login ใหม่"),
+    "AUTH_TOKEN_INVALID": (401, "Token ไม่ถูกต้อง"),
+    "AUTH_TOKEN_MISSING": (401, "ไม่มี Token"),
+    "AUTH_ACCOUNT_SUSPENDED": (403, "บัญชีถูกระงับ"),
+    "AUTH_ACCOUNT_PENDING": (403, "บัญชียังรอการอนุมัติ"),
+    "AUTH_ACCOUNT_REJECTED": (403, "บัญชีถูกปฏิเสธ"),
+    "AUTH_PERMISSION_DENIED": (403, "ไม่มีสิทธิ์ทำสิ่งนี้"),
+    # User
+    "USER_NOT_FOUND": (404, "ไม่พบ User"),
+    "USER_EMAIL_EXISTS": (409, "Email นี้มีในระบบแล้ว"),
+    "USER_CANNOT_SUSPEND_SELF": (400, "Admin ไม่สามารถ Suspend ตัวเองได้"),
+    "USER_STATUS_INVALID": (400, "สถานะบัญชีไม่ถูกต้อง"),
+    # Dataset
+    "DATASET_NOT_FOUND": (404, "ไม่พบ Dataset"),
+    "DATASET_PERMISSION_DENIED": (403, "ไม่ใช่เจ้าของ Dataset"),
+    "DATASET_INVALID_STATUS": (400, "สถานะ Dataset ไม่อนุญาตให้ทำสิ่งนี้"),
+    "DATASET_ALREADY_PUBLISHED": (400, "Dataset ถูก Publish แล้ว"),
+    "DATASET_REJECT_COMMENT_REQUIRED": (400, "ต้องใส่ Comment เมื่อ Reject"),
+    # File
+    "FILE_TOO_LARGE": (400, "ไฟล์ใหญ่เกิน 100MB"),
+    "FILE_INVALID_FORMAT": (400, "ไฟล์ไม่ใช่ CSV/Excel/JSON"),
+    "FILE_UPLOAD_FAILED": (500, "อัปโหลดไฟล์ไม่สำเร็จ"),
+    "FILE_NOT_FOUND": (404, "ไม่พบไฟล์"),
+    # Search
+    "SEARCH_KEYWORD_TOO_SHORT": (400, "คำค้นหาสั้นเกินไป"),
+    "SEARCH_INVALID_FILTER": (400, "Filter ไม่ถูกต้อง"),
+    # Download
+    "DOWNLOAD_PURPOSE_REQUIRED": (400, "ต้องกรอกวัตถุประสงค์ก่อนดาวน์โหลด"),
+    "DOWNLOAD_INVALID_FORMAT": (400, "Format ที่เลือกไม่รองรับ"),
+    # Category / Tag
+    "CATEGORY_NOT_FOUND": (404, "ไม่พบหมวดหมู่"),
+    "CATEGORY_SLUG_EXISTS": (409, "Slug นี้มีในระบบแล้ว"),
+    "CATEGORY_PARENT_NOT_FOUND": (404, "ไม่พบหมวดหมู่ระดับบนสุด"),
+    "CATEGORY_MAX_DEPTH_REACHED": (400, "เกิน 2 ระดับ"),
+    "CATEGORY_HAS_DATASETS": (400, "ลบไม่ได้เพราะมี Dataset อยู่"),
+    "CATEGORY_PERMISSION_DENIED": (403, "ไม่ใช่เจ้าของหมวดหมู่นี้"),
+    "CATEGORY_NOT_OWNED": (403, "หมวดหมู่นี้เป็นของ Agency อื่น"),
+    "TAG_NOT_FOUND": (404, "ไม่พบแท็ก"),
+    "TAG_NAME_EXISTS": (409, "ชื่อแท็กนี้มีในระบบแล้ว"),
+    # System
+    "VALIDATION_ERROR": (422, "ข้อมูลที่ส่งมาไม่ถูกต้อง"),
+    "RATE_LIMIT_EXCEEDED": (429, "เรียก API เกินจำนวนที่กำหนด"),
+    "INTERNAL_SERVER_ERROR": (500, "ระบบขัดข้อง"),
+    "NOT_FOUND": (404, "ไม่พบสิ่งที่ต้องการ"),
+}
+
+
+class AppException(HTTPException):
+    def __init__(self, code: str, message: str | None = None) -> None:
+        if code not in ERROR_DEFINITIONS:
+            raise ValueError(f"Unknown error code: {code}")
+        status_code, default_message = ERROR_DEFINITIONS[code]
+        self.code = code
+        super().__init__(
+            status_code=status_code,
+            detail={
+                "success": False,
+                "error": {
+                    "code": code,
+                    "message": message or default_message,
+                },
+            },
+        )
+
+
+def raise_app_error(code: str, message: str | None = None) -> None:
+    raise AppException(code, message)

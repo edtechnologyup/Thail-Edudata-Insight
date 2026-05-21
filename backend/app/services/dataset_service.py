@@ -100,11 +100,36 @@ def _delete_from_minio(minio_client, object_name: str) -> None:
         )
 
 
-def _index_to_elasticsearch(es_client, dataset_id: str, doc: dict) -> None:
-    try:
-        es_client.index(index="datasets", id=dataset_id, document=doc)
-    except Exception as exc:
-        log_request(logger, logging.ERROR, f"Elasticsearch index failed: {exc}")
+def _build_dataset_index_document(db: Session, dataset) -> dict:
+    from app.models.tag_model import Tag
+    from app.models.user_model import User
+
+    user = db.query(User).filter(User.id == dataset.user_id).first()
+    tag_ids = dataset_repo.get_dataset_tag_ids(db, dataset.id)
+    tag_names: list[str] = []
+    if tag_ids:
+        tags = db.query(Tag.name).filter(Tag.id.in_(tag_ids)).all()
+        tag_names = [t[0] for t in tags]
+
+    published_at = dataset.published_at
+    if published_at is not None:
+        published_at = published_at.isoformat()
+
+    return {
+        "id": str(dataset.id),
+        "title": dataset.title,
+        "description": dataset.description,
+        "tags": tag_names,
+        "agency_name": user.agency_name if user else None,
+        "category_id": str(dataset.category_id) if dataset.category_id else None,
+        "user_id": str(dataset.user_id),
+        "license": dataset.license,
+        "status": dataset.status,
+        "published_at": published_at,
+        "download_count": dataset.download_count,
+        "quality_score": dataset.quality_score,
+        "metadata": dataset.dataset_metadata,
+    }
 
 
 def _send_email_background(to: str, subject: str, body: str) -> None:
@@ -270,17 +295,10 @@ def upload(
         db, request.category_id, dataset.user_id
     )
 
-    background_tasks.add_task(
-        _index_to_elasticsearch,
-        es_client,
-        str(dataset.id),
-        {
-            "title": dataset.title,
-            "description": dataset.description,
-            "status": dataset.status,
-            "user_id": str(dataset.user_id),
-        },
-    )
+    from app.utils.elasticsearch_utils import index_dataset
+
+    index_doc = _build_dataset_index_document(db, dataset)
+    background_tasks.add_task(index_dataset, es_client, index_doc)
     if subscriber_emails:
         background_tasks.add_task(
             _notify_subscribers_background,
@@ -373,6 +391,8 @@ def delete_dataset(
     dataset_id: uuid.UUID,
     current_user: dict,
     ip_address: str,
+    background_tasks: BackgroundTasks | None = None,
+    es_client=None,
 ) -> None:
     dataset = dataset_repo.get_dataset_by_id(db, dataset_id)
     if dataset is None:
@@ -393,6 +413,13 @@ def delete_dataset(
         ip_address=ip_address,
     )
     db.commit()
+
+    if background_tasks is not None and es_client is not None:
+        from app.utils.elasticsearch_utils import delete_dataset_index
+
+        background_tasks.add_task(
+            delete_dataset_index, es_client, str(dataset_id)
+        )
 
 
 def get_versions(

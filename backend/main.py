@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.v1 import api_router
+from app.api.v1.routers.search_router import router as search_router
 from app.core.config import settings
 from app.core.errors import AppException, ERROR_DEFINITIONS
 from app.core.logging import get_logger, log_request, setup_logging
@@ -45,6 +46,7 @@ app.add_middleware(RBACMiddleware)
 app.add_middleware(RateLimitMiddleware)
 
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(search_router, prefix="/api/v1")
 
 
 @app.get("/health")

@@ -159,6 +159,7 @@ def update_dataset(
 def delete_dataset(
     dataset_id: uuid.UUID,
     request: Request,
+    background_tasks: BackgroundTasks,
     payload: dict = Depends(get_current_user_payload_with_status),
     db: Session = Depends(get_db),
 ):
@@ -171,6 +172,8 @@ def delete_dataset(
         dataset_id=dataset_id,
         current_user=payload,
         ip_address=get_client_ip(request),
+        background_tasks=background_tasks,
+        es_client=_get_es(),
     )
     return delete_response()
 

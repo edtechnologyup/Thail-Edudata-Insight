@@ -14,7 +14,11 @@ from app.api.v1.routers.search_router import router as search_router
 from app.core.config import settings
 from app.core.errors import AppException, ERROR_DEFINITIONS
 from app.core.logging import get_logger, log_request, setup_logging
-from app.core.middleware import RBACMiddleware, RateLimitMiddleware
+from app.core.middleware import (
+    RBACMiddleware,
+    RateLimitMiddleware,
+    SecurityHeadersMiddleware,
+)
 from app.core.security import get_client_ip
 
 setup_logging()
@@ -44,6 +48,7 @@ app.add_middleware(
 )
 app.add_middleware(RBACMiddleware)
 app.add_middleware(RateLimitMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(search_router, prefix="/api/v1")

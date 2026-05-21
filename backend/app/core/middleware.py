@@ -1,5 +1,5 @@
-# Module: Core
-# Feature: RBAC Middleware ตาม #44 + Rate Limit ตาม #47
+# Module: M8 Security / Core
+# Feature: Security Headers ตาม #49 + RBAC Middleware ตาม #44 + Rate Limit ตาม #47
 
 import logging
 import re
@@ -192,3 +192,23 @@ def _error_response(code: str, status_code: int) -> JSONResponse:
             "error": {"code": code, "message": message},
         },
     )
+
+
+SECURITY_HEADERS = {
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "X-XSS-Protection": "1; mode=block",
+    "Content-Security-Policy": "default-src 'self'",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+}
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """เพิ่ม Security Headers ทุก Response ตาม #49"""
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        response = await call_next(request)
+        for header, value in SECURITY_HEADERS.items():
+            response.headers[header] = value
+        return response

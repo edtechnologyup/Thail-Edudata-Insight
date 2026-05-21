@@ -77,6 +77,8 @@ def _save_to_minio(
     content: bytes,
     ext: str,
 ) -> str:
+    from minio.sse import SseS3
+
     file_uuid = uuid.uuid4()
     object_name = f"datasets/{dataset_id}/{file_uuid}.{ext}"
     minio_client.put_object(
@@ -84,6 +86,7 @@ def _save_to_minio(
         object_name,
         io.BytesIO(content),
         length=len(content),
+        sse=SseS3(),
     )
     return object_name
 
@@ -98,6 +101,17 @@ def _delete_from_minio(minio_client, object_name: str) -> None:
             f"MinIO delete failed: {exc}",
             error_code="FILE_UPLOAD_FAILED",
         )
+
+
+_SAFE_METADATA_KEYS = frozenset({"year", "province", "agency"})
+
+
+def _metadata_for_search(metadata: dict | None) -> dict | None:
+    """ส่งเฉพาะฟิลด์ DCAT-AP ที่กำหนดใน #21 — ไม่ index คอลัมน์ไฟล์ที่ Mask แล้ว ตาม #46"""
+    if not metadata or not isinstance(metadata, dict):
+        return None
+    filtered = {k: v for k, v in metadata.items() if k in _SAFE_METADATA_KEYS}
+    return filtered or None
 
 
 def _build_dataset_index_document(db: Session, dataset) -> dict:
@@ -128,7 +142,7 @@ def _build_dataset_index_document(db: Session, dataset) -> dict:
         "published_at": published_at,
         "download_count": dataset.download_count,
         "quality_score": dataset.quality_score,
-        "metadata": dataset.dataset_metadata,
+        "metadata": _metadata_for_search(dataset.dataset_metadata),
     }
 
 

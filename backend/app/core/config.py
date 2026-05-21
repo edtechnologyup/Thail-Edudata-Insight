@@ -39,9 +39,19 @@ class Settings(BaseSettings):
 
     RATE_LIMIT_PER_MINUTE: int = 100
     MAX_FILE_SIZE_MB: int = 100
+    ALLOWED_ORIGINS: str = ""
 
     @property
     def cors_allowed_origins(self) -> list[str]:
+        if self.ALLOWED_ORIGINS.strip():
+            origins = [
+                origin.strip()
+                for origin in self.ALLOWED_ORIGINS.split(",")
+                if origin.strip()
+            ]
+            if self.is_production:
+                origins = [origin for origin in origins if origin != "*"]
+            return origins
         if self.APP_ENV == "development":
             return [
                 "http://localhost",

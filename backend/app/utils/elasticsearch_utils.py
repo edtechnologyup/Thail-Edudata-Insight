@@ -28,10 +28,10 @@ INDEX_SORT_FIELDS = {
 INDEX_MAPPINGS = {
     "mappings": {
         "properties": {
-            "title": {"type": "text"},
-            "description": {"type": "text"},
+            "title": {"type": "text", "analyzer": "thai"},
+            "description": {"type": "text", "analyzer": "thai"},
             "tags": {"type": "keyword"},
-            "agency_name": {"type": "text"},
+            "agency_name": {"type": "text", "analyzer": "thai"},
             "category_id": {"type": "keyword"},
             "user_id": {"type": "keyword"},
             "license": {"type": "keyword"},
@@ -106,19 +106,29 @@ def delete_index(es_client) -> None:
         log_request(logger, logging.ERROR, f"Elasticsearch delete_index failed: {exc}")
 
 
-def create_index(es_client) -> None:
+def create_index_if_not_exists(es_client) -> None:
     try:
         if es_client.indices.exists(index=INDEX_NAME):
             return
         es_client.indices.create(index=INDEX_NAME, body=INDEX_MAPPINGS)
     except Exception as exc:
-        log_request(logger, logging.ERROR, f"Elasticsearch create_index failed: {exc}")
+        log_request(
+            logger, logging.ERROR, f"Elasticsearch create_index_if_not_exists failed: {exc}"
+        )
+
+
+def recreate_index(es_client) -> None:
+    try:
+        delete_index(es_client)
+        es_client.indices.create(index=INDEX_NAME, body=INDEX_MAPPINGS)
+    except Exception as exc:
+        log_request(logger, logging.ERROR, f"Elasticsearch recreate_index failed: {exc}")
 
 
 def index_dataset(es_client, dataset: dict[str, Any]) -> None:
     try:
         _ensure_es_client_utf8_headers(es_client)
-        create_index(es_client)
+        create_index_if_not_exists(es_client)
         doc_id = str(dataset.get("id", ""))
         if not doc_id:
             return
@@ -144,7 +154,7 @@ def search_datasets(
     filters: dict[str, Any] | None,
     pagination: PaginationParams,
 ) -> SearchResult:
-    create_index(es_client)
+    create_index_if_not_exists(es_client)
 
     must_clauses: list[dict] = [{"term": {"status": "published"}}]
 
@@ -167,9 +177,14 @@ def search_datasets(
             )
 
     should_clauses: list[dict] = [
-        {"wildcard": {"title": {"value": f"*{keyword}*"}}},
-        {"wildcard": {"description": {"value": f"*{keyword}*"}}},
-        {"wildcard": {"agency_name": {"value": f"*{keyword}*"}}},
+        {
+            "multi_match": {
+                "query": keyword,
+                "fields": ["title", "description", "agency_name"],
+                "operator": "or",
+                "analyzer": "thai",
+            }
+        }
     ]
 
     sort_field = _resolve_sort_field(es_client, pagination.sort)
@@ -203,7 +218,7 @@ def search_datasets(
 
 
 def autocomplete_datasets(es_client, keyword: str) -> list[str]:
-    create_index(es_client)
+    create_index_if_not_exists(es_client)
 
     body = {
         "query": {

@@ -687,6 +687,45 @@
       "nextPage": "Next page",
       "loadError": "Failed to load categories",
       "saveError": "Failed to save. Please try again"
+    },
+    "saved": {
+      "title": "My saved",
+      "subtitle": "Manage your bookmarked datasets, subscriptions, and saved searches",
+      "tabBookmark": "Bookmark ({count})",
+      "tabSubscription": "Subscription ({count})",
+      "tabSavedSearch": "Saved Search ({count})",
+      "statusPublished": "Published",
+      "statusDraft": "Draft",
+      "views": "{count}",
+      "bookmark": {
+        "empty": "No bookmarks yet",
+        "delete": "Delete bookmark",
+        "deleteError": "Failed to remove bookmark. Please try again.",
+        "loadError": "Failed to load bookmarks"
+      },
+      "subscription": {
+        "empty": "No subscriptions yet",
+        "add": "Add subscription",
+        "cancel": "Unsubscribe",
+        "cancelError": "Failed to unsubscribe. Please try again.",
+        "loadError": "Failed to load subscriptions",
+        "typeCategory": "Category",
+        "typeAgency": "Agency",
+        "subscribedAt": "Subscribed: {date}",
+        "categoryLabel": "Category: {name}",
+        "agencyLabel": "Agency: {name}"
+      },
+      "savedSearch": {
+        "empty": "No saved searches",
+        "emptyHint": "Save search filters you use often for quicker access later.",
+        "goSearch": "Go to dataset search",
+        "search": "Search",
+        "delete": "Delete",
+        "deleteError": "Failed to delete saved search. Please try again.",
+        "loadError": "Failed to load saved searches",
+        "createdAt": "Saved: {date}",
+        "filters": "Filters"
+      }
     }
   },
   "admin": {

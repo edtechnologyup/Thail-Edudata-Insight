@@ -2189,6 +2189,167 @@ export function deleteAgencyCategoryMock(level: 1 | 2, id: string): void {
   agencyCategoriesL2 = agencyCategoriesL2.filter((c) => c.id !== id);
 }
 
+// — Agency saved items (bookmarks, subscriptions, saved searches) —
+
+export type AgencyBookmarkMock = {
+  id: string;
+  datasetId: string;
+  title: string;
+  titleEn: string;
+  category: string;
+  categoryEn: string;
+  agency: string;
+  agencyEn: string;
+  status: "published" | "draft";
+  viewCount: number;
+  updatedAt: string;
+};
+
+export type AgencySubscriptionMock = {
+  id: string;
+  type: "category" | "agency";
+  name: string;
+  nameEn: string;
+  subscribedAt: string;
+};
+
+export type SavedSearchFilters = Record<string, string>;
+
+export type AgencySavedSearchMock = {
+  id: string;
+  name: string;
+  filters: SavedSearchFilters;
+  createdAt: string;
+};
+
+export const mockBookmarks: AgencyBookmarkMock[] = [
+  {
+    id: "bm-1",
+    datasetId: "1",
+    title: "สถิติจำนวนนักเรียนรายจังหวัด ประจำปี 2566",
+    titleEn: "Provincial student statistics academic year 2026",
+    category: "สถิตินักเรียน",
+    categoryEn: "Education",
+    agency: "สำนักงานปลัดกระทรวงศึกษาธิการ",
+    agencyEn: "Office of the Permanent Secretary",
+    status: "published",
+    viewCount: 1200,
+    updatedAt: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "bm-2",
+    datasetId: "2",
+    title: "งบประมาณรายจ่ายด้านการศึกษาจำแนกตามโครงการ",
+    titleEn: "Education expenditure budget by project",
+    category: "ทรัพยากร",
+    categoryEn: "Resources",
+    agency: "สำนักงบประมาณ",
+    agencyEn: "Bureau of the Budget",
+    status: "published",
+    viewCount: 856,
+    updatedAt: "2024-02-01T00:00:00Z",
+  },
+  {
+    id: "bm-3",
+    datasetId: "3",
+    title: "ทำเนียบครูและบุคลากรทางการศึกษา (Open Data)",
+    titleEn: "Teacher and education personnel directory (Open Data)",
+    category: "ครู",
+    categoryEn: "Teacher",
+    agency: "สำนักงานคณะกรรมการการศึกษาขั้นพื้นฐาน",
+    agencyEn: "Office of the Basic Education Commission",
+    status: "published",
+    viewCount: 3400,
+    updatedAt: "2024-03-15T00:00:00Z",
+  },
+];
+
+export const mockSubscriptions: AgencySubscriptionMock[] = [
+  {
+    id: "sub-1",
+    type: "category",
+    name: "เทคโนโลยีดิจิทัลเพื่อการเรียนรู้",
+    nameEn: "Digital technology for learning",
+    subscribedAt: "2024-01-12T00:00:00Z",
+  },
+  {
+    id: "sub-2",
+    type: "agency",
+    name: "กองทุนเพื่อความเสมอภาคทางการศึกษา (กสศ.)",
+    nameEn: "Equitable Education Fund (EEF)",
+    subscribedAt: "2024-01-05T00:00:00Z",
+  },
+];
+
+export const mockSavedSearches: AgencySavedSearchMock[] = [
+  {
+    id: "ss-1",
+    name: "สถิตินักเรียน 2566",
+    filters: {
+      q: "นักเรียน",
+      category: "student-statistics",
+      year: "2566",
+      format: "csv",
+    },
+    createdAt: "2024-01-15T00:00:00Z",
+  },
+  {
+    id: "ss-2",
+    name: "ข้อมูลครู Excel",
+    filters: {
+      q: "ครู",
+      format: "excel",
+    },
+    createdAt: "2024-02-20T00:00:00Z",
+  },
+];
+
+let agencyBookmarks: AgencyBookmarkMock[] = mockBookmarks.map((b) => ({ ...b }));
+let agencySubscriptions: AgencySubscriptionMock[] = mockSubscriptions.map(
+  (s) => ({ ...s })
+);
+let agencySavedSearches: AgencySavedSearchMock[] = mockSavedSearches.map(
+  (s) => ({ ...s })
+);
+
+export function getAgencyBookmarksMock(): AgencyBookmarkMock[] {
+  return [...agencyBookmarks];
+}
+
+export function deleteAgencyBookmarkMock(id: string): void {
+  agencyBookmarks = agencyBookmarks.filter((b) => b.id !== id);
+}
+
+export function getAgencySubscriptionsMock(): AgencySubscriptionMock[] {
+  return [...agencySubscriptions];
+}
+
+export function deleteAgencySubscriptionMock(id: string): void {
+  agencySubscriptions = agencySubscriptions.filter((s) => s.id !== id);
+}
+
+export function getAgencySavedSearchesMock(): AgencySavedSearchMock[] {
+  return [...agencySavedSearches];
+}
+
+export function deleteAgencySavedSearchMock(id: string): void {
+  agencySavedSearches = agencySavedSearches.filter((s) => s.id !== id);
+}
+
+export function buildSavedSearchUrl(
+  locale: string,
+  filters: SavedSearchFilters
+): string {
+  const params = new URLSearchParams();
+  if (filters.q) params.set("q", filters.q);
+  if (filters.category) params.set("category", filters.category);
+  if (filters.year) params.set("year", filters.year);
+  if (filters.format) params.set("format", filters.format);
+  if (filters.agency) params.set("agency", filters.agency);
+  const query = params.toString();
+  return `/${locale}/search${query ? `?${query}` : ""}`;
+}
+
 export const mockProvinces = [
   {
     value: "all",

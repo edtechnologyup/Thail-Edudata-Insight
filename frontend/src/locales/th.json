@@ -687,6 +687,45 @@
       "nextPage": "หน้าถัดไป",
       "loadError": "โหลดหมวดหมู่ไม่สำเร็จ",
       "saveError": "บันทึกไม่สำเร็จ กรุณาลองใหม่"
+    },
+    "saved": {
+      "title": "บันทึกของฉัน",
+      "subtitle": "จัดการชุดข้อมูล การติดตาม และการค้นหาที่คุณบันทึกไว้",
+      "tabBookmark": "Bookmark ({count})",
+      "tabSubscription": "Subscription ({count})",
+      "tabSavedSearch": "Saved Search ({count})",
+      "statusPublished": "Published",
+      "statusDraft": "Draft",
+      "views": "{count}",
+      "bookmark": {
+        "empty": "ยังไม่มีบุ๊กมาร์ก",
+        "delete": "Delete Bookmark",
+        "deleteError": "ลบบุ๊กมาร์กไม่สำเร็จ กรุณาลองใหม่",
+        "loadError": "โหลดบุ๊กมาร์กไม่สำเร็จ"
+      },
+      "subscription": {
+        "empty": "ยังไม่มีการติดตาม",
+        "add": "เพิ่มการติดตาม",
+        "cancel": "Unsubscribe",
+        "cancelError": "ยกเลิกการติดตามไม่สำเร็จ กรุณาลองใหม่",
+        "loadError": "โหลดการติดตามไม่สำเร็จ",
+        "typeCategory": "หมวดหมู่",
+        "typeAgency": "หน่วยงาน",
+        "subscribedAt": "ติดตามเมื่อ: {date}",
+        "categoryLabel": "หมวดหมู่: {name}",
+        "agencyLabel": "หน่วยงาน: {name}"
+      },
+      "savedSearch": {
+        "empty": "ไม่พบรายการค้นหาที่บันทึกไว้",
+        "emptyHint": "คุณสามารถบันทึกเงื่อนไขการค้นหาที่ใช้บ่อย เพื่อความสะดวกในการเข้าถึงข้อมูลในอนาคต",
+        "goSearch": "ไปที่หน้าค้นหาชุดข้อมูล",
+        "search": "ค้นหา",
+        "delete": "ลบ",
+        "deleteError": "ลบการค้นหาที่บันทึกไม่สำเร็จ กรุณาลองใหม่",
+        "loadError": "โหลดการค้นหาที่บันทึกไม่สำเร็จ",
+        "createdAt": "บันทึกเมื่อ: {date}",
+        "filters": "เงื่อนไข"
+      }
     }
   },
   "admin": {

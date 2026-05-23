@@ -446,6 +446,42 @@
     "resultCount": "{count} results"
   },
   "agency": {
+    "dashboard": {
+      "title": "Dashboard",
+      "totalDatasets": "Total datasets",
+      "published": "Published",
+      "draft": "Draft",
+      "totalDownloads": "Total downloads",
+      "downloadChart": "Monthly downloads",
+      "viewDetails": "View details",
+      "recentDatasets": "My recent datasets",
+      "viewAll": "View all",
+      "uploadNew": "Upload new dataset",
+      "agencyFallback": "Agency",
+      "totalTrend": "+{percent}% from last month",
+      "publishedShare": "{percent}% of all datasets",
+      "draftPending": "{count} items need review",
+      "downloadsThisMonth": "+ {count} this month",
+      "colTitle": "Dataset name",
+      "colCategory": "Category",
+      "colStatus": "Status",
+      "colDownloads": "Downloads",
+      "colUpdated": "Updated"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "myDatasets": "My datasets",
+      "upload": "Upload dataset",
+      "bulkUpload": "Bulk upload",
+      "categories": "Manage categories",
+      "saved": "My saves",
+      "customDashboard": "Custom dashboard",
+      "publishDataset": "Publish dataset"
+    },
+    "status": {
+      "published": "Published",
+      "draft": "Draft"
+    },
     "dashboardTitle": "Agency dashboard",
     "myDatasetsTitle": "Agency datasets",
     "createTitle": "Upload dataset",

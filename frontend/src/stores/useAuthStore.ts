@@ -17,11 +17,21 @@ type AuthState = {
   initAuth: () => void;
 };
 
+// TODO: ลบ mock user ออกเมื่อ Backend พร้อม
+const MOCK_AGENCY_USER: User = {
+  id: "1",
+  email: "agency@test.com",
+  role: "agency",
+  status: "active",
+  agency_name: "สพฐ. (ทดสอบ)",
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      user: null,
-      token: null,
+      // Mock user ชั่วคราว — ลบออกเมื่อ Backend พร้อม
+      token: "mock-token-agency",
+      user: MOCK_AGENCY_USER,
       login: (token, user) => {
         localStorage.setItem("token", token);
         set({ token, user });
@@ -30,12 +40,8 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem("token");
         set({ token: null, user: null });
       },
-      initAuth: () => {
-        const token = localStorage.getItem("token");
-        if (token) {
-          set({ token });
-        }
-      },
+      // TODO: เปิด initAuth จริงเมื่อ Backend พร้อม
+      initAuth: () => {},
     }),
     { name: "auth" }
   )

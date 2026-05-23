@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
 import Navbar from "@/components/common/Navbar";
 import Sidebar from "@/components/common/Sidebar";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -11,33 +10,32 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const params = useParams();
-  const locale = (params.locale as string) || "th";
-  const { token, user, initAuth } = useAuthStore();
+  const { initAuth } = useAuthStore();
 
   useEffect(() => {
     initAuth();
   }, [initAuth]);
 
-  useEffect(() => {
-    if (!token) {
-      router.replace(`/${locale}/login`);
-      return;
-    }
+  // TODO: เปิด Auth Guard เมื่อ Backend พร้อม
+  // ตอนนี้ bypass ไว้ก่อนเพื่อทดสอบ UI
+  // useEffect(() => {
+  //   if (!token) {
+  //     router.replace(`/${locale}/login`);
+  //     return;
+  //   }
+  //
+  //   if (user && user.role !== "admin") {
+  //     router.replace(`/${locale}`);
+  //   }
+  // }, [token, user, router, locale]);
 
-    if (user && user.role !== "admin") {
-      router.replace(`/${locale}`);
-    }
-  }, [token, user, router, locale]);
+  // if (!token) {
+  //   return null;
+  // }
 
-  if (!token) {
-    return null;
-  }
-
-  if (user && user.role !== "admin") {
-    return null;
-  }
+  // if (user && user.role !== "admin") {
+  //   return null;
+  // }
 
   return (
     <div className="flex min-h-screen flex-col">

@@ -446,6 +446,42 @@
     "resultCount": "{count} รายการ"
   },
   "agency": {
+    "dashboard": {
+      "title": "Dashboard",
+      "totalDatasets": "Dataset ทั้งหมด",
+      "published": "เผยแพร่แล้ว",
+      "draft": "แบบร่าง (Draft)",
+      "totalDownloads": "ดาวน์โหลดรวม",
+      "downloadChart": "ดาวน์โหลดรายเดือน",
+      "viewDetails": "ดูรายละเอียด",
+      "recentDatasets": "Dataset ล่าสุดของฉัน",
+      "viewAll": "ดูทั้งหมด",
+      "uploadNew": "อัปโหลด Dataset ใหม่",
+      "agencyFallback": "หน่วยงาน",
+      "totalTrend": "+{percent}% จากเดือนที่แล้ว",
+      "publishedShare": "{percent}% ของข้อมูลทั้งหมด",
+      "draftPending": "ต้องการการตรวจสอบ {count} รายการ",
+      "downloadsThisMonth": "+ {count} เดือนนี้",
+      "colTitle": "ชื่อ Dataset",
+      "colCategory": "หมวดหมู่",
+      "colStatus": "สถานะ",
+      "colDownloads": "ดาวน์โหลด",
+      "colUpdated": "วันที่อัปเดต"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "myDatasets": "Dataset ของฉัน",
+      "upload": "อัปโหลด Dataset",
+      "bulkUpload": "Bulk Upload",
+      "categories": "จัดการหมวดหมู่",
+      "saved": "บันทึกของฉัน",
+      "customDashboard": "Custom Dashboard",
+      "publishDataset": "Publish Dataset"
+    },
+    "status": {
+      "published": "เผยแพร่แล้ว",
+      "draft": "แบบร่าง"
+    },
     "dashboardTitle": "แดชบอร์ดหน่วยงาน",
     "myDatasetsTitle": "ชุดข้อมูลของหน่วยงาน",
     "createTitle": "อัปโหลดชุดข้อมูล",

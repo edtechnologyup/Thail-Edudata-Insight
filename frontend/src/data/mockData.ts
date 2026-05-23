@@ -1704,3 +1704,96 @@ export const MOCK_STATS_DATA: StatsDataMock = {
     },
   ],
 };
+
+export type AgencyMonthlyDownload = {
+  month: string;
+  monthEn: string;
+  count: number;
+};
+
+export type AgencyDashboardStats = {
+  totalDatasets: number;
+  publishedDatasets: number;
+  draftDatasets: number;
+  totalDownloads: number;
+  monthlyDownloads: AgencyMonthlyDownload[];
+};
+
+export type AgencyDatasetRow = {
+  id: string;
+  title: string;
+  titleEn: string;
+  category: string;
+  categoryEn: string;
+  status: "draft" | "published";
+  downloadCount: number;
+  updatedAt: string;
+};
+
+export const mockAgencyStats: AgencyDashboardStats = {
+  totalDatasets: 24,
+  publishedDatasets: 18,
+  draftDatasets: 6,
+  totalDownloads: 12456,
+  monthlyDownloads: [
+    { month: "ม.ค.", monthEn: "Jan", count: 1200 },
+    { month: "ก.พ.", monthEn: "Feb", count: 1450 },
+    { month: "มี.ค.", monthEn: "Mar", count: 1890 },
+    { month: "เม.ย.", monthEn: "Apr", count: 1670 },
+    { month: "พ.ค.", monthEn: "May", count: 2340 },
+    { month: "มิ.ย.", monthEn: "Jun", count: 1980 },
+  ],
+};
+
+export const mockAgencyDatasets: AgencyDatasetRow[] = [
+  {
+    id: "1",
+    title: "สถิตินักเรียนรายจังหวัด 2566",
+    titleEn: "Provincial student statistics 2023",
+    category: "สถิตินักเรียน",
+    categoryEn: "Student statistics",
+    status: "published",
+    downloadCount: 1234,
+    updatedAt: "2024-01-01",
+  },
+  {
+    id: "2",
+    title: "จำนวนครูรายวิชา 2566",
+    titleEn: "Teachers by subject 2023",
+    category: "จำนวนครู",
+    categoryEn: "Teacher counts",
+    status: "published",
+    downloadCount: 856,
+    updatedAt: "2024-02-01",
+  },
+  {
+    id: "3",
+    title: "งบประมาณการศึกษา 2566",
+    titleEn: "Education budget 2023",
+    category: "งบประมาณ",
+    categoryEn: "Budget",
+    status: "draft",
+    downloadCount: 0,
+    updatedAt: "2024-03-01",
+  },
+  {
+    id: "4",
+    title: "ผลการเรียน O-NET 2566",
+    titleEn: "O-NET results 2023",
+    category: "ผลการเรียน",
+    categoryEn: "Academic results",
+    status: "published",
+    downloadCount: 654,
+    updatedAt: "2024-03-15",
+  },
+  {
+    id: "5",
+    title: "จำนวนโรงเรียนรายจังหวัด 2566",
+    titleEn: "Schools by province 2023",
+    category: "โรงเรียน",
+    categoryEn: "Schools",
+    status: "draft",
+    downloadCount: 0,
+    updatedAt: "2024-04-01",
+  },
+];

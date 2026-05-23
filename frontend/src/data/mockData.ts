@@ -1906,3 +1906,126 @@ export const mockAgencyDatasets: AgencyDatasetRow[] = [
     updatedAt: "2024-03-05",
   },
 ];
+
+export type AgencyDatasetFormInitial = {
+  title: string;
+  description: string;
+  categoryLevel1: string;
+  categoryLevel2: string;
+  license: DatasetLicense;
+  tags: string[];
+  year?: number;
+  province?: string;
+};
+
+export type FileAnalysisResult = {
+  qualityScore: number;
+  piiColumnsTh: string[];
+  piiColumnsEn: string[];
+};
+
+export const mockFileAnalysisResult: FileAnalysisResult = {
+  qualityScore: 85,
+  piiColumnsTh: ["เลขบัตรประชาชน", "เบอร์โทรศัพท์"],
+  piiColumnsEn: ["National ID", "Phone number"],
+};
+
+export const mockCategories = MOCK_CATEGORIES;
+
+export const mockProvinces = [
+  {
+    value: "all",
+    labelTh: "ทุกจังหวัด (ภาพรวมประเทศ)",
+    labelEn: "All provinces (national)",
+  },
+  { value: "bangkok", labelTh: "กรุงเทพมหานคร", labelEn: "Bangkok" },
+  { value: "chiangmai", labelTh: "เชียงใหม่", labelEn: "Chiang Mai" },
+  { value: "khonkaen", labelTh: "ขอนแก่น", labelEn: "Khon Kaen" },
+];
+
+const mockAgencyDatasetFormById: Record<string, AgencyDatasetFormInitial> = {
+  "1": {
+    title: "ข้อมูลสถิติจำนวนนักเรียนรายจังหวัด ประจำปี 2566",
+    description:
+      "ข้อมูลจำนวนนักเรียนแยกตามจังหวัด ปีการศึกษา 2566 สำหรับวิเคราะห์ภาพรวมการศึกษาไทย",
+    categoryLevel1: "student-statistics",
+    categoryLevel2: "student-by-province",
+    license: "open",
+    tags: ["การศึกษา", "สถิติปี 2566"],
+    year: 2567,
+    province: "all",
+  },
+  "2": {
+    title: "งบประมาณสนับสนุนการวิจัยรายปี (Draft)",
+    description:
+      "รายละเอียดงบประมาณสนับสนุนการวิจัยของหน่วยงาน แยกตามโครงการและปีงบประมาณ",
+    categoryLevel1: "teacher-statistics",
+    categoryLevel2: "teacher-by-subject",
+    license: "conditional",
+    tags: ["งบประมาณ", "วิจัย"],
+    year: 2567,
+    province: "bangkok",
+  },
+};
+
+function resolveCategorySlugs(
+  categoryTh: string,
+  subcategoryTh: string
+): { categoryLevel1: string; categoryLevel2: string } {
+  const category =
+    MOCK_CATEGORIES.find(
+      (item) =>
+        item.nameTh === categoryTh ||
+        categoryTh.includes(item.nameTh) ||
+        item.nameTh.includes(categoryTh)
+    ) ?? MOCK_CATEGORIES[0];
+
+  const subcategory =
+    category.subcategories.find(
+      (item) =>
+        item.nameTh === subcategoryTh ||
+        subcategoryTh.includes(item.nameTh) ||
+        item.nameTh.includes(subcategoryTh)
+    ) ?? category.subcategories[0];
+
+  return {
+    categoryLevel1: category.slug,
+    categoryLevel2: subcategory?.slug ?? "",
+  };
+}
+
+export function getAgencyDatasetFormInitial(
+  id: string
+): AgencyDatasetFormInitial | null {
+  const preset = mockAgencyDatasetFormById[id];
+  if (preset) {
+    return preset;
+  }
+
+  const row = mockAgencyDatasets.find((dataset) => dataset.id === id);
+  if (!row) {
+    return null;
+  }
+
+  const { categoryLevel1, categoryLevel2 } = resolveCategorySlugs(
+    row.category,
+    row.subcategory
+  );
+
+  return {
+    title: row.title,
+    description:
+      "รายละเอียดของชุดข้อมูล วัตถุประสงค์ และการนำไปใช้งานเชิงนโยบายการศึกษา",
+    categoryLevel1,
+    categoryLevel2,
+    license: "open",
+    tags: ["การศึกษา"],
+    year: 2567,
+    province: "all",
+  };
+}
+
+export async function fetchMockFileAnalysis(): Promise<FileAnalysisResult> {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return mockFileAnalysisResult;
+}

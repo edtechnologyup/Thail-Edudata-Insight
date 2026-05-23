@@ -241,6 +241,13 @@ export default function Navbar({ variant }: NavbarProps) {
                 variant="dropdown"
               />
             </div>
+
+            <Link
+              href={`${base}/api-docs`}
+              className={linkClass(pathname.startsWith(`${base}/api-docs`))}
+            >
+              {t("apiDocs")}
+            </Link>
           </div>
         </div>
       </header>
@@ -305,6 +312,16 @@ export default function Navbar({ variant }: NavbarProps) {
               >
                 {t("categories")}
               </button>
+              <Link
+                href={`${base}/api-docs`}
+                className={`min-h-[44px] rounded-radius-sm px-3 py-2 font-sarabun text-label ${
+                  pathname.startsWith(`${base}/api-docs`)
+                    ? "bg-primary-light font-medium text-primary-dark"
+                    : "text-text-secondary"
+                }`}
+              >
+                {t("apiDocs")}
+              </Link>
               <Link
                 href={`${base}/login`}
                 className="mt-2 inline-flex min-h-[44px] items-center justify-center rounded-radius-sm bg-primary px-4 font-sarabun text-label font-medium text-white"

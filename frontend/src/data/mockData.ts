@@ -2083,3 +2083,70 @@ export function createBulkUploadTemplateBlob(): Blob {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
 }
+
+export type DatasetVersionChangelogType = "edit" | "add" | "initial";
+
+export type DatasetVersionItem = {
+  version: string;
+  createdAt: string;
+  createdByTh: string;
+  createdByEn: string;
+  changelogType: DatasetVersionChangelogType;
+  changelogTh: string[];
+  changelogEn: string[];
+  isCurrent: boolean;
+};
+
+export const mockVersionHistory: DatasetVersionItem[] = [
+  {
+    version: "3.0",
+    createdAt: "2024-03-12T14:30:00Z",
+    createdByTh: "นายสมชาย มั่นคง",
+    createdByEn: "Mr. Somchai Mankong",
+    changelogType: "edit",
+    changelogTh: ["อัปเดตข้อมูลปี 2566", "เพิ่มคอลัมน์จังหวัด"],
+    changelogEn: ["Updated 2023 academic year data", "Added province column"],
+    isCurrent: true,
+  },
+  {
+    version: "2.0",
+    createdAt: "2024-03-05T10:15:00Z",
+    createdByTh: "นายสมชาย มั่นคง",
+    createdByEn: "Mr. Somchai Mankong",
+    changelogType: "add",
+    changelogTh: ["แก้ไขข้อมูลผิดพลาดแถว 15-20", "อัปเดต License"],
+    changelogEn: ["Fixed incorrect rows 15-20", "Updated license"],
+    isCurrent: false,
+  },
+  {
+    version: "1.0",
+    createdAt: "2024-03-01T09:00:00Z",
+    createdByTh: "ระบบ (Initial Upload)",
+    createdByEn: "System (Initial Upload)",
+    changelogType: "initial",
+    changelogTh: ["อัปโหลดครั้งแรก"],
+    changelogEn: ["Initial upload"],
+    isCurrent: false,
+  },
+];
+
+export async function fetchMockVersionHistory(
+  datasetId: string
+): Promise<DatasetVersionItem[]> {
+  await Promise.resolve();
+  void datasetId;
+  return mockVersionHistory;
+}
+
+export function getAgencyDatasetById(id: string): AgencyDatasetRow | undefined {
+  return mockAgencyDatasets.find((dataset) => dataset.id === id);
+}
+
+export async function fetchMockRestoreVersion(
+  datasetId: string,
+  version: string
+): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  void datasetId;
+  void version;
+}

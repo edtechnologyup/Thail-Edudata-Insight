@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect } from "react";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useUIStore } from "@/stores/useUIStore";
 
 type NavItem = {
@@ -120,6 +121,57 @@ function SidebarNav({
   );
 }
 
+function SidebarFooter({ onNavigate }: { onNavigate?: () => void }) {
+  const locale = useLocale();
+  const router = useRouter();
+  const base = `/${locale}`;
+  const tNav = useTranslations("nav");
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleLogout = () => {
+    logout();
+    onNavigate?.();
+    router.push(`${base}/login`);
+  };
+
+  return (
+    <div className="mt-auto border-t border-[#e5e7eb] px-2 py-4">
+      <Link
+        href={`${base}/help-center`}
+        onClick={onNavigate}
+        className="mb-1 flex items-center gap-3 rounded-radius-lg px-4 py-2.5 font-sarabun text-label text-[#6c7a76] transition-colors hover:bg-[#f7f9fb] hover:text-[#006b5f]"
+      >
+        <HelpIcon />
+        Help Center
+      </Link>
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="flex w-full items-center gap-3 rounded-radius-lg px-4 py-2.5 font-sarabun text-label text-[#ba1a1a] transition-colors hover:bg-[#ffdad6]"
+      >
+        <LogoutIcon />
+        {tNav("logout")}
+      </button>
+    </div>
+  );
+}
+
+function HelpIcon() {
+  return (
+    <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M11 18h2v-2h-2v2Zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Zm0-14c-2.21 0-4 1.79-4 4h2a2 2 0 1 1 4 0c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4Z" />
+    </svg>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+    </svg>
+  );
+}
+
 export default function AgencySidebar() {
   const t = useTranslations("agency.sidebar");
   const locale = useLocale();
@@ -198,6 +250,7 @@ export default function AgencySidebar() {
 
       <aside className="hidden w-[240px] shrink-0 flex-col border-r border-border-sidebar bg-surface-card lg:flex">
         <SidebarNav items={items} pathname={pathname} />
+        <SidebarFooter />
       </aside>
 
       {sidebarOpen ? (
@@ -227,6 +280,7 @@ export default function AgencySidebar() {
               pathname={pathname}
               onNavigate={closeDrawer}
             />
+            <SidebarFooter onNavigate={closeDrawer} />
           </aside>
         </div>
       ) : null}

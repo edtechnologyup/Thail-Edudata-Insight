@@ -1,30 +1,52 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { usePathname, useRouter, useParams, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 
 type SearchBarProps = {
   defaultValue?: string;
   size?: "default" | "large";
   className?: string;
+  /** When true, updates ?q= on current path instead of navigating to /search */
+  syncUrl?: boolean;
 };
 
 export default function SearchBar({
   defaultValue = "",
   size = "default",
   className = "",
+  syncUrl = false,
 }: SearchBarProps) {
   const t = useTranslations("search");
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const params = useParams();
   const locale = (params.locale as string) || "th";
-  const [keyword, setKeyword] = useState(defaultValue);
+  const urlQuery = searchParams.get("q") ?? "";
+  const [keyword, setKeyword] = useState(defaultValue || urlQuery);
+
+  useEffect(() => {
+    if (syncUrl) {
+      setKeyword(urlQuery);
+    }
+  }, [syncUrl, urlQuery]);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const q = keyword.trim();
     if (q.length < 2) return;
+
+    if (syncUrl) {
+      const next = new URLSearchParams(searchParams.toString());
+      next.set("q", q);
+      next.delete("page");
+      const query = next.toString();
+      router.push(query ? `${pathname}?${query}` : pathname);
+      return;
+    }
+
     router.push(`/${locale}/search?q=${encodeURIComponent(q)}`);
   }
 

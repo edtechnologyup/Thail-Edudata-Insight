@@ -534,6 +534,36 @@
       "notFound": "Dataset not found",
       "backToList": "Back to datasets"
     },
+    "bulk": {
+      "title": "Bulk upload",
+      "subtitle": "Upload multiple datasets at once",
+      "breadcrumbDashboard": "Dashboard",
+      "breadcrumbCurrent": "Bulk upload",
+      "step1": "Step 1",
+      "step1Title": "Download Excel template",
+      "step1Desc": "Fill in dataset information in the template, then upload it in the next step.",
+      "downloadTemplate": "Download template",
+      "step2": "Step 2",
+      "step2Title": "Upload completed Excel file",
+      "dropzone": "Drag and drop your Excel file here, or",
+      "dropzoneClick": "Choose a file",
+      "dropzoneHint": ".xlsx files only",
+      "processing": "Processing... {percent}%",
+      "fileInvalidType": "Only .xlsx files are allowed",
+      "uploadFailed": "Upload failed. Please try again.",
+      "resultSuccess": "Success",
+      "resultError": "Error",
+      "successCount": "{count} datasets",
+      "errorCount": "{count} datasets",
+      "errorTableTitle": "Error details",
+      "errorTable": {
+        "row": "Row",
+        "title": "Dataset name",
+        "column": "Problem column",
+        "reason": "Reason"
+      },
+      "uploadAgain": "Upload again"
+    },
     "datasets": {
       "title": "My datasets",
       "uploadNew": "Upload new dataset",

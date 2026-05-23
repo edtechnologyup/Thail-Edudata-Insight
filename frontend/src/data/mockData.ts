@@ -2029,3 +2029,57 @@ export async function fetchMockFileAnalysis(): Promise<FileAnalysisResult> {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   return mockFileAnalysisResult;
 }
+
+export type BulkUploadErrorDetail = {
+  row: number;
+  titleTh: string;
+  titleEn: string;
+  column: string;
+  reasonTh: string;
+  reasonEn: string;
+};
+
+export type BulkUploadResult = {
+  success: number;
+  errors: number;
+  errorDetails: BulkUploadErrorDetail[];
+};
+
+export const mockBulkUploadResult: BulkUploadResult = {
+  success: 8,
+  errors: 2,
+  errorDetails: [
+    {
+      row: 3,
+      titleTh: "สถิตินักเรียน 2565",
+      titleEn: "Student statistics 2022",
+      column: "category",
+      reasonTh: "หมวดหมู่ไม่ถูกต้อง",
+      reasonEn: "Invalid category",
+    },
+    {
+      row: 7,
+      titleTh: "จำนวนครู 2565",
+      titleEn: "Teacher count 2022",
+      column: "license",
+      reasonTh: "License ไม่ถูกต้อง",
+      reasonEn: "Invalid license",
+    },
+  ],
+};
+
+export async function fetchMockBulkUpload(file: File): Promise<BulkUploadResult> {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  void file;
+  return mockBulkUploadResult;
+}
+
+const BULK_UPLOAD_TEMPLATE_CSV =
+  "title,description,category_id,subcategory_id,license,tags,year,province\n" +
+  "ตัวอย่าง Dataset,คำอธิบายชุดข้อมูล,student-statistics,student-by-province,open,การศึกษา,2567,all\n";
+
+export function createBulkUploadTemplateBlob(): Blob {
+  return new Blob([BULK_UPLOAD_TEMPLATE_CSV], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+}

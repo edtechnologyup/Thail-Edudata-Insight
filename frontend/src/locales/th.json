@@ -534,6 +534,36 @@
       "notFound": "ไม่พบ Dataset ที่ต้องการ",
       "backToList": "กลับไปรายการ Dataset"
     },
+    "bulk": {
+      "title": "Bulk Upload",
+      "subtitle": "อัปโหลด Dataset หลายชุดพร้อมกัน",
+      "breadcrumbDashboard": "Dashboard",
+      "breadcrumbCurrent": "Bulk Upload",
+      "step1": "ขั้นตอนที่ 1",
+      "step1Title": "ดาวน์โหลด Excel Template",
+      "step1Desc": "กรอกข้อมูล Dataset ลงใน Template แล้วนำมาอัปโหลดในขั้นตอนถัดไป",
+      "downloadTemplate": "ดาวน์โหลด Template",
+      "step2": "ขั้นตอนที่ 2",
+      "step2Title": "อัปโหลดไฟล์ Excel ที่กรอกข้อมูลแล้ว",
+      "dropzone": "ลากไฟล์ Excel มาวางที่นี่ หรือ",
+      "dropzoneClick": "คลิกเพื่อเลือกไฟล์",
+      "dropzoneHint": "รองรับ .xlsx เท่านั้น",
+      "processing": "กำลังประมวลผล... {percent}%",
+      "fileInvalidType": "ไฟล์ต้องเป็น .xlsx เท่านั้น",
+      "uploadFailed": "อัปโหลดไม่สำเร็จ กรุณาลองใหม่",
+      "resultSuccess": "สำเร็จ",
+      "resultError": "Error",
+      "successCount": "{count} ชุด",
+      "errorCount": "{count} ชุด",
+      "errorTableTitle": "รายละเอียด Error",
+      "errorTable": {
+        "row": "แถวที่",
+        "title": "ชื่อ Dataset",
+        "column": "คอลัมน์ที่มีปัญหา",
+        "reason": "เหตุผล"
+      },
+      "uploadAgain": "อัปโหลดใหม่"
+    },
     "datasets": {
       "title": "Dataset ของฉัน",
       "uploadNew": "อัปโหลด Dataset ใหม่",

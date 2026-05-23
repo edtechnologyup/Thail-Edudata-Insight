@@ -145,8 +145,115 @@ export const MOCK_LATEST_DATASETS: HomeDatasetMock[] = [
   },
 ];
 
+export type CategorySubcategoryMock = {
+  slug: string;
+  nameTh: string;
+  nameEn: string;
+  level: 2;
+  datasetCount: number;
+};
+
+export type CategoryMock = {
+  slug: string;
+  nameTh: string;
+  nameEn: string;
+  level: 1;
+  datasetCount: number;
+  searchCategoryId: string;
+  subcategories: CategorySubcategoryMock[];
+};
+
+export const MOCK_CATEGORIES: CategoryMock[] = [
+  {
+    slug: "student-statistics",
+    nameTh: "สถิตินักเรียน",
+    nameEn: "Student Statistics",
+    level: 1,
+    datasetCount: 45,
+    searchCategoryId: "student-stats",
+    subcategories: [
+      {
+        slug: "student-by-province",
+        nameTh: "รายจังหวัด",
+        nameEn: "By Province",
+        level: 2,
+        datasetCount: 12,
+      },
+      {
+        slug: "student-by-year",
+        nameTh: "รายปี",
+        nameEn: "By Year",
+        level: 2,
+        datasetCount: 8,
+      },
+      {
+        slug: "student-by-gender",
+        nameTh: "รายเพศ",
+        nameEn: "By Gender",
+        level: 2,
+        datasetCount: 6,
+      },
+    ],
+  },
+  {
+    slug: "teacher-statistics",
+    nameTh: "จำนวนครู",
+    nameEn: "Teacher Statistics",
+    level: 1,
+    datasetCount: 28,
+    searchCategoryId: "teacher-records",
+    subcategories: [
+      {
+        slug: "teacher-by-subject",
+        nameTh: "รายวิชา",
+        nameEn: "By Subject",
+        level: 2,
+        datasetCount: 10,
+      },
+      {
+        slug: "teacher-by-province",
+        nameTh: "รายจังหวัด",
+        nameEn: "By Province",
+        level: 2,
+        datasetCount: 8,
+      },
+    ],
+  },
+];
+
+export type CategoryPageData = {
+  level: 1 | 2;
+  category: CategoryMock;
+  subcategory: CategorySubcategoryMock | null;
+};
+
+export function findCategoryPage(slug: string): CategoryPageData | null {
+  for (const category of MOCK_CATEGORIES) {
+    if (category.slug === slug) {
+      return { level: 1, category, subcategory: null };
+    }
+    const subcategory = category.subcategories.find((s) => s.slug === slug);
+    if (subcategory) {
+      return { level: 2, category, subcategory };
+    }
+  }
+  return null;
+}
+
+export function getCategoryDatasets(pageData: CategoryPageData): SearchResultMock[] {
+  const { category, subcategory, level } = pageData;
+  return MOCK_SEARCH_RESULTS.filter((item) => {
+    if (item.categoryId !== category.searchCategoryId) return false;
+    if (level === 2 && subcategory) {
+      return item.subcategorySlug === subcategory.slug;
+    }
+    return true;
+  });
+}
+
 export type MegaMenuLink = {
   id: string;
+  slug?: string;
   labelTh: string;
   labelEn: string;
   href?: string;
@@ -156,45 +263,20 @@ export type MegaMenuCategory = MegaMenuLink & {
   children?: MegaMenuLink[];
 };
 
-export const MOCK_MEGAMENU_CATEGORIES: MegaMenuCategory[] = [
-  {
-    id: "cat-students",
-    labelTh: "สถิตินักเรียนและนักศึกษา",
-    labelEn: "Student statistics",
-    children: [
-      {
-        id: "cat-students-enroll",
-        labelTh: "การลงทะเบียนเรียน",
-        labelEn: "Enrollment",
-      },
-      {
-        id: "cat-students-region",
-        labelTh: "แยกตามภูมิภาค",
-        labelEn: "By region",
-      },
-    ],
-  },
-  {
-    id: "cat-teachers",
-    labelTh: "ข้อมูลจำนวนครูและบุคลากร",
-    labelEn: "Teachers and staff",
-  },
-  {
-    id: "cat-schools",
-    labelTh: "ที่ตั้งสถานศึกษาทั่วประเทศ",
-    labelEn: "School locations",
-  },
-  {
-    id: "cat-budget",
-    labelTh: "งบประมาณด้านการศึกษา",
-    labelEn: "Education budget",
-  },
-  {
-    id: "cat-outcomes",
-    labelTh: "ผลสัมฤทธิ์ทางการเรียน",
-    labelEn: "Learning outcomes",
-  },
-];
+export const MOCK_MEGAMENU_CATEGORIES: MegaMenuCategory[] = MOCK_CATEGORIES.map(
+  (cat) => ({
+    id: cat.slug,
+    slug: cat.slug,
+    labelTh: cat.nameTh,
+    labelEn: cat.nameEn,
+    children: cat.subcategories.map((sub) => ({
+      id: sub.slug,
+      slug: sub.slug,
+      labelTh: sub.nameTh,
+      labelEn: sub.nameEn,
+    })),
+  })
+);
 
 export const MOCK_MEGAMENU_YEARS: MegaMenuLink[] = [
   { id: "y2567", labelTh: "ปีการศึกษา 2567", labelEn: "Academic year 2567" },
@@ -222,6 +304,7 @@ export type SearchResultMock = {
   categoryTh: string;
   categoryEn: string;
   categoryId: string;
+  subcategorySlug?: string;
   agencyTh: string;
   agencyEn: string;
   agencyId: string;
@@ -243,6 +326,7 @@ export const MOCK_SEARCH_RESULTS: SearchResultMock[] = [
     categoryTh: "สถิตินักเรียน",
     categoryEn: "Student Statistics",
     categoryId: "student-stats",
+    subcategorySlug: "student-by-province",
     agencyTh: "สพฐ.",
     agencyEn: "OBEC",
     agencyId: "obec",
@@ -264,6 +348,7 @@ export const MOCK_SEARCH_RESULTS: SearchResultMock[] = [
     categoryTh: "สถิตินักเรียน",
     categoryEn: "Student Statistics",
     categoryId: "student-stats",
+    subcategorySlug: "student-by-year",
     agencyTh: "สพฐ.",
     agencyEn: "OBEC",
     agencyId: "obec",
@@ -283,6 +368,7 @@ export const MOCK_SEARCH_RESULTS: SearchResultMock[] = [
     categoryTh: "ข้อมูลครู",
     categoryEn: "Teacher Records",
     categoryId: "teacher-records",
+    subcategorySlug: "teacher-by-subject",
     agencyTh: "สพฐ.",
     agencyEn: "OBEC",
     agencyId: "obec",
@@ -397,6 +483,7 @@ export const MOCK_SEARCH_RESULTS: SearchResultMock[] = [
     categoryTh: "งบประมาณ",
     categoryEn: "Budget",
     categoryId: "student-stats",
+    subcategorySlug: "student-by-year",
     agencyTh: "สำนักงบประมาณ",
     agencyEn: "Budget Bureau",
     agencyId: "moe",
@@ -416,6 +503,7 @@ export const MOCK_SEARCH_RESULTS: SearchResultMock[] = [
     categoryTh: "สถิตินักเรียน",
     categoryEn: "Student Statistics",
     categoryId: "student-stats",
+    subcategorySlug: "student-by-gender",
     agencyTh: "สพฐ.",
     agencyEn: "OBEC",
     agencyId: "obec",
@@ -424,6 +512,26 @@ export const MOCK_SEARCH_RESULTS: SearchResultMock[] = [
     updatedAt: "2024-06-01T00:00:00Z",
     license: "open",
     fileFormats: ["csv", "excel", "json"],
+    year: 2566,
+  },
+  {
+    id: "11",
+    titleTh: "จำนวนครูรายจังหวัด ปีการศึกษา 2566",
+    titleEn: "Teachers by Province 2023",
+    descriptionTh: "ข้อมูลจำนวนครูแยกตามจังหวัดทั่วประเทศ",
+    descriptionEn: "Teacher counts by province nationwide",
+    categoryTh: "ข้อมูลครู",
+    categoryEn: "Teacher Records",
+    categoryId: "teacher-records",
+    subcategorySlug: "teacher-by-province",
+    agencyTh: "สพฐ.",
+    agencyEn: "OBEC",
+    agencyId: "obec",
+    status: "published",
+    downloadCount: 3100,
+    updatedAt: "2024-03-01T00:00:00Z",
+    license: "open",
+    fileFormats: ["csv", "excel"],
     year: 2566,
   },
 ];

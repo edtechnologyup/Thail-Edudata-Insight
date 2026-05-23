@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import type { DatasetDetailMock, DatasetLicense } from "@/data/mockData";
@@ -41,7 +40,6 @@ export default function DatasetDetail({
   const t = useTranslations("dataset");
   const tDetail = useTranslations("dataset.detail");
   const locale = useLocale();
-  const router = useRouter();
   const [downloadOpen, setDownloadOpen] = useState(false);
 
   const title = locale === "th" ? dataset.titleTh : dataset.titleEn;
@@ -51,11 +49,6 @@ export default function DatasetDetail({
   const agency = locale === "th" ? dataset.agencyTh : dataset.agencyEn;
   const tags = locale === "th" ? dataset.tagsTh : dataset.tagsEn;
   const base = `/${locale}`;
-
-  function scrollToCitation() {
-    if (typeof window === "undefined") return;
-    document.getElementById("dataset-citation")?.scrollIntoView({ behavior: "smooth" });
-  }
 
   return (
     <>
@@ -165,26 +158,15 @@ export default function DatasetDetail({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                 </svg>
               </button>
-              <button
-                type="button"
-                onClick={() => router.push(`${base}/datasets/${dataset.id}/compare`)}
+              <Link
+                href={`${base}/datasets/${dataset.id}/compare`}
                 className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-radius-md border border-border-input p-2.5 text-text-secondary transition-colors hover:bg-surface-container"
                 aria-label={tDetail("compare")}
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4" />
                 </svg>
-              </button>
-              <button
-                type="button"
-                onClick={scrollToCitation}
-                className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-radius-md border border-border-input p-2.5 text-text-secondary transition-colors hover:bg-surface-container"
-                aria-label={tDetail("quote")}
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                </svg>
-              </button>
+              </Link>
             </div>
           </div>
         </div>

@@ -39,24 +39,32 @@ export default function MegaMenu({
         <ul className="space-y-2">
           {MOCK_MEGAMENU_CATEGORIES.map((cat) => (
             <li key={cat.id}>
-              <button
-                type="button"
+              <Link
+                href={
+                  cat.slug
+                    ? `/${locale}/categories/${cat.slug}`
+                    : `/${locale}/search`
+                }
                 className="font-sarabun text-label text-text-secondary transition-colors hover:text-primary-dark"
                 onClick={onClose}
               >
                 {label(cat)}
-              </button>
+              </Link>
               {cat.children && cat.children.length > 0 && (
                 <ul className="mt-1 space-y-1 border-l-2 border-primary-light pl-3">
                   {cat.children.map((child) => (
                     <li key={child.id}>
-                      <button
-                        type="button"
+                      <Link
+                        href={
+                          child.slug
+                            ? `/${locale}/categories/${child.slug}`
+                            : `/${locale}/search`
+                        }
                         className="font-sarabun text-caption text-text-muted transition-colors hover:text-primary-dark"
                         onClick={onClose}
                       >
                         {label(child)}
-                      </button>
+                      </Link>
                     </li>
                   ))}
                 </ul>

@@ -160,7 +160,27 @@
   },
   "category": {
     "datasetsIn": "Datasets in category",
-    "notFound": "Category not found"
+    "notFound": "Category not found",
+    "datasets": "{count} datasets found",
+    "subcategories": "Subcategories",
+    "datasetCount": "{count} datasets",
+    "breadcrumbHome": "Home",
+    "breadcrumbCategories": "Categories",
+    "foundCount": "{count} datasets in this category",
+    "noResults": "No datasets in this category",
+    "filter": {
+      "title": "Filters",
+      "sort": "Sort by",
+      "agency": "Agency",
+      "year": "Data year",
+      "format": "File format",
+      "clear": "Clear filters",
+      "newest": "Newest",
+      "popular": "Most downloaded",
+      "name": "Name A-Z",
+      "showFilters": "Show filters",
+      "closeFilters": "Close filters"
+    }
   },
   "auth": {
     "login": {

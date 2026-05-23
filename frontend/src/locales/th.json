@@ -160,7 +160,27 @@
   },
   "category": {
     "datasetsIn": "ชุดข้อมูลในหมวด",
-    "notFound": "ไม่พบหมวดหมู่นี้"
+    "notFound": "ไม่พบหมวดหมู่นี้",
+    "datasets": "พบ {count} Dataset",
+    "subcategories": "หมวดหมู่ย่อย",
+    "datasetCount": "{count} ชุดข้อมูล",
+    "breadcrumbHome": "หน้าหลัก",
+    "breadcrumbCategories": "หมวดหมู่",
+    "foundCount": "พบ {count} ชุดข้อมูล ในหมวดหมู่นี้",
+    "noResults": "ไม่พบชุดข้อมูลในหมวดนี้",
+    "filter": {
+      "title": "ตัวกรองข้อมูล",
+      "sort": "เรียงลำดับ",
+      "agency": "หน่วยงาน",
+      "year": "ปีข้อมูล",
+      "format": "รูปแบบไฟล์",
+      "clear": "ล้าง Filter",
+      "newest": "ใหม่ล่าสุด",
+      "popular": "ดาวน์โหลดมากสุด",
+      "name": "ชื่อ A-Z",
+      "showFilters": "แสดงตัวกรองข้อมูล",
+      "closeFilters": "ปิดตัวกรอง"
+    }
   },
   "auth": {
     "login": {

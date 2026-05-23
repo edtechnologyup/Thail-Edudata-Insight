@@ -1151,13 +1151,41 @@ export type StatsDataMock = {
   topDatasets: StatsTopDataset[];
 };
 
-export type PageContentSection = {
+export type PageContentTextSection = {
   id: string;
   titleTh: string;
   titleEn: string;
+  type?: "text";
   contentTh: string;
   contentEn: string;
 };
+
+export type PageContentWarningSection = {
+  id: string;
+  titleTh: string;
+  titleEn: string;
+  type: "warning";
+  contentTh: string;
+  contentEn: string;
+  bodyTh?: string;
+  bodyEn?: string;
+};
+
+export type PageContentRightsSection = {
+  id: string;
+  titleTh: string;
+  titleEn: string;
+  type: "rights";
+  allowedTh: string[];
+  allowedEn: string[];
+  prohibitedTh: string[];
+  prohibitedEn: string[];
+};
+
+export type PageContentSection =
+  | PageContentTextSection
+  | PageContentWarningSection
+  | PageContentRightsSection;
 
 export type PageContentMock = {
   slug: string;
@@ -1244,7 +1272,102 @@ export const MOCK_PAGE_CONTENT: PageContentMock[] = [
     titleTh: "เงื่อนไขการใช้งาน",
     titleEn: "Terms of Service",
     updatedAt: "2024-01-01",
-    sections: [],
+    sections: [
+      {
+        id: "acceptance",
+        titleTh: "การยอมรับเงื่อนไข",
+        titleEn: "Acceptance of Terms",
+        type: "warning",
+        contentTh:
+          "การใช้งานระบบถือว่าท่านยอมรับเงื่อนไขทั้งหมดที่ระบุไว้ในหน้านี้อย่างไม่มีเงื่อนไข",
+        contentEn:
+          "By using this system you unconditionally accept all terms stated on this page.",
+        bodyTh:
+          "ยินดีต้อนรับสู่ Thai EduData Insight ศูนย์รวมข้อมูลการศึกษาของประเทศไทย การเข้าถึงและการใช้บริการเว็บไซต์นี้ ถือว่าท่านตกลงที่จะผูกพันตามข้อกำหนดและเงื่อนไขการใช้งานเหล่านี้ หากท่านไม่ตกลงตามเงื่อนไขดังกล่าว โปรดงดเว้นจากการใช้งานระบบของเรา",
+        bodyEn:
+          "Welcome to Thai EduData Insight, Thailand's education data hub. By accessing and using this website you agree to be bound by these terms. If you do not agree, please refrain from using the system.",
+      },
+      {
+        id: "usage",
+        titleTh: "การใช้งานระบบ",
+        titleEn: "System Usage",
+        type: "text",
+        contentTh:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">ผู้ใช้งานตกลงจะใช้งานระบบเพื่อวัตถุประสงค์ที่ชอบด้วยกฎหมายเท่านั้น โดยต้องไม่กระทำการใดๆ ที่เป็นการรบกวนการทำงานของระบบ การเข้าถึงข้อมูลโดยไม่ได้รับอนุญาต หรือการพยายามเจาะระบบรักษาความปลอดภัยของเครือข่าย Thai EduData Insight</p>',
+        contentEn:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">Users agree to use the system only for lawful purposes and must not disrupt operations, access data without authorization, or attempt to breach Thai EduData Insight security.</p>',
+      },
+      {
+        id: "rights",
+        titleTh: "สิทธิ์และข้อจำกัด",
+        titleEn: "Rights and Restrictions",
+        type: "rights",
+        allowedTh: [
+          "ดาวน์โหลดข้อมูลเพื่อการศึกษา",
+          "อ้างอิงแหล่งที่มา",
+          "นำไปวิจัยและพัฒนา",
+          "แชร์ลิงก์ข้อมูลไปยังแพลตฟอร์มอื่น",
+        ],
+        allowedEn: [
+          "Download data for education",
+          "Cite the source",
+          "Use for research and development",
+          "Share dataset links on other platforms",
+        ],
+        prohibitedTh: [
+          "นำข้อมูลไปจำหน่าย",
+          "แก้ไขข้อมูลโดยไม่ได้รับอนุญาต",
+          "อ้างความเป็นเจ้าของข้อมูล",
+          "ใช้สคริปต์อัตโนมัติดึงข้อมูลเกินความจำเป็น",
+        ],
+        prohibitedEn: [
+          "Sell the data",
+          "Modify data without permission",
+          "Claim ownership of data",
+          "Use automated scripts to scrape data excessively",
+        ],
+      },
+      {
+        id: "intellectual-property",
+        titleTh: "ทรัพย์สินทางปัญญา",
+        titleEn: "Intellectual Property",
+        type: "text",
+        contentTh:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">เนื้อหาทั้งหมดที่ปรากฏบน Thai EduData Insight รวมถึงโลโก้ กราฟิก ซอฟต์แวร์ และชุดข้อมูลที่ผ่านการประมวลผล เป็นทรัพย์สินของหน่วยงานเจ้าของข้อมูลหรือผู้จัดทำระบบ เว้นแต่จะระบุไว้เป็นอย่างอื่นในสัญญาอนุญาตของชุดข้อมูลนั้นๆ</p>',
+        contentEn:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">All content on Thai EduData Insight, including logos, graphics, software, and processed datasets, belongs to the data owners or system operators unless otherwise stated in the dataset license.</p>',
+      },
+      {
+        id: "liability",
+        titleTh: "ข้อจำกัดความรับผิด",
+        titleEn: "Limitation of Liability",
+        type: "text",
+        contentTh:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">เราพยายามอย่างเต็มที่เพื่อให้ข้อมูลมีความถูกต้องและเป็นปัจจุบัน อย่างไรก็ตาม Thai EduData Insight ไม่รับประกันความสมบูรณ์ ความถูกต้อง หรือความพร้อมใช้งานของข้อมูลตลอดเวลา และจะไม่รับผิดชอบต่อความเสียหายใดๆ ที่เกิดขึ้นจากการนำข้อมูลไปใช้งาน</p>',
+        contentEn:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">We strive to keep data accurate and up to date, but Thai EduData Insight does not guarantee completeness, accuracy, or availability at all times and is not liable for damages arising from use of the data.</p>',
+      },
+      {
+        id: "termination",
+        titleTh: "การยกเลิกบัญชี",
+        titleEn: "Account Termination",
+        type: "text",
+        contentTh:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">ทางระบบขอสงวนสิทธิ์ในการระงับหรือยกเลิกการเข้าถึงบัญชีผู้ใช้งาน หากพบว่ามีการละเมิดเงื่อนไขการใช้งานที่ระบุไว้ โดยไม่ต้องแจ้งให้ทราบล่วงหน้า</p>',
+        contentEn:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">We reserve the right to suspend or terminate user accounts for violations of these terms without prior notice.</p>',
+      },
+      {
+        id: "changes",
+        titleTh: "การเปลี่ยนแปลงเงื่อนไข",
+        titleEn: "Changes to Terms",
+        type: "text",
+        contentTh:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">เราอาจปรับปรุงเงื่อนไขเหล่านี้เป็นครั้งคราวเพื่อให้สอดคล้องกับการเปลี่ยนแปลงของกฎหมายและนโยบายภาครัฐ โดยจะระบุวันที่อัปเดตล่าสุดไว้ด้านบนสุดของหน้า</p>',
+        contentEn:
+          '<p class="font-sarabun text-body-md leading-relaxed text-text-secondary">We may update these terms periodically to reflect legal and policy changes. The latest update date will be shown at the top of this page.</p>',
+      },
+    ],
   },
   {
     slug: "api-docs",
@@ -1257,6 +1380,244 @@ export const MOCK_PAGE_CONTENT: PageContentMock[] = [
 
 export function getPageContentBySlug(slug: string): PageContentMock | null {
   return MOCK_PAGE_CONTENT.find((page) => page.slug === slug) ?? null;
+}
+
+export { MOCK_PAGE_CONTENT as mockPageContent };
+
+export type ApiDocParam = {
+  name: string;
+  type: string;
+  required: boolean;
+  descTh: string;
+  descEn: string;
+};
+
+export type ApiDocEndpoint = {
+  id: string;
+  titleTh: string;
+  titleEn: string;
+  descTh?: string;
+  descEn?: string;
+  method?: "GET" | "POST" | "PUT" | "DELETE";
+  path?: string;
+  baseUrl?: string;
+  code?: string;
+  params?: ApiDocParam[];
+  response?: string;
+  contentTh?: string;
+  contentEn?: string;
+};
+
+export type ApiDocsMock = {
+  slug: string;
+  titleTh: string;
+  titleEn: string;
+  descriptionTh: string;
+  descriptionEn: string;
+  version: string;
+  updatedAt: string;
+  baseUrl: string;
+  endpoints: ApiDocEndpoint[];
+};
+
+export const MOCK_API_DOCS: ApiDocsMock = {
+  slug: "api-docs",
+  titleTh: "เอกสาร API",
+  titleEn: "API Documentation",
+  descriptionTh:
+    "ศูนย์รวมข้อมูลการเชื่อมต่อและใช้งาน Application Programming Interface (API) สำหรับนักพัฒนาเพื่อเข้าถึงชุดข้อมูลการศึกษาของประเทศไทยอย่างมีประสิทธิภาพและโปร่งใส",
+  descriptionEn:
+    "Central hub for connecting to and using our Application Programming Interface (API), enabling developers to access Thai education datasets efficiently and transparently.",
+  version: "v1.0.0-stable",
+  updatedAt: "2024-01-01",
+  baseUrl:
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1",
+  endpoints: [
+    {
+      id: "getting-started",
+      titleTh: "เริ่มต้นใช้งาน",
+      titleEn: "Introduction",
+      descTh:
+        "API ของระบบใช้รูปแบบ JSend และรองรับการเข้าถึงแบบสาธารณะสำหรับชุดข้อมูลที่เผยแพร่แล้ว",
+      descEn:
+        "Our API uses the JSend format and supports public access to published datasets.",
+    },
+    {
+      id: "authentication",
+      titleTh: "การยืนยันตัวตน",
+      titleEn: "Authentication",
+      descTh:
+        "Endpoint ที่ต้องเข้าสู่ระบบจะต้องแนบ JWT Token ใน Header ทุกครั้ง",
+      descEn:
+        "Authenticated endpoints require a JWT token in the Authorization header.",
+      code: "Authorization: Bearer {your_token}",
+    },
+    {
+      id: "get-datasets",
+      method: "GET",
+      path: "/public/datasets",
+      titleTh: "รายการ Dataset",
+      titleEn: "List Datasets",
+      descTh:
+        "เรียกดูรายการชุดข้อมูลทั้งหมดที่เผยแพร่แล้ว รองรับ Pagination และการกรองพื้นฐาน",
+      descEn:
+        "List all published datasets with pagination and basic filters.",
+      params: [
+        {
+          name: "page",
+          type: "integer",
+          required: false,
+          descTh: "เลขหน้าข้อมูลที่ต้องการเรียกดู (Default: 1)",
+          descEn: "Page number (default: 1)",
+        },
+        {
+          name: "page_size",
+          type: "integer",
+          required: false,
+          descTh: "จำนวนรายการต่อหน้า (Max: 100)",
+          descEn: "Items per page (max: 100)",
+        },
+      ],
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "title": "สถิติจำนวนนักเรียนรายจังหวัด 2566",
+      "status": "published"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 20,
+    "total_items": 45,
+    "total_pages": 3
+  },
+  "message": "ok"
+}`,
+    },
+    {
+      id: "get-dataset",
+      method: "GET",
+      path: "/public/datasets/{id}",
+      titleTh: "รายละเอียด Dataset",
+      titleEn: "Get Dataset",
+      descTh:
+        "เรียกดูรายละเอียดเชิงลึกของชุดข้อมูลที่ระบุ รวม Metadata และสถิติ",
+      descEn:
+        "Retrieve detailed information for a specific dataset including metadata and stats.",
+      params: [
+        {
+          name: "id",
+          type: "string",
+          required: true,
+          descTh: "รหัสชุดข้อมูล (UUID)",
+          descEn: "Dataset unique identifier (UUID)",
+        },
+      ],
+      response: `{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "title": "สถิติจำนวนนักเรียนรายจังหวัด 2566",
+    "license": "open"
+  },
+  "message": "ok"
+}`,
+    },
+    {
+      id: "search",
+      method: "GET",
+      path: "/search",
+      titleTh: "ค้นหา Dataset",
+      titleEn: "Search Datasets",
+      descTh: "ค้นหาชุดข้อมูลด้วยคำสำคัญและตัวกรอง",
+      descEn: "Search published datasets by keyword and filters.",
+      params: [
+        {
+          name: "keyword",
+          type: "string",
+          required: true,
+          descTh: 'คำค้นหา เช่น "มหาวิทยาลัย", "ยากจน"',
+          descEn: 'Search keyword, e.g. "university", "poverty"',
+        },
+        {
+          name: "category_id",
+          type: "string",
+          required: false,
+          descTh: "กรองตามหมวดหมู่ (UUID)",
+          descEn: "Filter by category (UUID)",
+        },
+      ],
+      response: `{
+  "success": true,
+  "data": [],
+  "pagination": {
+    "page": 1,
+    "page_size": 20,
+    "total_items": 234,
+    "total_pages": 12
+  },
+  "message": "ok"
+}`,
+    },
+    {
+      id: "download",
+      method: "GET",
+      path: "/public/datasets/{id}/download",
+      titleTh: "ดาวน์โหลด Dataset",
+      titleEn: "Download Dataset",
+      descTh:
+        "ดาวน์โหลดไฟล์ข้อมูลในรูปแบบที่เลือก (csv, excel, json, xml) ต้องระบุวัตถุประสงค์",
+      descEn:
+        "Download dataset files in the selected format (csv, excel, json, xml). Purpose is required.",
+      params: [
+        {
+          name: "format",
+          type: "string",
+          required: true,
+          descTh: "รูปแบบไฟล์: csv, excel, json, xml",
+          descEn: "File format: csv, excel, json, xml",
+        },
+        {
+          name: "purpose",
+          type: "string",
+          required: true,
+          descTh: "วัตถุประสงค์การใช้งานข้อมูล",
+          descEn: "Purpose of data use",
+        },
+      ],
+      response: `{
+  "success": true,
+  "data": {
+    "download_url": "https://storage.example/files/dataset.csv"
+  },
+  "message": "ok"
+}`,
+    },
+    {
+      id: "error-codes",
+      titleTh: "รหัสข้อผิดพลาด",
+      titleEn: "Error Codes",
+      contentTh:
+        "ทุก Error Response ใช้รูปแบบ JSend พร้อม error.code (UPPER_SNAKE_CASE) และ error.message ภาษาไทย เช่น DATASET_NOT_FOUND, RATE_LIMIT_EXCEEDED",
+      contentEn:
+        "All error responses use JSend with error.code (UPPER_SNAKE_CASE) and a Thai error.message, e.g. DATASET_NOT_FOUND, RATE_LIMIT_EXCEEDED.",
+    },
+    {
+      id: "rate-limits",
+      titleTh: "ขีดจำกัดการเรียกใช้",
+      titleEn: "Rate Limits",
+      contentTh:
+        "จำกัด 100 คำขอต่อนาทีต่อ IP สำหรับทุก Endpoint เมื่อเกินขีดจำกัดระบบจะคืน HTTP 429 พร้อม RATE_LIMIT_EXCEEDED",
+      contentEn:
+        "Limited to 100 requests per minute per IP for all endpoints. Exceeding the limit returns HTTP 429 with RATE_LIMIT_EXCEEDED.",
+    },
+  ],
+};
+
+export function getApiDocsMock(): ApiDocsMock {
+  return MOCK_API_DOCS;
 }
 
 export const MOCK_STATS_DATA: StatsDataMock = {

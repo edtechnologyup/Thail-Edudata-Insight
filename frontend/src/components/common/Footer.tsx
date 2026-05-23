@@ -13,14 +13,14 @@ export default async function Footer({ locale }: FooterProps) {
   const exploreLinks = [
     { href: `${base}/search`, label: t("catalog") },
     { href: `${base}/stats`, label: t("dashboard") },
-    { href: `${base}/search`, label: t("apiDocs") },
+    { href: `${base}/api-docs`, label: t("apiDocs") },
     { href: `${base}/privacy-policy`, label: t("dataStandards") },
   ];
 
   const aboutLinks = [
     { href: `${base}/privacy-policy`, label: t("openDataPolicy") },
     { href: `${base}/privacy-policy`, label: t("privacy") },
-    { href: `${base}/privacy-policy`, label: t("terms") },
+    { href: `${base}/terms`, label: t("terms") },
     { href: `${base}/privacy-policy`, label: t("contact") },
   ];
 

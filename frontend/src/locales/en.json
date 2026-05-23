@@ -178,7 +178,38 @@
     "section3Title": "Your rights",
     "section3Body": "You have the right to access, correct, or delete personal data under the Personal Data Protection Act.",
     "section4Title": "Contact",
-    "section4Body": "If you have questions about this policy, please contact the system administrator through the channels listed on this site."
+    "section4Body": "If you have questions about this policy, please contact the system administrator through the channels listed on this site.",
+    "fallbackNote": "Showing sample content",
+    "allowed": "Allowed",
+    "prohibited": "Prohibited"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: {date}",
+    "allowed": "Allowed",
+    "prohibited": "Prohibited",
+    "fallbackNote": "Showing sample content",
+    "contactQuestion": "Questions about these terms?",
+    "contactCta": "Contact us"
+  },
+  "apiDocs": {
+    "title": "API documentation",
+    "copy": "Copy",
+    "copied": "Copied ✓",
+    "required": "Required",
+    "optional": "Optional",
+    "params": "Parameters",
+    "paramName": "Name",
+    "paramType": "Type",
+    "paramRequired": "Required",
+    "paramDescription": "Description",
+    "response": "Response example",
+    "loading": "Loading API documentation...",
+    "fallback": "Could not load from server. Showing sample documentation.",
+    "baseUrl": "Base URL",
+    "breadcrumbHome": "Home",
+    "breadcrumbCurrent": "API tools",
+    "jumpTo": "Jump to..."
   },
   "category": {
     "datasetsIn": "Datasets in category",

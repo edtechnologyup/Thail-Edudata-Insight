@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import StaticPageSection from "@/components/common/StaticPageSection";
@@ -7,7 +8,7 @@ import TableOfContents from "@/components/common/TableOfContents";
 import { getPageContentBySlug } from "@/data/mockData";
 import { usePageContent } from "@/hooks/usePageContent";
 
-const PAGE_SLUG = "privacy-policy";
+const PAGE_SLUG = "terms";
 
 function formatUpdatedAt(iso: string, locale: string): string {
   return new Date(iso).toLocaleDateString(locale === "th" ? "th-TH" : "en-US", {
@@ -17,18 +18,18 @@ function formatUpdatedAt(iso: string, locale: string): string {
   });
 }
 
-function PrivacyPageSkeleton() {
+function TermsPageSkeleton() {
   return (
     <div className="mx-auto max-w-container-max animate-pulse px-4 py-spacing-12 md:px-spacing-10">
-      <div className="mb-spacing-6 h-10 w-72 rounded-radius-sm bg-surface-container" />
+      <div className="mb-spacing-6 h-10 w-64 rounded-radius-sm bg-surface-container" />
       <div className="mb-spacing-8 h-4 w-48 rounded-radius-sm bg-surface-container" />
       <div className="flex gap-spacing-6">
         <div className="hidden h-80 w-[240px] rounded-radius-md bg-surface-container md:block" />
         <div className="flex-1 space-y-6 rounded-radius-lg border border-border-default bg-surface-card p-10">
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="space-y-3">
               <div className="h-6 w-1/2 rounded-radius-sm bg-surface-container" />
-              <div className="h-24 w-full rounded-radius-sm bg-surface-container" />
+              <div className="h-20 w-full rounded-radius-sm bg-surface-container" />
             </div>
           ))}
         </div>
@@ -37,12 +38,13 @@ function PrivacyPageSkeleton() {
   );
 }
 
-export default function PrivacyPolicyPage() {
-  const t = useTranslations("privacy");
+export default function TermsPage() {
+  const t = useTranslations("terms");
+  const tPrivacy = useTranslations("privacy");
   const locale = useLocale();
   const [showBackToTop, setShowBackToTop] = useState(false);
 
-  const { data, isLoading, isError, isFetching } = usePageContent(PAGE_SLUG);
+  const { data, isLoading, isError } = usePageContent(PAGE_SLUG);
   const fallback = getPageContentBySlug(PAGE_SLUG);
   const page = !isError && data ? data : fallback;
   const showFallbackNote = isError || !data;
@@ -63,13 +65,13 @@ export default function PrivacyPolicyPage() {
   }, []);
 
   if (isLoading && !page) {
-    return <PrivacyPageSkeleton />;
+    return <TermsPageSkeleton />;
   }
 
   if (!page) {
     return (
       <div className="mx-auto max-w-container-max px-4 py-12 text-center font-sarabun text-body-md text-text-muted">
-        {t("notFound")}
+        {tPrivacy("notFound")}
       </div>
     );
   }
@@ -82,10 +84,10 @@ export default function PrivacyPolicyPage() {
   return (
     <main className="mx-auto max-w-container-max px-4 py-spacing-12 md:px-spacing-10">
       <header className="mb-spacing-6">
-        <h1 className="font-kanit text-heading-2 font-bold leading-tight text-surface-navy md:text-heading-1">
+        <h1 className="font-kanit text-heading-2 font-bold leading-tight text-text-primary md:text-heading-1">
           {title}
         </h1>
-        <p className="mt-2 font-sarabun text-label text-text-muted">
+        <p className="mt-2 font-sarabun text-caption text-text-muted">
           {updatedLabel}
         </p>
       </header>
@@ -96,20 +98,14 @@ export default function PrivacyPolicyPage() {
         </p>
       )}
 
-      {isFetching && !isLoading && (
-        <p className="sr-only" aria-live="polite">
-          {t("jumpToSection")}
-        </p>
-      )}
-
       {tocSections.length > 0 && (
         <div className="sticky top-[72px] z-40 mb-spacing-6 md:hidden">
-          <label className="sr-only" htmlFor="privacy-toc-mobile">
-            {t("jumpToSection")}
+          <label className="sr-only" htmlFor="terms-toc-mobile">
+            {tPrivacy("jumpToSection")}
           </label>
           <select
-            id="privacy-toc-mobile"
-            className="w-full rounded-radius-lg border border-border-input bg-surface-card p-4 font-sarabun text-label text-text-primary shadow-level-1 focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-primary-dark/30"
+            id="terms-toc-mobile"
+            className="w-full rounded-radius-lg border border-border-input bg-surface-card p-4 font-sarabun text-label text-primary-dark shadow-level-1 focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-primary-dark/30"
             defaultValue=""
             onChange={(e) => {
               if (e.target.value) {
@@ -119,7 +115,7 @@ export default function PrivacyPolicyPage() {
               }
             }}
           >
-            <option value="">{t("jumpToSection")}</option>
+            <option value="">{tPrivacy("jumpToSection")}</option>
             {tocSections.map((section) => (
               <option key={section.id} value={section.id}>
                 {section.label}
@@ -139,36 +135,46 @@ export default function PrivacyPolicyPage() {
         )}
 
         <article className="min-w-0 flex-1 rounded-radius-lg border border-border-default/80 bg-surface-card p-6 shadow-level-1 md:p-10">
-          {page.sections.length === 0 ? (
-            <p className="font-sarabun text-body-md text-text-secondary">
-              {t("emptyContent")}
-            </p>
-          ) : (
-            page.sections.map((section, index) => (
-              <div
-                key={section.id}
-                className={index < page.sections.length - 1 ? "mb-spacing-12" : ""}
-              >
+          <div className="space-y-spacing-12">
+            {page.sections.length === 0 ? (
+              <p className="font-sarabun text-body-md text-text-secondary">
+                {tPrivacy("emptyContent")}
+              </p>
+            ) : (
+              page.sections.map((section, index) => (
                 <StaticPageSection
+                  key={section.id}
                   section={section}
                   index={index}
                   locale={locale}
                   allowedLabel={t("allowed")}
                   prohibitedLabel={t("prohibited")}
                 />
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
+
+          <div className="mt-spacing-12 flex flex-col items-center justify-between gap-4 border-t border-border-default/30 pt-spacing-6 md:flex-row">
+            <p className="font-sarabun text-body-md text-text-secondary">
+              {t("contactQuestion")}
+            </p>
+            <Link
+              href={`/${locale}/privacy-policy`}
+              className="rounded-radius-lg bg-surface-navy px-8 py-2.5 font-sarabun text-label text-surface-card transition-opacity hover:opacity-90"
+            >
+              {t("contactCta")}
+            </Link>
+          </div>
         </article>
       </div>
 
       <button
         type="button"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className={`fixed bottom-8 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-radius-full bg-primary-dark text-white shadow-level-2 transition-opacity ${
+        className={`fixed bottom-8 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-radius-full bg-primary-dark text-surface-card shadow-level-2 transition-opacity ${
           showBackToTop ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
-        aria-label={t("backToTop")}
+        aria-label={tPrivacy("backToTop")}
       >
         <svg
           className="h-6 w-6"

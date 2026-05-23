@@ -28,7 +28,13 @@
     "all": "ทั้งหมด",
     "language": "ภาษา",
     "thai": "ไทย",
-    "english": "English"
+    "english": "English",
+    "pagination": {
+      "previous": "ก่อนหน้า",
+      "next": "ถัดไป",
+      "page": "หน้า",
+      "of": "จาก"
+    }
   },
   "nav": {
     "home": "หน้าหลัก",

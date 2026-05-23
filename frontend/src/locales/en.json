@@ -28,7 +28,13 @@
     "all": "All",
     "language": "Language",
     "thai": "ไทย",
-    "english": "English"
+    "english": "English",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page",
+      "of": "of"
+    }
   },
   "nav": {
     "home": "Home",

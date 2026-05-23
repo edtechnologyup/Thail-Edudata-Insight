@@ -37,14 +37,14 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
   return (
     <nav
       className="mt-12 flex justify-center items-center gap-2"
-      aria-label={t("pagination", { defaultValue: "Pagination" })}
+      aria-label={`${t("pagination.page")} ${currentPage} ${t("pagination.of")} ${totalPages}`}
     >
       <button
         type="button"
         onClick={() => goToPage(currentPage - 1)}
         disabled={currentPage <= 1}
         className="flex h-10 w-10 items-center justify-center rounded-radius-md border border-border-input text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
-        aria-label={t("previous")}
+        aria-label={t("pagination.previous")}
       >
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -78,7 +78,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
         onClick={() => goToPage(currentPage + 1)}
         disabled={currentPage >= totalPages}
         className="flex h-10 w-10 items-center justify-center rounded-radius-md border border-border-input text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
-        aria-label={t("next")}
+        aria-label={t("pagination.next")}
       >
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

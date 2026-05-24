@@ -884,6 +884,39 @@
         "agency": "Agency",
         "admin": "Admin"
       }
+    },
+    "datasets": {
+      "title": "จัดการ Dataset",
+      "search": "ค้นหาชื่อ Dataset",
+      "searchPlaceholder": "ค้นหาชื่อ Dataset",
+      "filterAgency": "หน่วยงาน",
+      "filterStatus": "สถานะ",
+      "filterAllAgency": "ทุกหน่วยงาน",
+      "filterAllStatus": "ทุกสถานะ",
+      "createDataset": "สร้าง Dataset",
+      "colTitle": "ชื่อ Dataset",
+      "colAgency": "หน่วยงาน",
+      "colCategory": "หมวดหมู่",
+      "colStatus": "Status",
+      "colQuality": "Quality Score",
+      "colUpdated": "วันที่อัปเดต",
+      "colAction": "Action",
+      "edit": "แก้ไข",
+      "delete": "ลบ",
+      "deleteTitle": "ยืนยันการลบ",
+      "deleteMsg": "ต้องการลบ {title} ใช่หรือไม่?",
+      "deleteWarning": "การลบไม่สามารถย้อนกลับได้ ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบออกจากระบบถาวร",
+      "deleteError": "ลบ Dataset ไม่สำเร็จ กรุณาลองใหม่",
+      "deleteSuccess": "ลบ Dataset สำเร็จ",
+      "cancel": "ยกเลิก",
+      "confirmDelete": "ลบข้อมูล",
+      "deleting": "กำลังลบ...",
+      "empty": "ไม่พบ Dataset",
+      "paginationSummary": "แสดง {start} ถึง {end} จากทั้งหมด {total} รายการ",
+      "status": {
+        "published": "Published",
+        "draft": "Draft"
+      }
     }
   }
 }

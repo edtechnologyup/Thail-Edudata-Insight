@@ -884,6 +884,39 @@
         "agency": "Agency",
         "admin": "Admin"
       }
+    },
+    "datasets": {
+      "title": "Manage datasets",
+      "search": "Search datasets",
+      "searchPlaceholder": "Search by dataset name",
+      "filterAgency": "Agency",
+      "filterStatus": "Status",
+      "filterAllAgency": "All agencies",
+      "filterAllStatus": "All statuses",
+      "createDataset": "Create dataset",
+      "colTitle": "Dataset name",
+      "colAgency": "Agency",
+      "colCategory": "Category",
+      "colStatus": "Status",
+      "colQuality": "Quality score",
+      "colUpdated": "Updated",
+      "colAction": "Action",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteTitle": "Confirm deletion",
+      "deleteMsg": "Delete {title}?",
+      "deleteWarning": "This action cannot be undone. All related data will be permanently removed.",
+      "deleteError": "Failed to delete dataset. Please try again.",
+      "deleteSuccess": "Dataset deleted",
+      "cancel": "Cancel",
+      "confirmDelete": "Delete",
+      "deleting": "Deleting...",
+      "empty": "No datasets found",
+      "paginationSummary": "Showing {start}–{end} of {total} items",
+      "status": {
+        "published": "Published",
+        "draft": "Draft"
+      }
     }
   }
 }

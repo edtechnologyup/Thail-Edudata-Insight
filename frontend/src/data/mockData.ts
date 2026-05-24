@@ -2947,3 +2947,155 @@ export function unsuspendAdminUserMock(userId: string): void {
   }
   user.status = "active";
 }
+
+export type AdminDatasetStatus = "published" | "draft";
+
+export type AdminDataset = {
+  id: string;
+  title: string;
+  titleEn: string;
+  agency: string;
+  agencyEn: string;
+  category: string;
+  categoryEn: string;
+  status: AdminDatasetStatus;
+  qualityScore: number;
+  updatedAt: string;
+};
+
+export type AdminDatasetsFilters = {
+  search?: string;
+  status?: string;
+  agency?: string;
+  page?: number;
+};
+
+export type AdminDatasetsResult = {
+  data: AdminDataset[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  agencies: string[];
+};
+
+export const ADMIN_DATASETS_PAGE_SIZE = 5;
+
+const INITIAL_ADMIN_DATASETS: AdminDataset[] = [
+  {
+    id: "1",
+    title: "สถิตินักเรียนรายจังหวัด 2566",
+    titleEn: "Provincial Student Statistics 2023",
+    agency: "สพฐ.",
+    agencyEn: "OBEC",
+    category: "สถิตินักเรียน",
+    categoryEn: "Student statistics",
+    status: "published",
+    qualityScore: 85,
+    updatedAt: "2024-01-01",
+  },
+  {
+    id: "2",
+    title: "จำนวนครูรายวิชา 2566",
+    titleEn: "Teachers by Subject 2023",
+    agency: "สพฐ.",
+    agencyEn: "OBEC",
+    category: "จำนวนครู",
+    categoryEn: "Teacher count",
+    status: "published",
+    qualityScore: 78,
+    updatedAt: "2024-02-01",
+  },
+  {
+    id: "3",
+    title: "งบประมาณการศึกษา 2566",
+    titleEn: "Education Budget 2023",
+    agency: "สำนักงบประมาณ",
+    agencyEn: "Bureau of the Budget",
+    category: "งบประมาณ",
+    categoryEn: "Budget",
+    status: "draft",
+    qualityScore: 62,
+    updatedAt: "2024-03-01",
+  },
+  {
+    id: "4",
+    title: "ผลการเรียน O-NET 2566",
+    titleEn: "O-NET Results 2023",
+    agency: "สทศ.",
+    agencyEn: "NIETS",
+    category: "ผลการเรียน",
+    categoryEn: "Academic results",
+    status: "published",
+    qualityScore: 91,
+    updatedAt: "2024-03-15",
+  },
+  {
+    id: "5",
+    title: "จำนวนโรงเรียนรายจังหวัด 2566",
+    titleEn: "Schools by Province 2023",
+    agency: "สพฐ.",
+    agencyEn: "OBEC",
+    category: "โรงเรียน",
+    categoryEn: "Schools",
+    status: "draft",
+    qualityScore: 70,
+    updatedAt: "2024-04-01",
+  },
+];
+
+let adminDatasetsState: AdminDataset[] = INITIAL_ADMIN_DATASETS.map((item) => ({
+  ...item,
+}));
+
+export const mockAdminDatasets: AdminDataset[] = INITIAL_ADMIN_DATASETS;
+
+function getAdminDatasetAgencies(): string[] {
+  return [...new Set(adminDatasetsState.map((item) => item.agency))].sort();
+}
+
+export function getAdminDatasetsMock(
+  filters?: AdminDatasetsFilters
+): AdminDatasetsResult {
+  let data = adminDatasetsState.map((item) => ({ ...item }));
+
+  if (filters?.status && filters.status !== "all") {
+    data = data.filter((item) => item.status === filters.status);
+  }
+
+  if (filters?.agency && filters.agency !== "all") {
+    data = data.filter((item) => item.agency === filters.agency);
+  }
+
+  if (filters?.search?.trim()) {
+    const keyword = filters.search.trim().toLowerCase();
+    data = data.filter(
+      (item) =>
+        item.title.toLowerCase().includes(keyword) ||
+        item.titleEn.toLowerCase().includes(keyword)
+    );
+  }
+
+  const total = data.length;
+  const page = Math.max(1, filters?.page ?? 1);
+  const totalPages = Math.max(1, Math.ceil(total / ADMIN_DATASETS_PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const start = (safePage - 1) * ADMIN_DATASETS_PAGE_SIZE;
+
+  return {
+    data: data.slice(start, start + ADMIN_DATASETS_PAGE_SIZE),
+    total,
+    page: safePage,
+    pageSize: ADMIN_DATASETS_PAGE_SIZE,
+    totalPages,
+    agencies: getAdminDatasetAgencies(),
+  };
+}
+
+export function deleteAdminDatasetMock(datasetId: string): void {
+  const index = adminDatasetsState.findIndex((item) => item.id === datasetId);
+  if (index === -1) {
+    throw new Error("DATASET_NOT_FOUND");
+  }
+  adminDatasetsState = adminDatasetsState.filter((item) => item.id !== datasetId);
+}

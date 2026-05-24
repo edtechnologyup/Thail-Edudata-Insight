@@ -3819,3 +3819,204 @@ export function toggleAnnouncementMock(id: string, isActive: boolean): void {
     item.id === id ? { ...item, isActive } : item
   );
 }
+
+// — Audit logs (mutable in-memory for UI-only phase) —
+
+export type AuditLogAction =
+  | "UPLOAD"
+  | "LOGIN"
+  | "DELETE"
+  | "APPROVE"
+  | "REJECT"
+  | "DOWNLOAD";
+
+export type AuditLog = {
+  id: string;
+  timestamp: string;
+  email: string;
+  action: AuditLogAction;
+  detail: string;
+  ip: string;
+};
+
+export type AuditLogsFilters = {
+  dateFrom?: string;
+  dateTo?: string;
+  action?: string;
+  search?: string;
+  page?: number;
+};
+
+export type AuditLogsResult = {
+  data: AuditLog[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export const ADMIN_AUDIT_LOGS_PAGE_SIZE = 6;
+
+export const mockAuditLogs: AuditLog[] = [
+  {
+    id: "log-1",
+    timestamp: "2024-11-20 09:12:45",
+    email: "somchai.p@moe.go.th",
+    action: "UPLOAD",
+    detail: 'อัปโหลดไฟล์ "สถิติการศึกษาปี_2566_v2.csv" ขนาด 45MB',
+    ip: "192.168.1.105",
+  },
+  {
+    id: "log-2",
+    timestamp: "2024-11-20 08:55:12",
+    email: "admin.center@edudata.th",
+    action: "LOGIN",
+    detail: "เข้าสู่ระบบสำเร็จ ผ่าน Browser Chrome/Windows",
+    ip: "171.96.224.12",
+  },
+  {
+    id: "log-3",
+    timestamp: "2024-11-20 08:30:05",
+    email: "vichai.r@school.th",
+    action: "DELETE",
+    detail: 'ลบข้อมูลรายการ "ทะเบียนนักเรียนภาคตะวันออก" ออกจากระบบ',
+    ip: "202.143.166.45",
+  },
+  {
+    id: "log-4",
+    timestamp: "2024-11-19 16:45:33",
+    email: "supervisor.edu@gov.th",
+    action: "APPROVE",
+    detail: 'อนุมัติการเผยแพร่ชุดข้อมูล "อัตราการว่างงานครู 2567"',
+    ip: "10.10.45.122",
+  },
+  {
+    id: "log-5",
+    timestamp: "2024-11-19 14:20:11",
+    email: "user.test@testmail.com",
+    action: "REJECT",
+    detail: "ปฏิเสธคำขอการแก้ไขข้อมูล เนื่องจากเอกสารไม่ครบถ้วน",
+    ip: "125.24.188.9",
+  },
+  {
+    id: "log-6",
+    timestamp: "2024-11-19 11:05:59",
+    email: "public.data@edu.th",
+    action: "DOWNLOAD",
+    detail: 'ดาวน์โหลดชุดข้อมูล "ทำเนียบโรงเรียนเอกชน" รูปแบบ JSON',
+    ip: "183.88.201.33",
+  },
+  {
+    id: "log-7",
+    timestamp: "2024-05-01 09:15:23",
+    email: "obec@gov.th",
+    action: "UPLOAD",
+    detail: "อัปโหลด Dataset: สถิตินักเรียน 2566",
+    ip: "192.168.1.1",
+  },
+  {
+    id: "log-8",
+    timestamp: "2024-05-01 10:30:45",
+    email: "admin@edudata.go.th",
+    action: "APPROVE",
+    detail: "อนุมัติบัญชี: กรมการศึกษา",
+    ip: "192.168.1.2",
+  },
+  {
+    id: "log-9",
+    timestamp: "2024-05-01 11:00:00",
+    email: "moe@gov.th",
+    action: "LOGIN",
+    detail: "เข้าสู่ระบบสำเร็จ",
+    ip: "10.0.0.1",
+  },
+  {
+    id: "log-10",
+    timestamp: "2024-05-01 13:45:12",
+    email: "stat@gov.th",
+    action: "DOWNLOAD",
+    detail: "ดาวน์โหลด Dataset: จำนวนครู 2566",
+    ip: "172.16.0.1",
+  },
+  {
+    id: "log-11",
+    timestamp: "2024-05-01 14:20:33",
+    email: "admin@edudata.go.th",
+    action: "DELETE",
+    detail: "ลบ Dataset: ข้อมูลเก่า 2560",
+    ip: "192.168.1.2",
+  },
+  {
+    id: "log-12",
+    timestamp: "2024-05-01 15:10:55",
+    email: "admin@edudata.go.th",
+    action: "REJECT",
+    detail: "ปฏิเสธบัญชี: บริษัท ABC (ไม่ใช่หน่วยงานรัฐ)",
+    ip: "192.168.1.2",
+  },
+];
+
+function parseAuditLogDate(timestamp: string): Date {
+  const normalized = timestamp.replace(" ", "T");
+  return new Date(normalized);
+}
+
+function filterAuditLogs(
+  logs: AuditLog[],
+  filters?: Omit<AuditLogsFilters, "page">
+): AuditLog[] {
+  let data = [...logs];
+
+  if (filters?.action && filters.action !== "all") {
+    const action = filters.action.toUpperCase();
+    data = data.filter((log) => log.action === action);
+  }
+
+  if (filters?.search?.trim()) {
+    const keyword = filters.search.trim().toLowerCase();
+    data = data.filter((log) => log.email.toLowerCase().includes(keyword));
+  }
+
+  if (filters?.dateFrom) {
+    const from = new Date(`${filters.dateFrom}T00:00:00`);
+    data = data.filter((log) => parseAuditLogDate(log.timestamp) >= from);
+  }
+
+  if (filters?.dateTo) {
+    const to = new Date(`${filters.dateTo}T23:59:59`);
+    data = data.filter((log) => parseAuditLogDate(log.timestamp) <= to);
+  }
+
+  return data.sort(
+    (a, b) =>
+      parseAuditLogDate(b.timestamp).getTime() -
+      parseAuditLogDate(a.timestamp).getTime()
+  );
+}
+
+export function getAdminAuditLogsMock(
+  filters?: AuditLogsFilters
+): AuditLogsResult {
+  const filtered = filterAuditLogs(mockAuditLogs, filters);
+  const total = filtered.length;
+  const totalPages = Math.max(
+    1,
+    Math.ceil(total / ADMIN_AUDIT_LOGS_PAGE_SIZE)
+  );
+  const page = Math.min(Math.max(filters?.page ?? 1, 1), totalPages);
+  const start = (page - 1) * ADMIN_AUDIT_LOGS_PAGE_SIZE;
+
+  return {
+    data: filtered.slice(start, start + ADMIN_AUDIT_LOGS_PAGE_SIZE),
+    total,
+    page,
+    pageSize: ADMIN_AUDIT_LOGS_PAGE_SIZE,
+    totalPages,
+  };
+}
+
+export function getAdminAuditLogsForExport(
+  filters?: Omit<AuditLogsFilters, "page">
+): AuditLog[] {
+  return filterAuditLogs(mockAuditLogs, filters);
+}

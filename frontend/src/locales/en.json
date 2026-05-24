@@ -1062,6 +1062,35 @@
       "contentPlaceholder": "Enter page content...",
       "loading": "Loading...",
       "notFound": "Page not found"
+    },
+    "auditLogs": {
+      "title": "Audit Log",
+      "subtitle": "Track usage history and all activities in the system",
+      "export": "Export CSV",
+      "filterDateFrom": "From",
+      "filterDateTo": "To",
+      "filterAction": "Activity type",
+      "filterActionAll": "All",
+      "filterSearch": "User",
+      "filterSearchPlaceholder": "Search by email",
+      "search": "Search",
+      "colTimestamp": "Date & time",
+      "colUser": "User (Email)",
+      "colAction": "Action",
+      "colDetail": "Detail",
+      "colIP": "IP Address",
+      "actions": {
+        "login": "LOGIN",
+        "upload": "UPLOAD",
+        "download": "DOWNLOAD",
+        "delete": "DELETE",
+        "approve": "APPROVE",
+        "reject": "REJECT"
+      },
+      "empty": "No audit log entries found",
+      "paginationSummary": "Showing {start} - {end} of {total} entries",
+      "prevPage": "Previous page",
+      "nextPage": "Next page"
     }
   }
 }

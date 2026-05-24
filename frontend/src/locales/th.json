@@ -1062,6 +1062,35 @@
       "contentPlaceholder": "พิมพ์เนื้อหาหน้านี้...",
       "loading": "กำลังโหลด...",
       "notFound": "ไม่พบหน้าที่ต้องการ"
+    },
+    "auditLogs": {
+      "title": "Audit Log",
+      "subtitle": "ติดตามประวัติการใช้งานและกิจกรรมทั้งหมดในระบบ",
+      "export": "Export CSV",
+      "filterDateFrom": "จาก",
+      "filterDateTo": "ถึง",
+      "filterAction": "ประเภทกิจกรรม",
+      "filterActionAll": "ทั้งหมด (All)",
+      "filterSearch": "ผู้ใช้งาน",
+      "filterSearchPlaceholder": "ค้นหา Email",
+      "search": "ค้นหา",
+      "colTimestamp": "วันที่-เวลา",
+      "colUser": "User (Email)",
+      "colAction": "Action",
+      "colDetail": "รายละเอียด",
+      "colIP": "IP Address",
+      "actions": {
+        "login": "LOGIN",
+        "upload": "UPLOAD",
+        "download": "DOWNLOAD",
+        "delete": "DELETE",
+        "approve": "APPROVE",
+        "reject": "REJECT"
+      },
+      "empty": "ไม่พบรายการ Audit Log",
+      "paginationSummary": "แสดง {start} - {end} จากทั้งหมด {total} รายการ",
+      "prevPage": "หน้าก่อน",
+      "nextPage": "หน้าถัดไป"
     }
   }
 }

@@ -2652,3 +2652,298 @@ export async function fetchMockRestoreVersion(
   void datasetId;
   void version;
 }
+
+export type AdminMonthlyCount = {
+  month: string;
+  monthEn: string;
+  count: number;
+};
+
+export type AdminPendingUser = {
+  id: string;
+  agencyName: string;
+  agencyNameEn: string;
+  email: string;
+  createdAt: string;
+  initials: string;
+};
+
+export type AdminDashboardData = {
+  totalUsers: number;
+  totalDatasets: number;
+  pendingUsers: number;
+  todayDownloads: number;
+  userTrendPercent: number;
+  datasetTrendPercent: number;
+  datasetsByMonth: AdminMonthlyCount[];
+  downloadsByMonth: AdminMonthlyCount[];
+  pendingUserList: AdminPendingUser[];
+};
+
+const INITIAL_ADMIN_DASHBOARD: AdminDashboardData = {
+  totalUsers: 156,
+  totalDatasets: 1234,
+  pendingUsers: 8,
+  todayDownloads: 432,
+  userTrendPercent: 12,
+  datasetTrendPercent: 5.4,
+  datasetsByMonth: [
+    { month: "ม.ค.", monthEn: "Jan", count: 45 },
+    { month: "ก.พ.", monthEn: "Feb", count: 62 },
+    { month: "มี.ค.", monthEn: "Mar", count: 58 },
+    { month: "เม.ย.", monthEn: "Apr", count: 71 },
+    { month: "พ.ค.", monthEn: "May", count: 89 },
+    { month: "มิ.ย.", monthEn: "Jun", count: 76 },
+  ],
+  downloadsByMonth: [
+    { month: "ม.ค.", monthEn: "Jan", count: 3200 },
+    { month: "ก.พ.", monthEn: "Feb", count: 4100 },
+    { month: "มี.ค.", monthEn: "Mar", count: 3800 },
+    { month: "เม.ย.", monthEn: "Apr", count: 5200 },
+    { month: "พ.ค.", monthEn: "May", count: 6100 },
+    { month: "มิ.ย.", monthEn: "Jun", count: 5800 },
+  ],
+  pendingUserList: [
+    {
+      id: "u-1",
+      agencyName: "กรมการศึกษา",
+      agencyNameEn: "Department of Education",
+      email: "edu@gov.th",
+      createdAt: "2024-05-01",
+      initials: "กศ",
+    },
+    {
+      id: "u-2",
+      agencyName: "สำนักงานสถิติ",
+      agencyNameEn: "National Statistical Office",
+      email: "stat@gov.th",
+      createdAt: "2024-05-02",
+      initials: "สส",
+    },
+    {
+      id: "u-3",
+      agencyName: "กระทรวงศึกษาธิการ",
+      agencyNameEn: "Ministry of Education",
+      email: "moe@gov.th",
+      createdAt: "2024-05-03",
+      initials: "กศ",
+    },
+  ],
+};
+
+let adminDashboardState: AdminDashboardData = {
+  ...INITIAL_ADMIN_DASHBOARD,
+  pendingUserList: INITIAL_ADMIN_DASHBOARD.pendingUserList.map((user) => ({
+    ...user,
+  })),
+  datasetsByMonth: INITIAL_ADMIN_DASHBOARD.datasetsByMonth.map((item) => ({
+    ...item,
+  })),
+  downloadsByMonth: INITIAL_ADMIN_DASHBOARD.downloadsByMonth.map((item) => ({
+    ...item,
+  })),
+};
+
+export const mockAdminDashboard: AdminDashboardData = INITIAL_ADMIN_DASHBOARD;
+
+export function getAdminDashboardMock(): AdminDashboardData {
+  syncDashboardPendingUsers();
+  return {
+    ...adminDashboardState,
+    pendingUserList: adminDashboardState.pendingUserList.map((user) => ({
+      ...user,
+    })),
+    datasetsByMonth: adminDashboardState.datasetsByMonth.map((item) => ({
+      ...item,
+    })),
+    downloadsByMonth: adminDashboardState.downloadsByMonth.map((item) => ({
+      ...item,
+    })),
+  };
+}
+
+export type AdminUserRole = "agency" | "admin";
+export type AdminUserStatus = "pending" | "active" | "rejected" | "suspended";
+
+export type AdminUser = {
+  id: string;
+  agencyName: string;
+  agencyNameEn: string;
+  email: string;
+  role: AdminUserRole;
+  status: AdminUserStatus;
+  createdAt: string;
+  rejectReason?: string;
+};
+
+export type AdminUsersFilters = {
+  status?: string;
+  role?: string;
+  search?: string;
+  page?: number;
+};
+
+export type AdminUsersResult = {
+  data: AdminUser[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export const ADMIN_USERS_PAGE_SIZE = 5;
+
+const INITIAL_ADMIN_USERS: AdminUser[] = [
+  {
+    id: "u-1",
+    agencyName: "กรมการศึกษา",
+    agencyNameEn: "Department of Education",
+    email: "edu@gov.th",
+    role: "agency",
+    status: "pending",
+    createdAt: "2024-05-01",
+  },
+  {
+    id: "u-2",
+    agencyName: "สพฐ.",
+    agencyNameEn: "Office of the Basic Education Commission",
+    email: "obec@gov.th",
+    role: "agency",
+    status: "active",
+    createdAt: "2024-01-15",
+  },
+  {
+    id: "u-3",
+    agencyName: "สอศ.",
+    agencyNameEn: "Office of the Vocational Education Commission",
+    email: "ovec@gov.th",
+    role: "agency",
+    status: "suspended",
+    createdAt: "2024-02-20",
+  },
+  {
+    id: "u-4",
+    agencyName: "Admin System",
+    agencyNameEn: "Admin System",
+    email: "admin@edudata.go.th",
+    role: "admin",
+    status: "active",
+    createdAt: "2024-01-01",
+  },
+  {
+    id: "u-5",
+    agencyName: "กระทรวงศึกษาธิการ",
+    agencyNameEn: "Ministry of Education",
+    email: "moe@gov.th",
+    role: "agency",
+    status: "rejected",
+    createdAt: "2024-03-10",
+    rejectReason:
+      "เอกสารหนังสือรับรองหน่วยงานไม่ครบถ้วน กรุณาส่งเอกสารเพิ่มเติมและสมัครใหม่อีกครั้ง",
+  },
+];
+
+let adminUsersState: AdminUser[] = INITIAL_ADMIN_USERS.map((user) => ({ ...user }));
+
+export const mockAdminUsers: AdminUser[] = INITIAL_ADMIN_USERS;
+
+function adminUserToPending(user: AdminUser): AdminPendingUser {
+  const initials = user.agencyName
+    .replace(/[^\u0E00-\u0E7FA-Za-z]/g, "")
+    .slice(0, 2)
+    .toUpperCase();
+
+  return {
+    id: user.id,
+    agencyName: user.agencyName,
+    agencyNameEn: user.agencyNameEn,
+    email: user.email,
+    createdAt: user.createdAt,
+    initials: initials || "AG",
+  };
+}
+
+function syncDashboardPendingUsers(): void {
+  adminDashboardState.pendingUserList = adminUsersState
+    .filter((user) => user.status === "pending")
+    .map(adminUserToPending);
+  adminDashboardState.pendingUsers = adminDashboardState.pendingUserList.length;
+  adminDashboardState.totalUsers = adminUsersState.length;
+}
+
+export function getAdminUsersMock(
+  filters?: AdminUsersFilters
+): AdminUsersResult {
+  let data = adminUsersState.map((user) => ({ ...user }));
+
+  if (filters?.status && filters.status !== "all") {
+    data = data.filter((user) => user.status === filters.status);
+  }
+
+  if (filters?.role && filters.role !== "all") {
+    data = data.filter((user) => user.role === filters.role);
+  }
+
+  if (filters?.search?.trim()) {
+    const keyword = filters.search.trim().toLowerCase();
+    data = data.filter(
+      (user) =>
+        user.agencyName.toLowerCase().includes(keyword) ||
+        user.agencyNameEn.toLowerCase().includes(keyword) ||
+        user.email.toLowerCase().includes(keyword)
+    );
+  }
+
+  const total = data.length;
+  const page = Math.max(1, filters?.page ?? 1);
+  const totalPages = Math.max(1, Math.ceil(total / ADMIN_USERS_PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const start = (safePage - 1) * ADMIN_USERS_PAGE_SIZE;
+
+  return {
+    data: data.slice(start, start + ADMIN_USERS_PAGE_SIZE),
+    total,
+    page: safePage,
+    pageSize: ADMIN_USERS_PAGE_SIZE,
+    totalPages,
+  };
+}
+
+export function approveAdminUserMock(userId: string): void {
+  const user = adminUsersState.find((item) => item.id === userId);
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+  user.status = "active";
+  delete user.rejectReason;
+  syncDashboardPendingUsers();
+}
+
+export function rejectAdminUserMock(userId: string, reason = ""): void {
+  const user = adminUsersState.find((item) => item.id === userId);
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+  user.status = "rejected";
+  user.rejectReason = reason;
+  syncDashboardPendingUsers();
+}
+
+export function suspendAdminUserMock(userId: string): void {
+  const user = adminUsersState.find((item) => item.id === userId);
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+  if (user.role === "admin") {
+    throw new Error("USER_CANNOT_SUSPEND_SELF");
+  }
+  user.status = "suspended";
+}
+
+export function unsuspendAdminUserMock(userId: string): void {
+  const user = adminUsersState.find((item) => item.id === userId);
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+  user.status = "active";
+}

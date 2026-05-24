@@ -1,7 +1,15 @@
+import "./globals.css";
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <html suppressHydrationWarning>
+      <body className="font-sarabun bg-surface-page" suppressHydrationWarning>
+        {children}
+      </body>
+    </html>
+  );
 }

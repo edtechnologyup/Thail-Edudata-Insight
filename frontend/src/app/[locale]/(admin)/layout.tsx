@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import AdminSidebar from "@/components/common/AdminSidebar";
 import Navbar from "@/components/common/Navbar";
-import Sidebar from "@/components/common/Sidebar";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function AdminLayout({
@@ -40,9 +40,11 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar variant="admin" />
-      <div className="flex flex-1">
-        <Sidebar variant="admin" />
-        <main className="flex-1 p-6">{children}</main>
+      <div className="flex min-h-0 flex-1">
+        <AdminSidebar />
+        <main className="min-w-0 flex-1 overflow-y-auto bg-surface-page p-6 lg:p-10 [&_aside]:hidden">
+          {children}
+        </main>
       </div>
     </div>
   );

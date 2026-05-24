@@ -11,10 +11,10 @@
 |-------|--------|------|
 | 1 · Foundation | 21 รายการ | #7 #8 #9 #38 #39 #41 #43 |
 | 2 · Auth | 2 หน้า | #35 #40 |
-| 3 · Public | 7 หน้า | #35 #36 #37 #42 |
+| 3 · Public | 10 หน้า | #35 #36 #37 #42 |
 | 4 · Agency | 8 หน้า | #35 #36 #37 #39 #42 |
-| 5 · Admin | 6 หน้า | #35 #36 #37 #42 |
-| **รวม** | **23 หน้า + 21 Foundation** | |
+| 5 · Admin | 7 หน้า | #35 #36 #37 #42 |
+| **รวม** | **27 หน้า + 21 Foundation** | |
 
 ---
 
@@ -354,17 +354,26 @@ padding: 48px 40px
 
 ---
 
-## Phase 3 — Public (7 หน้า)
+## Phase 3 — Public (9 หน้า)
 
-| # | หน้า | Route | Component หลัก |
-|---|------|-------|----------------|
-| 3 | หน้าหลัก | `/[locale]` | Banner, StatsOverview, DatasetCard ×2 Section |
-| 4 | ค้นหา | `/[locale]/search` | SearchBar + SearchFilter Tree + SearchResult |
-| 5 | รายละเอียด Dataset | `/[locale]/datasets/[id]` | DatasetDetail + PreviewTable + DownloadModal |
-| 6 | เปรียบเทียบ | `/[locale]/datasets/[id]/compare` | CompareChart (Bar + Line) |
-| 7 | หมวดหมู่ | `/[locale]/categories/[slug]` | Breadcrumb + DatasetList + Filter |
-| 8 | สถิติภาพรวม | `/[locale]/stats` | Line + Bar + Pie (Recharts) |
-| 9 | Privacy Policy | `/[locale]/privacy-policy` | Static content |
+| # | หน้า | Route | Component หลัก | สถานะ |
+|---|------|-------|----------------|-------|
+| 3 | หน้าหลัก | `/[locale]` | Navbar 2ชั้น+MegaMenu, Banner, HeroSearch, StatsOverview, DatasetCard ×2 Section, Footer | ✅ เสร็จแล้ว |
+| 4 | ค้นหา | `/[locale]/search` | SearchBar + SearchFilter Tree + SearchResult | ⏳ |
+| 5 | รายละเอียด Dataset | `/[locale]/datasets/[id]` | DatasetDetail + PreviewTable + DownloadModal | ⏳ |
+| 6 | เปรียบเทียบ | `/[locale]/datasets/[id]/compare` | CompareChart (Bar + Line) | ⏳ |
+| 7 | หมวดหมู่ | `/[locale]/categories/[slug]` | Breadcrumb + DatasetList + Filter | ⏳ |
+| 8 | สถิติภาพรวม | `/[locale]/stats` | Line + Bar + Pie (Recharts) | ⏳ |
+| 9 | Privacy Policy | `/[locale]/privacy-policy` | Static content | ⏳ |
+| 10 | เอกสาร API | `/[locale]/api-docs` | Static content + Code examples | ⏳ |
+| 11 | เงื่อนไขการใช้งาน | `/[locale]/terms` | Static content | ⏳ |
+
+**Footer Link ที่เชื่อมได้:**
+- รายการชุดข้อมูล → `/[locale]/search`
+- สถิติภาพรวม → `/[locale]/stats`
+- เอกสาร API → `/[locale]/api-docs`
+- นโยบายความเป็นส่วนตัว → `/[locale]/privacy-policy`
+- เงื่อนไขการใช้งาน → `/[locale]/terms`
 
 **Responsive #42**
 - DatasetCard grid: Desktop 3 col → Tablet 2 col → Mobile 1 col
@@ -379,14 +388,14 @@ padding: 48px 40px
 
 | # | หน้า | Route | Component หลัก |
 |---|------|-------|----------------|
-| 10 | Dashboard | `/[locale]/dashboard` | StatsCard ×4, Download Chart, DatasetList ล่าสุด |
-| 11 | รายการ Dataset | `/[locale]/datasets` | Table, Status Badge (draft/published), Filter, Action |
-| 12 | อัปโหลด / แก้ไข | `/[locale]/datasets/create` `/[locale]/datasets/[id]/edit` | DatasetForm mode:create/edit, DnD Upload, Quality Score, PII |
-| 13 | Bulk Upload | `/[locale]/datasets/bulk-upload` | Download Template, DnD Excel, BulkUploadResult |
-| 14 | Version History | `/[locale]/datasets/[id]/versions` | VersionHistoryTable + Restore |
-| 15 | จัดการหมวดหมู่ | `/[locale]/categories` | หมวด Level 1+2 ของตัวเอง, CategoryForm, SubcategoryForm |
-| 16 | Bookmark + Subscription + Saved Search | `/[locale]/saved` | Tab 3 อัน รวมหน้าเดียว |
-| 17 | Custom Dashboard | `/[locale]/dashboard/custom` | DashboardGrid DnD Kit + DashboardWidget |
+| 10 | Dashboard | `/[locale]/dashboard` | StatsCard ×4, Download Chart, DatasetList ล่าสุด | ✅ |
+| 11 | รายการ Dataset | `/[locale]/datasets` | Table, Status Badge (draft/published), Filter, Action | ✅ |
+| 12 | อัปโหลด / แก้ไข | `/[locale]/datasets/create` `/[locale]/datasets/[id]/edit` | DatasetForm mode:create/edit, DnD Upload, Quality Score, PII | ✅ |
+| 13 | Bulk Upload | `/[locale]/datasets/bulk-upload` | Download Template, DnD Excel, BulkUploadResult | ✅ |
+| 14 | Version History | `/[locale]/datasets/[id]/versions` | VersionTimeline + RestoreModal | ✅ |
+| 15 | จัดการหมวดหมู่ | `/[locale]/categories` | หมวด Level 1+2 ของตัวเอง, CategoryForm, SubcategoryForm | ⏳ |
+| 16 | Bookmark + Subscription + Saved Search | `/[locale]/saved` | Tab 3 อัน รวมหน้าเดียว | ⏳ |
+| 17 | Custom Dashboard | `/[locale]/dashboard/custom` | DashboardGrid DnD Kit + DashboardWidget | ⏳ |
 
 **Status Badge**
 - `draft` = bg `#dbeafe` text `#1d4c61`
@@ -394,18 +403,36 @@ padding: 48px 40px
 
 ---
 
-## Phase 5 — Admin (6 หน้า)
+## Phase 5 — Admin (7 หน้า)
 
 > Auth Guard: ไม่ใช่ Admin → Redirect หน้าหลัก
 
-| # | หน้า | Route | Component หลัก |
-|---|------|-------|----------------|
-| 18 | Dashboard | `/[locale]/admin` | AdminStatsCard ×4, Dataset Chart, Download Chart, User รอ Approve |
-| 19 | จัดการ User | `/[locale]/admin/users` | UserTable, อนุมัติ/ปฏิเสธ/Suspend, Filter, Search |
-| 20 | จัดการ Dataset | `/[locale]/admin/datasets` | Table Dataset ทุกหน่วยงาน, แก้ไข/ลบ |
-| 21 | หมวดหมู่ + แท็ก | `/[locale]/admin/categories` | CategoryTree 2 ระดับ, เพิ่ม Level 1, Tab แท็ก |
-| 22 | จัดการประกาศ | `/[locale]/admin/announcements` | AnnouncementForm, Toggle เปิด/ปิด |
-| 23 | Audit Log | `/[locale]/admin/audit-logs` | AuditLogTable, Filter, Export CSV |
+| # | หน้า | Route | Component หลัก | สถานะ |
+|---|------|-------|----------------|-------|
+| 18 | Dashboard | `/[locale]/admin` | AdminStatsCard ×4, Dataset Chart, Download Chart, User รอ Approve | ⏳ |
+| 19 | จัดการ User | `/[locale]/admin/users` | UserTable, อนุมัติ/ปฏิเสธ/Suspend, Filter, Search | ⏳ |
+| 20 | จัดการ Dataset | `/[locale]/admin/datasets` | Table Dataset ทุกหน่วยงาน, แก้ไข/ลบ | ⏳ |
+| 21 | หมวดหมู่ + แท็ก | `/[locale]/admin/categories` | CategoryTree 2 ระดับ, เพิ่ม Level 1, Tab แท็ก | ⏳ |
+| 22 | จัดการประกาศ | `/[locale]/admin/announcements` | AnnouncementForm, Toggle เปิด/ปิด | ⏳ |
+| 23 | **จัดการหน้า Static** | **`/[locale]/admin/pages`** | **PageList, RichTextEditor, บันทึกเนื้อหา** | ⏳ |
+| 24 | Audit Log | `/[locale]/admin/audit-logs` | AuditLogTable, Filter, Export CSV | ⏳ |
+
+**หน้า Static ที่ Admin จัดการได้:**
+- Privacy Policy → `/[locale]/privacy-policy`
+- เงื่อนไขการใช้งาน → `/[locale]/terms`
+- เอกสาร API → `/[locale]/api-docs`
+- Help Center → `/[locale]/help-center`
+
+**API ที่ต้องมี (Backend):**
+- `GET /api/v1/pages/[slug]` — ดึงเนื้อหา
+- `PUT /api/v1/admin/pages/[slug]` — แก้เนื้อหา (Admin only)
+
+**Flow:**
+```
+Admin → /admin/pages → เลือกหน้า → แก้ Rich Text → บันทึก
+    ↓
+หน้า Public ดึง GET /api/v1/pages/[slug] แสดงเนื้อหาใหม่
+```
 
 ---
 
@@ -498,3 +525,98 @@ frontend/
 ---
 
 *อ้างอิง claude.md + DESIGN.md | อัปเดตล่าสุด: ขั้นที่ 14 Frontend*
+
+---
+
+## API ที่ยังไม่ได้เชื่อม (รอ Backend + Docker พร้อม)
+
+### Auth
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/register`
+
+### Public
+- `GET /api/v1/datasets` — รายการ Dataset
+- `GET /api/v1/datasets/{id}` — รายละเอียด Dataset
+- `GET /api/v1/search` — ค้นหา
+- `GET /api/v1/categories` — หมวดหมู่
+- `GET /api/v1/stats` — สถิติภาพรวม
+- `POST /api/v1/datasets/{id}/download` — ดาวน์โหลด
+- `GET /api/v1/pages/{slug}` — เนื้อหา Static Page
+
+### Agency
+- `GET /api/v1/agency/dashboard` — สถิติ Dashboard
+- `GET /api/v1/agency/datasets` — รายการ Dataset ของตัวเอง
+- `POST /api/v1/agency/datasets` — อัปโหลด Dataset
+- `PUT /api/v1/agency/datasets/{id}` — แก้ไข Dataset
+- `DELETE /api/v1/agency/datasets/{id}` — ลบ Dataset
+- `POST /api/v1/agency/datasets/bulk-upload` — Bulk Upload
+- `GET /api/v1/agency/datasets/bulk-template` — ดาวน์โหลด Template
+- `GET /api/v1/agency/datasets/{id}/versions` — ประวัติ Version
+- `POST /api/v1/agency/datasets/{id}/versions/{v}/restore` — Restore
+- `GET /api/v1/agency/categories` — หมวดหมู่ของตัวเอง
+- `POST /api/v1/agency/categories` — สร้างหมวดหมู่
+- `PUT /api/v1/agency/categories/{id}` — แก้ไขหมวดหมู่
+- `DELETE /api/v1/agency/categories/{id}` — ลบหมวดหมู่
+- `GET /api/v1/agency/bookmarks` — รายการ Bookmark
+- `DELETE /api/v1/agency/bookmarks/{id}` — ลบ Bookmark
+- `GET /api/v1/agency/subscriptions` — รายการ Subscription
+- `DELETE /api/v1/agency/subscriptions/{id}` — ลบ Subscription
+- `GET /api/v1/agency/saved-searches` — รายการ Saved Search
+- `DELETE /api/v1/agency/saved-searches/{id}` — ลบ Saved Search
+
+### Admin
+- `GET /api/v1/admin/dashboard` — สถิติ Admin
+- `GET /api/v1/admin/users` — รายการ User ทั้งหมด
+- `PUT /api/v1/admin/users/{id}/approve` — อนุมัติ User
+- `PUT /api/v1/admin/users/{id}/reject` — ปฏิเสธ User
+- `PUT /api/v1/admin/users/{id}/suspend` — Suspend User
+- `GET /api/v1/admin/datasets` — Dataset ทุกหน่วยงาน
+- `DELETE /api/v1/admin/datasets/{id}` — ลบ Dataset
+- `GET /api/v1/admin/categories` — หมวดหมู่ทั้งหมด
+- `POST /api/v1/admin/categories` — สร้างหมวดระดับ 1
+- `PUT /api/v1/admin/categories/{id}` — แก้ไขหมวดหมู่
+- `DELETE /api/v1/admin/categories/{id}` — ลบหมวดหมู่
+- `GET /api/v1/admin/announcements` — รายการประกาศ
+- `POST /api/v1/admin/announcements` — สร้างประกาศ
+- `PUT /api/v1/admin/announcements/{id}` — แก้ไขประกาศ
+- `DELETE /api/v1/admin/announcements/{id}` — ลบประกาศ
+- `GET /api/v1/admin/pages/{slug}` — ดึง Static Page
+- `PUT /api/v1/admin/pages/{slug}` — แก้ Static Page
+- `GET /api/v1/admin/audit-logs` — Audit Log
+
+---
+
+## กฎสำคัญ (ห้ามลืม)
+
+- ห้าม hardcode mock data ใน component เด็ดขาด
+- Mock data อยู่ใน `src/data/mockData.ts` เท่านั้น
+- ทุก API call ใส่ `// TODO: เปลี่ยนเป็น API จริงเมื่อ Backend พร้อม`
+- ทุก Form ใช้ React Hook Form + Zod
+- ทุก API call ใช้ React Query
+- ทุกข้อความใช้ next-intl ห้าม hardcode
+- Sidebar Agency ใช้จาก `layout.tsx` เท่านั้น
+- Auth Guard bypass ไว้ชั่วคราว รอ Backend + Docker พร้อม
+- ทำทีละหน้า Stitch → Cursor → บอกผลก่อนไปหน้าถัดไป
+
+---
+
+## Sidebar Agency (ครบ 7 เมนู + Help Center + Logout)
+
+```
+เมนูหลัก:
+1. Dashboard          → /[locale]/dashboard
+2. Dataset ของฉัน     → /[locale]/datasets
+3. อัปโหลด Dataset    → /[locale]/datasets/create
+4. Bulk Upload        → /[locale]/datasets/bulk-upload
+5. จัดการหมวดหมู่     → /[locale]/categories
+6. บันทึกของฉัน       → /[locale]/saved
+7. Custom Dashboard   → /[locale]/dashboard/custom
+
+ด้านล่าง (แยกส่วน):
+- Help Center → /[locale]/help-center
+- Logout → สีแดง #ba1a1a → logout() + redirect /login
+```
+
+---
+
+*อัปเดตล่าสุด: Phase 4 Agency 5/8 เสร็จแล้ว*

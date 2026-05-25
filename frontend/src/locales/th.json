@@ -919,11 +919,15 @@
       "deleting": "กำลังลบ...",
       "empty": "ไม่พบ Dataset",
       "paginationSummary": "แสดง {start} ถึง {end} จากทั้งหมด {total} รายการ",
+      "actionError": "ดำเนินการไม่สำเร็จ กรุณาลองใหม่",
       "status": {
         "published": "Published",
-        "draft": "Draft"
+        "draft": "Draft",
+        "submitted": "รออนุมัติ",
+        "rejected": "Rejected"
       }
     },
+    "datasetApproved": "อนุมัติ Dataset สำเร็จ",
     "categories": {
       "title": "หมวดหมู่ + แท็ก",
       "subtitle": "จัดการโครงสร้างหมวดหมู่ข้อมูลระดับชาติและแท็กสำหรับการค้นหา",

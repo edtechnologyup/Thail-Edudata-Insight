@@ -3,15 +3,16 @@
 
 import uuid
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, status
 from sqlalchemy.orm import Session
 
 import app.services.admin_service as admin_service
+import app.services.dataset_service as dataset_service
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.pagination import PaginationParams, get_pagination_params
 from app.core.response import delete_response, list_response, success_response
-from app.core.security import require_roles
+from app.core.security import get_client_ip, require_roles
 from app.schemas.admin_schema import (
     AdminUserListFilters,
     AnnouncementCreateRequest,
@@ -27,6 +28,12 @@ def _get_redis():
     import redis
 
     return redis.from_url(settings.redis_url, decode_responses=True)
+
+
+def _get_es():
+    from elasticsearch import Elasticsearch
+
+    return Elasticsearch(settings.ELASTICSEARCH_URL)
 
 
 @router.get("/stats", status_code=status.HTTP_200_OK)
@@ -138,6 +145,29 @@ def admin_suspend_user(
     """
     result = admin_service.suspend_user(
         db, _get_redis(), user_id=id, current_user=payload
+    )
+    return success_response(result.model_dump(mode="json"))
+
+
+@router.post("/datasets/{id}/approve", status_code=status.HTTP_200_OK)
+def admin_approve_dataset(
+    id: uuid.UUID,
+    request: Request,
+    background_tasks: BackgroundTasks,
+    payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """
+    อนุมัติ Dataset (submitted → published) ตาม #20
+    - Auth ✅ Admin
+    """
+    result = dataset_service.approve_dataset(
+        db=db,
+        dataset_id=id,
+        current_user=payload,
+        ip_address=get_client_ip(request),
+        background_tasks=background_tasks,
+        es_client=_get_es(),
     )
     return success_response(result.model_dump(mode="json"))
 

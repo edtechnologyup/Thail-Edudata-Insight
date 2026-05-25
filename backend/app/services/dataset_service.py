@@ -302,6 +302,54 @@ def submit_dataset(
     return _build_dataset_response(db, dataset_id)
 
 
+def approve_dataset(
+    db: Session,
+    dataset_id: uuid.UUID,
+    current_user: dict,
+    ip_address: str,
+    background_tasks: BackgroundTasks,
+    es_client,
+) -> DatasetResponse:
+    """Admin อนุมัติ Dataset ที่ status=submitted → published."""
+    dataset = dataset_repo.get_dataset_by_id(db, dataset_id)
+    if dataset is None:
+        raise_app_error("DATASET_NOT_FOUND")
+    if dataset.status == "published":
+        return _build_dataset_response(db, dataset_id)
+    if dataset.status != "submitted":
+        raise_app_error("DATASET_INVALID_STATUS")
+
+    now = datetime.now(timezone.utc)
+    dataset_repo.update_dataset(
+        db,
+        dataset_id,
+        status="published",
+        published_at=now,
+    )
+    dataset_repo.create_audit_log(
+        db,
+        user_id=uuid.UUID(current_user["sub"]),
+        action="dataset.approve",
+        target_type="dataset",
+        target_id=dataset_id,
+        detail=None,
+        ip_address=ip_address,
+    )
+    db.commit()
+
+    refreshed = dataset_repo.get_dataset_by_id(db, dataset_id)
+    if refreshed is not None:
+        from app.utils.elasticsearch_utils import index_dataset
+
+        index_doc = _build_dataset_index_document(db, refreshed)
+        background_tasks.add_task(index_dataset, es_client, index_doc)
+        email_service.notify_subscribers_new_dataset(background_tasks, db, refreshed)
+        email_service.notify_saved_search(background_tasks, db, refreshed)
+        email_service.notify_agency_dataset_approved(background_tasks, db, refreshed)
+
+    return _build_dataset_response(db, dataset_id)
+
+
 def get_dataset(db: Session, dataset_id: uuid.UUID) -> DatasetResponse:
     dataset = dataset_repo.get_dataset_by_id(db, dataset_id)
     if dataset is None:

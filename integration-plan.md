@@ -125,7 +125,7 @@ NEXT_PUBLIC_APP_ENV=development
 | 4 | useRejectUser | POST /admin/users/{id}/reject | ✅ |
 | 5 | useSuspendUser | POST /admin/users/{id}/suspend (+ PATCH unsuspend) | ✅ |
 | 6 | useAdminDatasets | GET /datasets?all=true (ทุก agency) | ✅ |
-| 7 | useApproveDataset | POST /admin/datasets/{id}/approve | ⏳ |
+| 7 | useApproveDataset | POST /admin/datasets/{id}/approve | ✅ |
 | 8 | useRejectDataset | POST /admin/datasets/{id}/reject | ⏳ |
 | 9 | useAdminCategories | GET/POST/PATCH/DELETE /admin/categories | ⏳ |
 | 10 | useAdminTags | GET/POST/PATCH/DELETE /admin/tags | ⏳ |

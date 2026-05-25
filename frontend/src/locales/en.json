@@ -919,11 +919,15 @@
       "deleting": "Deleting...",
       "empty": "No datasets found",
       "paginationSummary": "Showing {start}–{end} of {total} items",
+      "actionError": "Action failed. Please try again.",
       "status": {
         "published": "Published",
-        "draft": "Draft"
+        "draft": "Draft",
+        "submitted": "Pending approval",
+        "rejected": "Rejected"
       }
     },
+    "datasetApproved": "Dataset approved",
     "categories": {
       "title": "Categories + Tags",
       "subtitle": "Manage national data category structure and tags for search",

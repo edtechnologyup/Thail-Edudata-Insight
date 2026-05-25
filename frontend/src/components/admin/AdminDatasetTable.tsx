@@ -7,6 +7,7 @@ import { useState } from "react";
 import DeleteDatasetModal from "@/components/admin/DeleteDatasetModal";
 import type { AdminDataset, AdminDatasetsFilters } from "@/data/mockData";
 import { useAdminDatasets } from "@/hooks/useAdminDatasets";
+import { useApproveDataset } from "@/hooks/useApproveDataset";
 
 type AdminDatasetTableProps = {
   filters: AdminDatasetsFilters;
@@ -46,13 +47,17 @@ function StatusBadge({
   status: AdminDataset["status"];
   label: string;
 }) {
-  const isPublished = status === "published";
+  const styles: Record<AdminDataset["status"], string> = {
+    published: "bg-status-published-bg text-status-published",
+    draft: "bg-status-draft-bg text-status-draft",
+    submitted: "bg-status-warning-bg text-status-warning",
+    rejected: "bg-status-error-bg text-status-error",
+  };
+
   return (
     <span
       className={`inline-flex rounded-radius-full px-3 py-1 font-sarabun text-caption font-semibold ${
-        isPublished
-          ? "bg-status-published-bg text-status-published"
-          : "bg-status-draft-bg text-status-draft"
+        styles[status] ?? styles.draft
       }`}
     >
       {label}
@@ -94,10 +99,12 @@ export default function AdminDatasetTable({
   onError,
 }: AdminDatasetTableProps) {
   const t = useTranslations("admin.datasets");
+  const tAdmin = useTranslations("admin");
   const locale = useLocale();
   const router = useRouter();
   const base = `/${locale}`;
   const { data, isLoading } = useAdminDatasets(filters);
+  const approveMutation = useApproveDataset();
 
   const [deleteTarget, setDeleteTarget] = useState<AdminDataset | null>(null);
   const [deleteTitle, setDeleteTitle] = useState("");
@@ -119,6 +126,15 @@ export default function AdminDatasetTable({
     const title = locale === "th" ? dataset.title : dataset.titleEn;
     setDeleteTarget(dataset);
     setDeleteTitle(title);
+  };
+
+  const handleApprove = async (datasetId: string) => {
+    try {
+      await approveMutation.mutateAsync(datasetId);
+      onSuccess(tAdmin("datasetApproved"));
+    } catch {
+      onError(t("actionError"));
+    }
   };
 
   return (
@@ -195,6 +211,16 @@ export default function AdminDatasetTable({
                           </td>
                           <td className="px-6 py-3 text-right">
                             <div className="flex items-center justify-end gap-3">
+                              {dataset.status === "submitted" ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleApprove(dataset.id)}
+                                  disabled={approveMutation.isPending}
+                                  className="rounded-radius-sm bg-primary-light px-3 py-1.5 font-sarabun text-caption font-bold text-status-published hover:opacity-90 disabled:opacity-50"
+                                >
+                                  {tAdmin("approve")}
+                                </button>
+                              ) : null}
                               <button
                                 type="button"
                                 onClick={() => handleEdit(dataset.id)}

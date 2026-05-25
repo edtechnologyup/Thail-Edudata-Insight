@@ -3550,7 +3550,7 @@ let adminCategoriesState: AdminCategory[] = mockAdminCategories.map((c) => ({
 }));
 let adminTagsState: AdminTag[] = mockAdminTags.map((t) => ({ ...t }));
 
-const ADMIN_CATEGORY_PAGE_SIZE = 4;
+export const ADMIN_CATEGORY_PAGE_SIZE = 4;
 
 export type AdminCategoriesResult = {
   data: AdminCategory[];

@@ -127,8 +127,8 @@ NEXT_PUBLIC_APP_ENV=development
 | 6 | useAdminDatasets | GET /datasets?all=true (ทุก agency) | ✅ |
 | 7 | useApproveDataset | POST /admin/datasets/{id}/approve | ✅ |
 | 8 | useRejectDataset | POST /admin/datasets/{id}/reject | ⏳ |
-| 9 | useAdminCategories | GET/POST/PATCH/DELETE /admin/categories | ⏳ |
-| 10 | useAdminTags | GET/POST/PATCH/DELETE /admin/tags | ⏳ |
+| 9 | useAdminCategories | GET/POST/PATCH/DELETE /admin/categories | ✅ |
+| 10 | useAdminTags | GET/POST/PATCH/DELETE /admin/tags | ✅ |
 | 11 | useAdminAnnouncements | GET/POST/PATCH/DELETE /admin/announcements | ⏳ |
 | 12 | useAuditLogs | GET /admin/audit-logs | ⏳ |
 | 13 | useAdminPageContent | GET/PUT /admin/pages/{slug} | ⏳ |

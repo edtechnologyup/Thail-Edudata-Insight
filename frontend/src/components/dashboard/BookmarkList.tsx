@@ -74,7 +74,7 @@ function BookmarkCard({
         </div>
         <button
           type="button"
-          onClick={() => onDelete(bookmark.id)}
+          onClick={() => onDelete(bookmark.datasetId)}
           disabled={isDeleting}
           className="flex items-center gap-1 rounded-radius-sm px-2 py-1 font-sarabun text-caption font-semibold text-status-error transition-colors hover:bg-status-error-bg disabled:opacity-50"
         >

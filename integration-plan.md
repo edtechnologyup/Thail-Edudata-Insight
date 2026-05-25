@@ -94,9 +94,9 @@ NEXT_PUBLIC_APP_ENV=development
 | 9 | useCreateCategory | POST /categories + subcategories | ✅ |
 | 10 | useUpdateCategory | PATCH /categories/{id} | ✅ |
 | 11 | useDeleteCategory | DELETE /categories/{id} | ✅ |
-| 12 | useBookmarks | GET/POST/DELETE /bookmarks | ⏳ |
-| 13 | useSubscriptions | GET/POST/DELETE /subscriptions | ⏳ |
-| 14 | useSavedSearches | GET/POST/DELETE /saved-searches | ⏳ |
+| 12 | useBookmarks | GET/POST/DELETE /bookmarks | ✅ |
+| 13 | useSubscriptions | GET/DELETE /subscriptions | ✅ |
+| 14 | useSavedSearches | GET/POST/DELETE /saved-searches | ✅ |
 | 15 | useDashboardLayout | GET/PUT /dashboard-layouts | ⏳ |
 
 **⚠️ จุดสำคัญตาม claude.md #5 M2**

@@ -1,26 +1,29 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  deleteAgencyBookmarkMock,
-  getAgencyBookmarksMock,
-  type AgencyBookmarkMock,
-} from "@/data/mockData";
+import apiClient from "@/services/api";
+import type { AgencyBookmarkMock } from "@/data/mockData";
+import { fetchBookmarks } from "@/utils/savedItemsApi";
 
 export function useBookmarks() {
   return useQuery<AgencyBookmarkMock[]>({
     queryKey: ["agency", "bookmarks"],
-    queryFn: async () => {
-      // TODO: เปลี่ยนเป็น API จริงเมื่อ Backend พร้อม
-      // const res = await apiClient.get<{ data: AgencyBookmarkMock[] }>(
-      //   "/agency/bookmarks"
-      // );
-      // return res.data.data;
-
-      await Promise.resolve();
-      return getAgencyBookmarksMock();
-    },
+    queryFn: fetchBookmarks,
+    retry: 1,
     staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useAddBookmark() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (datasetId: string) => {
+      await apiClient.post("/bookmarks", { dataset_id: datasetId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agency", "bookmarks"] });
+    },
   });
 }
 
@@ -28,13 +31,10 @@ export function useDeleteBookmark() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      // TODO: เปลี่ยนเป็น API จริงเมื่อ Backend พร้อม
-      // await apiClient.delete(`/agency/bookmarks/${id}`);
-
-      await Promise.resolve();
-      deleteAgencyBookmarkMock(id);
+    mutationFn: async (datasetId: string) => {
+      await apiClient.delete(`/bookmarks/${datasetId}`);
     },
+    retry: 0,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["agency", "bookmarks"] });
     },

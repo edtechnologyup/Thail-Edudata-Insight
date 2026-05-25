@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import type { DatasetDetailMock, DatasetLicense } from "@/data/mockData";
+import { useAddBookmark } from "@/hooks/useBookmarks";
+import { useAuthStore } from "@/stores/useAuthStore";
 import CitationBox from "./CitationBox";
 import DatasetTags from "./DatasetTags";
 import DownloadModal from "./DownloadModal";
@@ -41,6 +43,10 @@ export default function DatasetDetail({
   const tDetail = useTranslations("dataset.detail");
   const locale = useLocale();
   const [downloadOpen, setDownloadOpen] = useState(false);
+  const { user } = useAuthStore();
+  const addBookmarkMutation = useAddBookmark();
+  const canBookmark =
+    user?.role === "agency" || user?.role === "admin";
 
   const title = locale === "th" ? dataset.titleTh : dataset.titleEn;
   const description = locale === "th" ? dataset.descriptionTh : dataset.descriptionEn;
@@ -149,15 +155,19 @@ export default function DatasetDetail({
                 </svg>
                 {tDetail("download")}
               </button>
-              <button
-                type="button"
-                className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-radius-md border border-border-input p-2.5 text-text-secondary transition-colors hover:bg-surface-container"
-                aria-label={tDetail("bookmark")}
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                </svg>
-              </button>
+              {canBookmark && (
+                <button
+                  type="button"
+                  onClick={() => addBookmarkMutation.mutate(dataset.id)}
+                  disabled={addBookmarkMutation.isPending}
+                  className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-radius-md border border-border-input p-2.5 text-text-secondary transition-colors hover:bg-surface-container disabled:opacity-50"
+                  aria-label={tDetail("bookmark")}
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                </button>
+              )}
               <Link
                 href={`${base}/datasets/${dataset.id}/compare`}
                 className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-radius-md border border-border-input p-2.5 text-text-secondary transition-colors hover:bg-surface-container"

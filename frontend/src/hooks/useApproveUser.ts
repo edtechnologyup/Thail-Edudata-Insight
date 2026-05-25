@@ -1,14 +1,10 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { approveAdminUserMock } from "@/data/mockData";
-// import apiClient from "@/services/api";
+import apiClient from "@/services/api";
 
 async function approveUser(userId: string): Promise<void> {
-  // TODO: เปลี่ยนเป็น API จริงเมื่อ Backend พร้อม
-  // await apiClient.post(`/admin/users/${userId}/approve`);
-  await Promise.resolve();
-  approveAdminUserMock(userId);
+  await apiClient.post(`/admin/users/${userId}/approve`);
 }
 
 export function useApproveUser() {
@@ -16,6 +12,7 @@ export function useApproveUser() {
 
   return useMutation({
     mutationFn: approveUser,
+    retry: 0,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });

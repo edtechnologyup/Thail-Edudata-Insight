@@ -3,6 +3,16 @@
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# CORS ตาม claude.md #49 — Frontend dev (Next.js)
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3007",
+    "http://localhost",
+]
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -44,14 +54,7 @@ class Settings(BaseSettings):
     @property
     def cors_allowed_origins(self) -> list[str]:
         if self.APP_ENV == "development":
-            origins = [
-                "http://localhost",
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "http://localhost:3002",
-                "http://localhost:3007",
-                "http://127.0.0.1:3000",
-            ]
+            origins = list(ALLOWED_ORIGINS)
             if self.ALLOWED_ORIGINS.strip():
                 for origin in self.ALLOWED_ORIGINS.split(","):
                     value = origin.strip()
@@ -68,13 +71,7 @@ class Settings(BaseSettings):
                 origins = [origin for origin in origins if origin != "*"]
             return origins
         if self.APP_ENV == "staging":
-            return [
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "http://localhost:3002",
-                "http://localhost:3007",
-                "http://127.0.0.1:3000",
-            ]
+            return list(ALLOWED_ORIGINS)
         return []
 
     @property

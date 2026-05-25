@@ -1,23 +1,15 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  suspendAdminUserMock,
-  unsuspendAdminUserMock,
-} from "@/data/mockData";
+import apiClient from "@/services/api";
 
 async function suspendUser(userId: string): Promise<void> {
-  // TODO: เปลี่ยนเป็น API จริงเมื่อ Backend พร้อม
-  // await apiClient.post(`/admin/users/${userId}/suspend`);
-  await Promise.resolve();
-  suspendAdminUserMock(userId);
+  await apiClient.post(`/admin/users/${userId}/suspend`);
 }
 
+/** Backend ไม่มี /unsuspend — ใช้ PATCH status=active ตาม PATCH /admin/users/{id} */
 async function unsuspendUser(userId: string): Promise<void> {
-  // TODO: เปลี่ยนเป็น API จริงเมื่อ Backend พร้อม
-  // await apiClient.post(`/admin/users/${userId}/unsuspend`);
-  await Promise.resolve();
-  unsuspendAdminUserMock(userId);
+  await apiClient.patch(`/admin/users/${userId}`, { status: "active" });
 }
 
 export function useSuspendUser() {
@@ -25,8 +17,10 @@ export function useSuspendUser() {
 
   return useMutation({
     mutationFn: suspendUser,
+    retry: 0,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] });
     },
   });
 }
@@ -36,8 +30,10 @@ export function useUnsuspendUser() {
 
   return useMutation({
     mutationFn: unsuspendUser,
+    retry: 0,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] });
     },
   });
 }

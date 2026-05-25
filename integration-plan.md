@@ -13,7 +13,7 @@
 | Docker (Backend + DB) | ✅ รันได้ |
 | Phase 0 Auth | ✅ เสร็จแล้ว |
 | Phase 1 Agency | ✅ เสร็จ (Bulk Upload รอทดสอบเมื่อ MinIO รัน) |
-| Phase 2 Admin | ⏳ รอ |
+| Phase 2 Admin | ⏳ กำลังทำ (Hook 1 ✅) |
 | Phase 3 Public | ⏳ รอ |
 
 ---
@@ -40,7 +40,7 @@ NEXT_PUBLIC_APP_ENV=development
 
 | Email | Password | Role | Status |
 |-------|----------|------|--------|
-| admin@edudata.go.th | Admin1234! | admin | active |
+| admin@edudata.go.th | admintest12345 | admin | active |
 | agency@test.com | Test12345 | agency | active |
 | agency3@test.com | Test12345 | admin | active |
 | emailtest@test.com | Test12345 | agency | pending |
@@ -119,11 +119,11 @@ NEXT_PUBLIC_APP_ENV=development
 
 | # | Hook | API (claude.md #20) | สถานะ |
 |---|------|---------------------|-------|
-| 1 | useAdminDashboard | GET /admin/stats | ⏳ |
-| 2 | useAdminUsers | GET /admin/users | ⏳ |
-| 3 | useApproveUser | POST /admin/users/{id}/approve | ⏳ |
-| 4 | useRejectUser | POST /admin/users/{id}/reject | ⏳ |
-| 5 | useSuspendUser | POST /admin/users/{id}/suspend | ⏳ |
+| 1 | useAdminDashboard | GET /admin/stats + GET /admin/users (pending list) | ✅ |
+| 2 | useAdminUsers | GET /admin/users (+ client filter) | ✅ |
+| 3 | useApproveUser | POST /admin/users/{id}/approve | ✅ |
+| 4 | useRejectUser | POST /admin/users/{id}/reject | ✅ |
+| 5 | useSuspendUser | POST /admin/users/{id}/suspend (+ PATCH unsuspend) | ✅ |
 | 6 | useAdminDatasets | GET /datasets (ทุก agency) | ⏳ |
 | 7 | useApproveDataset | POST /admin/datasets/{id}/approve | ⏳ |
 | 8 | useRejectDataset | POST /admin/datasets/{id}/reject | ⏳ |
@@ -186,9 +186,10 @@ NEXT_PUBLIC_APP_ENV=development
 # สร้าง Admin (รันครั้งเดียว)
 docker exec -it thail-datacatalog-backend-1 python scripts/seed_admin.py
 
-# Admin Account
+# Admin Account (แหล่งความจริง: backend/scripts/seed_admin.py)
+# รัน seed ผ่าน Docker เท่านั้น — ห้ามรันบน host (คนละ DB กับ backend)
 Email: admin@edudata.go.th
-Password: Admin1234!
+Password: admintest12345
 ```
 
 ---

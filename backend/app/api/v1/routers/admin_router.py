@@ -3,7 +3,7 @@
 
 import uuid
 
-from fastapi import APIRouter, BackgroundTasks, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
 from sqlalchemy.orm import Session
 
 import app.services.admin_service as admin_service
@@ -13,8 +13,10 @@ from app.core.pagination import PaginationParams, get_pagination_params
 from app.core.response import delete_response, list_response, success_response
 from app.core.security import require_roles
 from app.schemas.admin_schema import (
+    AdminUserListFilters,
     AnnouncementCreateRequest,
     AnnouncementUpdateRequest,
+    UserRejectRequest,
     UserUpdateRequest,
 )
 
@@ -40,17 +42,27 @@ def admin_stats(
     return success_response(result.model_dump(mode="json"))
 
 
+def get_admin_user_list_filters(
+    status: str | None = Query(default=None),
+    role: str | None = Query(default=None),
+    search: str | None = Query(default=None),
+) -> AdminUserListFilters:
+    return AdminUserListFilters(status=status, role=role, search=search)
+
+
 @router.get("/users", status_code=status.HTTP_200_OK)
 def admin_list_users(
     pagination: PaginationParams = Depends(get_pagination_params),
+    filters: AdminUserListFilters = Depends(get_admin_user_list_filters),
     payload: dict = Depends(require_roles("admin")),
     db: Session = Depends(get_db),
 ):
     """
     ดูรายการ User ทั้งหมด ตาม #20
+    - Query: status, role, search, page, page_size, sort, order
     - Auth ✅ Admin
     """
-    items, total = admin_service.get_all_users(db, pagination)
+    items, total = admin_service.get_all_users(db, pagination, filters)
     return list_response(
         data=[i.model_dump(mode="json") for i in items],
         page=pagination.page,
@@ -94,16 +106,22 @@ def admin_approve_user(
 @router.post("/users/{id}/reject", status_code=status.HTTP_200_OK)
 def admin_reject_user(
     id: uuid.UUID,
+    request_body: UserRejectRequest,
     background_tasks: BackgroundTasks,
     payload: dict = Depends(require_roles("admin")),
     db: Session = Depends(get_db),
 ):
     """
     ปฏิเสธบัญชี Agency ตาม #28
+    - Body: { "reason": string }
     - Auth ✅ Admin
     """
     result = admin_service.reject_user(
-        db, background_tasks, user_id=id, current_user=payload
+        db,
+        background_tasks,
+        user_id=id,
+        request=request_body,
+        current_user=payload,
     )
     return success_response(result.model_dump(mode="json"))
 

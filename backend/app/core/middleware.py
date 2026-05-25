@@ -42,8 +42,10 @@ PUBLIC_PREFIXES = (
 
 ADMIN_PREFIX = "/api/v1/admin"
 
+AUTH_LOGIN_PATH = "/api/v1/auth/login"
+
+# POST /api/v1/auth/login — ไม่ใส่ใน rules (Dev ปิดผ่าน _is_rate_limit_exempt ทั้งระบบ)
 RATE_LIMIT_RULES: list[tuple[str, str, int]] = [
-    ("POST", r"^/api/v1/auth/login$", 5),
     ("POST", r"^/api/v1/auth/register$", 3),
     ("GET", r"^/api/v1/search$", 30),
     ("GET", r"^/api/v1/datasets/[^/]+/download$", 10),
@@ -53,6 +55,26 @@ RATE_LIMIT_RULES: list[tuple[str, str, int]] = [
 
 DEFAULT_RATE_LIMIT = settings.RATE_LIMIT_PER_MINUTE
 RATE_LIMIT_WINDOW_SECONDS = 60
+
+# claude.md #47 — localhost + Docker bridge (เบราว์เซอร์ → host → container)
+RATE_LIMIT_WHITELIST_IPS = frozenset(
+    {"127.0.0.1", "::1", "172.17.0.1", "172.18.0.1", "172.19.0.1"}
+)
+
+
+def _app_env() -> str:
+    return (settings.APP_ENV or "").strip().lower()
+
+
+def _is_rate_limit_exempt(request: Request) -> bool:
+    """Dev (APP_ENV=development): ปิด rate limit ทั้งหมด รวม POST /api/v1/auth/login."""
+    if _app_env() == "development":
+        return True
+
+    ip = get_client_ip(request)
+    if ip in RATE_LIMIT_WHITELIST_IPS:
+        return True
+    return False
 
 
 def _is_public_path(path: str) -> bool:
@@ -76,6 +98,13 @@ def _rate_limit_key(ip: str, method: str, path: str) -> str:
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        # Dev: ข้าม rate limit ก่อนทุกอย่าง (รวม /auth/login)
+        if _is_rate_limit_exempt(request):
+            return await call_next(request)
+
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         ip = get_client_ip(request)
         method = request.method
         path = request.url.path

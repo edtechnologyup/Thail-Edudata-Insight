@@ -18,12 +18,23 @@ class AdminStatsResponse(BaseModel):
     downloads_today: int
 
 
+class AdminUserListFilters(BaseModel):
+    status: str | None = None
+    role: str | None = None
+    search: str | None = None
+
+
+class UserRejectRequest(BaseModel):
+    reason: str = Field(min_length=10, max_length=500)
+
+
 class UserListResponse(BaseModel):
     id: uuid.UUID
     email: str
     role: str
     status: str
     agency_name: str | None
+    reject_reason: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

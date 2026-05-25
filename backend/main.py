@@ -39,6 +39,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Middleware ลำดับสำคัญ: เพิ่ม CORS สุดท้าย = ชั้นนอกสุด
+# เพื่อให้ทุก response (รวม error จาก middleware อื่น) มี CORS headers
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RateLimitMiddleware)
+app.add_middleware(RBACMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_allowed_origins,
@@ -46,9 +51,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(RBACMiddleware)
-app.add_middleware(RateLimitMiddleware)
-app.add_middleware(SecurityHeadersMiddleware)
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(search_router, prefix="/api/v1")

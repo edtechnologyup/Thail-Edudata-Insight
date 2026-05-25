@@ -4,7 +4,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Enum, String
+from sqlalchemy import Enum, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -46,5 +46,9 @@ class User(SoftDeleteMixin, BaseModel):
     )
     agency_name: Mapped[str | None] = mapped_column(
         String(255),
+        nullable=True,
+    )
+    reject_reason: Mapped[str | None] = mapped_column(
+        Text,
         nullable=True,
     )

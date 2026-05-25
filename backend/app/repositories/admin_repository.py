@@ -5,8 +5,10 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
+
+from app.schemas.admin_schema import AdminUserListFilters
 
 from app.core.pagination import PaginationParams
 from app.models.announcement_model import Announcement
@@ -104,9 +106,26 @@ def get_admin_stats(db: Session) -> dict[str, Any]:
 
 
 def get_all_users(
-    db: Session, pagination: PaginationParams
+    db: Session,
+    pagination: PaginationParams,
+    filters: AdminUserListFilters | None = None,
 ) -> tuple[list[User], int]:
     query = db.query(User).filter(User.is_deleted.is_(False))
+
+    if filters is not None:
+        if filters.status and filters.status != "all":
+            query = query.filter(User.status == filters.status)
+        if filters.role and filters.role != "all":
+            query = query.filter(User.role == filters.role)
+        if filters.search and filters.search.strip():
+            keyword = f"%{filters.search.strip()}%"
+            query = query.filter(
+                or_(
+                    User.email.ilike(keyword),
+                    User.agency_name.ilike(keyword),
+                )
+            )
+
     total = query.count()
     sort_col = _user_sort_column(pagination.sort)
     order = sort_col.desc() if pagination.order == "desc" else sort_col.asc()

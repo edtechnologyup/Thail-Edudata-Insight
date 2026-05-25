@@ -13,11 +13,13 @@ from app.core.errors import raise_app_error
 from app.core.pagination import PaginationParams
 from app.schemas.admin_schema import (
     AdminStatsResponse,
+    AdminUserListFilters,
     AnnouncementCreateRequest,
     AnnouncementResponse,
     AnnouncementUpdateRequest,
     AuditLogResponse,
     UserListResponse,
+    UserRejectRequest,
     UserUpdateRequest,
 )
 
@@ -30,9 +32,11 @@ def get_admin_stats(db: Session) -> AdminStatsResponse:
 
 
 def get_all_users(
-    db: Session, pagination: PaginationParams
+    db: Session,
+    pagination: PaginationParams,
+    filters: AdminUserListFilters | None = None,
 ) -> tuple[list[UserListResponse], int]:
-    items, total = admin_repo.get_all_users(db, pagination)
+    items, total = admin_repo.get_all_users(db, pagination, filters)
     return [UserListResponse.model_validate(u) for u in items], total
 
 
@@ -61,6 +65,7 @@ def reject_user(
     db: Session,
     background_tasks: BackgroundTasks,
     user_id: uuid.UUID,
+    request: UserRejectRequest,
     current_user: dict,
 ) -> UserListResponse:
     user = admin_repo.get_user_by_id(db, user_id)
@@ -69,7 +74,12 @@ def reject_user(
     if user.status != "pending":
         raise_app_error("USER_STATUS_INVALID")
 
-    admin_repo.update_user(db, user_id, status="rejected")
+    admin_repo.update_user(
+        db,
+        user_id,
+        status="rejected",
+        reject_reason=request.reason.strip(),
+    )
     db.commit()
     db.refresh(user)
 

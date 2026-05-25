@@ -1,22 +1,31 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchMockRestoreVersion } from "@/data/mockData";
+import apiClient from "@/services/api";
 
-type RestoreVersionInput = {
+export type RestoreVersionInput = {
   datasetId: string;
   version: string;
+};
+
+type RestoreVersionResponse = {
+  success: boolean;
+  data: unknown;
 };
 
 async function restoreVersion({
   datasetId,
   version,
-}: RestoreVersionInput): Promise<void> {
-  // TODO: เปลี่ยนเป็น API จริงเมื่อ Backend พร้อม
-  // await apiClient.post(
-  //   `/agency/datasets/${datasetId}/versions/${version}/restore`
-  // );
-  return fetchMockRestoreVersion(datasetId, version);
+}: RestoreVersionInput): Promise<unknown> {
+  const versionNumber = Number.parseInt(version, 10);
+  if (Number.isNaN(versionNumber)) {
+    throw new Error("หมายเลขเวอร์ชันไม่ถูกต้อง");
+  }
+
+  const res = await apiClient.post<RestoreVersionResponse>(
+    `/datasets/${datasetId}/versions/${versionNumber}/restore`
+  );
+  return res.data.data;
 }
 
 export function useRestoreVersion() {
@@ -24,11 +33,12 @@ export function useRestoreVersion() {
 
   return useMutation({
     mutationFn: restoreVersion,
+    retry: 1,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["agency", "datasets"] });
       queryClient.invalidateQueries({
         queryKey: ["agency", "datasets", variables.datasetId, "versions"],
       });
+      queryClient.invalidateQueries({ queryKey: ["agency", "datasets"] });
     },
   });
 }

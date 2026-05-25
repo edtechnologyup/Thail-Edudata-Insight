@@ -1,11 +1,10 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-async function deleteDataset(id: string): Promise<void> {
-  // TODO: เปลี่ยนเป็น API จริงเมื่อ Backend พร้อม
-  // await apiClient.delete(`/agency/datasets/${id}`);
-  await Promise.resolve();
-  void id;
+import apiClient from "@/services/api";
+
+async function deleteDataset(datasetId: string): Promise<void> {
+  await apiClient.delete(`/datasets/${datasetId}`);
 }
 
 export function useDeleteDataset() {
@@ -13,6 +12,7 @@ export function useDeleteDataset() {
 
   return useMutation({
     mutationFn: deleteDataset,
+    retry: 0,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["agency", "datasets"] });
       queryClient.invalidateQueries({ queryKey: ["agency", "dashboard"] });

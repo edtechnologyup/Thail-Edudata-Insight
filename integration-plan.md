@@ -88,6 +88,7 @@ NEXT_PUBLIC_APP_ENV=development
 | 4 | useUpdateDataset | PATCH /datasets/{id} | ✅ |
 | 5 | useVersionHistory | GET /datasets/{id}/versions | ✅ |
 | 6 | useRestoreVersion | POST /datasets/{id}/versions/{v}/restore | ✅ |
+| 6b | useDeleteDataset | DELETE /datasets/{id} (soft delete) | ✅ |
 | 7 | useBulkUpload | POST /datasets/bulk-upload | ⏳ |
 | 8 | useAgencyCategories | GET /categories | ⏳ |
 | 9 | useCreateCategory | POST /categories | ⏳ |

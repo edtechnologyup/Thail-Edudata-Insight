@@ -28,6 +28,21 @@ class UserRejectRequest(BaseModel):
     reason: str = Field(min_length=10, max_length=500)
 
 
+class AdminDatasetListItem(BaseModel):
+    id: uuid.UUID
+    title: str
+    title_en: str = Field(serialization_alias="titleEn")
+    agency: str
+    agency_en: str = Field(serialization_alias="agencyEn")
+    category: str
+    category_en: str = Field(serialization_alias="categoryEn")
+    status: str
+    quality_score: int | None = Field(serialization_alias="qualityScore")
+    updated_at: datetime = Field(serialization_alias="updatedAt")
+
+    model_config = {"populate_by_name": True}
+
+
 class UserListResponse(BaseModel):
     id: uuid.UUID
     email: str

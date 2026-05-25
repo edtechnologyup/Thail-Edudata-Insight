@@ -15,6 +15,7 @@ from app.core.config import settings
 from app.core.errors import raise_app_error
 from app.core.logging import get_logger, log_request
 from app.core.pagination import PaginationParams
+from app.schemas.admin_schema import AdminDatasetListItem
 from app.schemas.dataset_schema import (
     BulkUploadResponse,
     BulkUploadRowError,
@@ -327,6 +328,88 @@ def list_datasets(
         r.tags = tag_ids
         responses.append(r)
     return responses, total
+
+
+def list_admin_datasets(
+    db: Session,
+    pagination: PaginationParams,
+    status_filter: str | None = None,
+    search: str | None = None,
+    agency_filter: str | None = None,
+) -> tuple[list[AdminDatasetListItem], int]:
+    """รายการ Dataset ทุกหน่วยงาน ทุก status สำหรับ Admin (GET /datasets?all=true)."""
+    from sqlalchemy import or_
+
+    from app.models.dataset_model import Dataset
+    from app.models.user_model import User
+    from app.repositories.agency_repository import _resolve_category_labels
+
+    query = (
+        db.query(Dataset, User)
+        .join(User, Dataset.user_id == User.id)
+        .filter(Dataset.is_deleted.is_(False), User.is_deleted.is_(False))
+    )
+
+    if status_filter and status_filter != "all":
+        query = query.filter(Dataset.status == status_filter)
+    if agency_filter and agency_filter != "all":
+        query = query.filter(User.agency_name == agency_filter)
+    if search and search.strip():
+        keyword = f"%{search.strip()}%"
+        query = query.filter(Dataset.title.ilike(keyword))
+
+    total = query.count()
+
+    sort_col = Dataset.updated_at
+    if pagination.sort == "created_at":
+        sort_col = Dataset.created_at
+    elif pagination.sort == "title":
+        sort_col = Dataset.title
+    order = sort_col.desc() if pagination.order == "desc" else sort_col.asc()
+
+    rows = (
+        query.order_by(order)
+        .offset(pagination.offset)
+        .limit(pagination.page_size)
+        .all()
+    )
+
+    items: list[AdminDatasetListItem] = []
+    for dataset, user in rows:
+        cat_th, cat_en, _, _ = _resolve_category_labels(db, dataset.category_id)
+        agency_name = (user.agency_name or user.email).strip()
+        items.append(
+            AdminDatasetListItem(
+                id=dataset.id,
+                title=dataset.title,
+                title_en=dataset.title,
+                agency=agency_name,
+                agency_en=agency_name,
+                category=cat_th,
+                category_en=cat_en,
+                status=dataset.status,
+                quality_score=dataset.quality_score if dataset.quality_score is not None else 0,
+                updated_at=dataset.updated_at,
+            )
+        )
+    return items, total
+
+
+def list_admin_dataset_agencies(db: Session) -> list[str]:
+    from app.models.dataset_model import Dataset
+    from app.models.user_model import User
+
+    rows = (
+        db.query(User.agency_name)
+        .join(Dataset, Dataset.user_id == User.id)
+        .filter(Dataset.is_deleted.is_(False), User.is_deleted.is_(False))
+        .distinct()
+        .all()
+    )
+    agencies = sorted(
+        {name.strip() for (name,) in rows if name and name.strip()}
+    )
+    return agencies
 
 
 def update_dataset(

@@ -3295,7 +3295,11 @@ export function unsuspendAdminUserMock(userId: string): void {
   user.status = "active";
 }
 
-export type AdminDatasetStatus = "published" | "draft";
+export type AdminDatasetStatus =
+  | "published"
+  | "draft"
+  | "submitted"
+  | "rejected";
 
 export type AdminDataset = {
   id: string;

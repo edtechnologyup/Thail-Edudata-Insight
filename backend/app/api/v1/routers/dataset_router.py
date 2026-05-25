@@ -3,21 +3,29 @@
 
 import uuid
 
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, Request, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, Query, Request, UploadFile, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 import app.services.dataset_service as dataset_service
 from app.core.database import get_db
+from app.core.errors import raise_app_error
 from app.core.pagination import PaginationParams, get_pagination_params
 from app.core.response import delete_response, list_response, success_response
 from app.core.security import (
+    decode_access_token,
+    extract_bearer_token,
     get_client_ip,
     get_current_user_payload_with_status,
+    get_user_status,
     require_roles,
+    validate_token_in_redis,
+    validate_user_status,
 )
 from app.schemas.dataset_schema import DatasetCreateRequest, DatasetUpdateRequest
 
 router = APIRouter()
+_bearer_optional = HTTPBearer(auto_error=False)
 
 
 def _get_minio():
@@ -99,16 +107,54 @@ def upload_dataset(
     return success_response(data=result.model_dump(mode="json"))
 
 
+def _require_admin_payload(
+    credentials: HTTPAuthorizationCredentials | None,
+    db: Session,
+) -> dict:
+    token = extract_bearer_token(credentials)
+    payload = decode_access_token(token)
+    user_id = payload.get("sub")
+    if not user_id:
+        raise_app_error("AUTH_TOKEN_INVALID")
+    validate_token_in_redis(user_id, token)
+    user_status = get_user_status(db, user_id)
+    validate_user_status(user_status)
+    if payload.get("role") != "admin":
+        raise_app_error("AUTH_PERMISSION_DENIED")
+    return payload
+
+
 @router.get("/datasets", status_code=status.HTTP_200_OK)
 def list_datasets(
     pagination: PaginationParams = Depends(get_pagination_params),
+    all: bool = Query(default=False, description="Admin: ทุกหน่วยงาน ทุก status"),
+    status: str | None = Query(default=None, description="กรอง status (ใช้กับ all=true)"),
+    search: str | None = Query(default=None),
+    agency: str | None = Query(default=None),
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_optional),
     db: Session = Depends(get_db),
 ):
     """
-    ดูรายการ Dataset — แสดงเฉพาะ published ตาม #5 M2
-    - Auth ❌
-    - คืน 200 + list_response
+    ดูรายการ Dataset
+    - all=false: เฉพาะ published, Auth ❌
+    - all=true: ทุก Agency ทุก status, Auth ✅ Admin
     """
+    if all:
+        _require_admin_payload(credentials, db)
+        items, total = dataset_service.list_admin_datasets(
+            db=db,
+            pagination=pagination,
+            status_filter=status,
+            search=search,
+            agency_filter=agency,
+        )
+        return list_response(
+            data=[i.model_dump(mode="json", by_alias=True) for i in items],
+            page=pagination.page,
+            page_size=pagination.page_size,
+            total_items=total,
+        )
+
     items, total = dataset_service.list_datasets(
         db=db, pagination=pagination, status_filter="published"
     )
@@ -118,6 +164,7 @@ def list_datasets(
         page_size=pagination.page_size,
         total_items=total,
     )
+
 
 
 @router.get("/datasets/{dataset_id}", status_code=status.HTTP_200_OK)

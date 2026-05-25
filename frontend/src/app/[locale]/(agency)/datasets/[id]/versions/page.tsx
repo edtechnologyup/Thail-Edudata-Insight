@@ -3,11 +3,17 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import RestoreModal from "@/components/dataset/RestoreModal";
 import VersionTimeline from "@/components/dataset/VersionTimeline";
-import { getAgencyDatasetById } from "@/data/mockData";
 import { useVersionHistory } from "@/hooks/useVersionHistory";
+import apiClient from "@/services/api";
+
+type DatasetDetail = {
+  id: string;
+  title: string;
+};
 
 export default function DatasetVersionsPage() {
   const t = useTranslations("agency.versions");
@@ -20,15 +26,21 @@ export default function DatasetVersionsPage() {
   const [toastSuccess, setToastSuccess] = useState<string | null>(null);
   const [toastError, setToastError] = useState<string | null>(null);
 
+  const { data: dataset, isLoading: isDatasetLoading } = useQuery({
+    queryKey: ["datasets", datasetId],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: DatasetDetail }>(
+        `/datasets/${datasetId}`
+      );
+      return res.data.data;
+    },
+    enabled: Boolean(datasetId),
+    retry: 1,
+  });
+
   const { data: versions, isLoading, isError } = useVersionHistory(datasetId);
 
-  const dataset = useMemo(
-    () => getAgencyDatasetById(datasetId),
-    [datasetId]
-  );
-
-  const datasetTitle =
-    locale === "th" ? dataset?.title : dataset?.titleEn ?? dataset?.title ?? "";
+  const datasetTitle = dataset?.title ?? "";
 
   const handleRestoreSuccess = () => {
     setToastSuccess(t("restoreSuccess"));
@@ -49,7 +61,13 @@ export default function DatasetVersionsPage() {
           <Link href={`${base}/datasets`} className="hover:text-primary-dark">
             {t("breadcrumbDatasets")}
           </Link>
-          {datasetTitle && (
+          {isDatasetLoading && (
+            <>
+              <ChevronIcon />
+              <span className="inline-block h-4 w-32 animate-pulse rounded-radius-sm bg-surface-container" />
+            </>
+          )}
+          {!isDatasetLoading && datasetTitle && (
             <>
               <ChevronIcon />
               <Link
@@ -68,7 +86,10 @@ export default function DatasetVersionsPage() {
         <h1 className="font-kanit text-[28px] font-bold text-text-primary">
           {t("title")}
         </h1>
-        {datasetTitle && (
+        {isDatasetLoading && (
+          <div className="mt-1 h-5 w-64 animate-pulse rounded-radius-sm bg-surface-container" />
+        )}
+        {!isDatasetLoading && datasetTitle && (
           <p className="mt-1 font-sarabun text-body-md text-text-muted">
             {datasetTitle}
           </p>

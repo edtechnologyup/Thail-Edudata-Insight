@@ -1,26 +1,63 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
-import {
-  fetchMockBulkUpload,
-  type BulkUploadResult,
-} from "@/data/mockData";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import apiClient from "@/services/api";
+import type { BulkUploadResult } from "@/data/mockData";
+
+// TODO: ต้องการ MinIO รันก่อนทดสอบ
+// docker-compose up -d minio
+// ทดสอบที่: /th/datasets/bulk-upload
+
+type BulkUploadApiRowError = {
+  row: number;
+  error: string;
+};
+
+type BulkUploadApiResponse = {
+  success_count: number;
+  error_count: number;
+  errors: BulkUploadApiRowError[];
+};
+
+function mapBulkUploadResponse(data: BulkUploadApiResponse): BulkUploadResult {
+  return {
+    success: data.success_count,
+    errors: data.error_count,
+    errorDetails: data.errors.map((item) => ({
+      row: item.row,
+      titleTh: "—",
+      titleEn: "—",
+      column: "—",
+      reasonTh: item.error,
+      reasonEn: item.error,
+    })),
+  };
+}
 
 async function bulkUpload(file: File): Promise<BulkUploadResult> {
-  // TODO: เปลี่ยนเป็น API จริงเมื่อ Backend พร้อม
-  // const formData = new FormData();
-  // formData.append("file", file);
-  // const response = await apiClient.post<JSendResponse<BulkUploadResult>>(
-  //   "/agency/datasets/bulk-upload",
-  //   formData,
-  //   { headers: { "Content-Type": "multipart/form-data" } }
-  // );
-  // return response.data.data!;
-  return fetchMockBulkUpload(file);
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await apiClient.post<{ data: BulkUploadApiResponse }>(
+    "/datasets/bulk-upload",
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 120000,
+    }
+  );
+
+  return mapBulkUploadResponse(res.data.data);
 }
 
 export function useBulkUpload() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: bulkUpload,
+    retry: 0,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agency", "datasets"] });
+    },
   });
 }

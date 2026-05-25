@@ -12,7 +12,7 @@
 | UI ทุกหน้า (27 หน้า) | ✅ เสร็จแล้ว |
 | Docker (Backend + DB) | ✅ รันได้ |
 | Phase 0 Auth | ✅ เสร็จแล้ว |
-| Phase 1 Agency | ⏳ กำลังทำ |
+| Phase 1 Agency | ✅ เสร็จ (Bulk Upload รอทดสอบเมื่อ MinIO รัน) |
 | Phase 2 Admin | ⏳ รอ |
 | Phase 3 Public | ⏳ รอ |
 
@@ -74,7 +74,7 @@ NEXT_PUBLIC_APP_ENV=development
 
 ---
 
-## Phase 1 — Agency ⏳ กำลังทำ
+## Phase 1 — Agency ✅ เสร็จ (Bulk Upload รอทดสอบเมื่อ MinIO รัน)
 
 **เป้าหมาย:** หน้า (agency)/* ใช้ API จริงแทน mock
 
@@ -84,20 +84,16 @@ NEXT_PUBLIC_APP_ENV=development
 |---|------|---------------------|-------|
 | 1 | useAgencyDashboard | GET /agency/dashboard | ✅ |
 | 2 | useAgencyDatasets | GET /agency/datasets | ✅ |
-| 3 | useUploadDataset | POST /datasets (multipart) | ✅ |
-| 4 | useUpdateDataset | PATCH /datasets/{id} | ✅ |
-| 5 | useVersionHistory | GET /datasets/{id}/versions | ✅ |
-| 6 | useRestoreVersion | POST /datasets/{id}/versions/{v}/restore | ✅ |
-| 6b | useDeleteDataset | DELETE /datasets/{id} (soft delete) | ✅ |
-| 7 | useBulkUpload | POST /datasets/bulk-upload | ⏳ |
-| 8 | useAgencyCategories | GET /categories (filter ตาม agency) | ✅ |
-| 9 | useCreateCategory | POST /categories + subcategories | ✅ |
-| 10 | useUpdateCategory | PATCH /categories/{id} | ✅ |
-| 11 | useDeleteCategory | DELETE /categories/{id} | ✅ |
-| 12 | useBookmarks | GET/POST/DELETE /bookmarks | ✅ |
-| 13 | useSubscriptions | GET/DELETE /subscriptions | ✅ |
-| 14 | useSavedSearches | GET/POST/DELETE /saved-searches | ✅ |
-| 15 | useDashboardLayout | GET/PUT /dashboard-layouts | ✅ |
+| 3 | useUploadDataset + useUpdateDataset | POST /datasets, PATCH /datasets/{id} | ✅ |
+| 4 | useVersionHistory + useRestoreVersion | GET versions, POST restore | ✅ |
+| 5 | useDeleteDataset | DELETE /datasets/{id} (soft delete) | ✅ |
+| 6 | useDownloadDataset | GET /datasets/{id}/download | ✅ |
+| 7 | useAgencyCategories + CRUD | GET/POST/PATCH/DELETE /categories | ✅ |
+| 8 | useBookmarks | GET/POST/DELETE /bookmarks | ✅ |
+| 9 | useSubscriptions | GET/DELETE /subscriptions | ✅ |
+| 10 | useSavedSearches | GET/POST/DELETE /saved-searches | ✅ |
+| 11 | useDashboardLayout | GET/PUT /dashboard-layouts | ✅ |
+| — | useBulkUpload | POST /datasets/bulk-upload | ✅ (เชื่อม API แล้ว — รอ MinIO ทดสอบ) |
 
 **⚠️ จุดสำคัญตาม claude.md #5 M2**
 - Agency ส่งได้แค่ status = `submitted`

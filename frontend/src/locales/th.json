@@ -147,6 +147,8 @@
     "categoriesNote": "ครอบคลุมทุกระดับชั้น",
     "studentsByYear": "จำนวนนักเรียนรายปี",
     "teachersByYear": "จำนวนครูรายปี",
+    "datasetsByYear": "Dataset รายปี",
+    "noChartData": "ยังไม่มีข้อมูล",
     "schoolsByYear": "จำนวนโรงเรียนรายปี",
     "schoolsLegend": "โรงเรียนรัฐบาล",
     "datasetByCategory": "Dataset แยกตามหมวดหมู่",

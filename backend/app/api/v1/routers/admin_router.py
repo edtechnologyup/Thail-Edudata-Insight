@@ -3,11 +3,21 @@
 
 import uuid
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    Query,
+    Request,
+    UploadFile,
+    status,
+)
 from sqlalchemy.orm import Session
 
 import app.services.admin_service as admin_service
 import app.services.dataset_service as dataset_service
+import app.services.hero_image_service as hero_image_service
 import app.services.page_content_service as page_content_service
 from app.core.config import settings
 from app.core.database import get_db
@@ -37,6 +47,17 @@ def _get_es():
     from elasticsearch import Elasticsearch
 
     return Elasticsearch(settings.ELASTICSEARCH_URL)
+
+
+def _get_minio():
+    from minio import Minio
+
+    return Minio(
+        settings.MINIO_ENDPOINT,
+        access_key=settings.MINIO_ACCESS_KEY,
+        secret_key=settings.MINIO_SECRET_KEY,
+        secure=False,
+    )
 
 
 @router.get("/stats", status_code=status.HTTP_200_OK)
@@ -274,6 +295,42 @@ def admin_delete_announcement(
     """
     admin_service.delete_announcement(db, announcement_id=id)
     return delete_response()
+
+
+@router.get("/settings/hero-image", status_code=status.HTTP_200_OK)
+def get_hero_image():
+    """
+    ดึง URL รูป Hero หน้าหลัก
+    - Auth ❌ (Visitor ดูได้)
+    """
+    result = hero_image_service.get_hero_image(_get_minio())
+    return success_response(result.model_dump(mode="json"))
+
+
+@router.post("/settings/hero-image", status_code=status.HTTP_200_OK)
+def upload_hero_image(
+    image: UploadFile = File(...),
+    payload: dict = Depends(require_roles("admin")),
+):
+    """
+    อัปโหลดรูป Hero หน้าหลัก (เก็บใน MinIO)
+    - Auth ✅ Admin
+    - multipart field: image
+    """
+    result = hero_image_service.upload_hero_image(_get_minio(), image)
+    return success_response(result.model_dump(mode="json"))
+
+
+@router.delete("/settings/hero-image", status_code=status.HTTP_200_OK)
+def delete_hero_image(
+    payload: dict = Depends(require_roles("admin")),
+):
+    """
+    ลบรูป Hero หน้าหลัก
+    - Auth ✅ Admin
+    """
+    result = hero_image_service.delete_hero_image(_get_minio())
+    return success_response(result.model_dump(mode="json"))
 
 
 @router.get("/pages", status_code=status.HTTP_200_OK)

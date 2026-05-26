@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import CategoryPieChart from "@/components/dashboard/CategoryPieChart";
+import DatasetsByYearChart from "@/components/dashboard/DatasetsByYearChart";
 import SchoolChart from "@/components/dashboard/SchoolChart";
 import StatsPageOverview from "@/components/dashboard/StatsPageOverview";
 import StudentChart from "@/components/dashboard/StudentChart";
@@ -28,6 +29,8 @@ export default async function StatsPage(_props: StatsPageProps) {
       <section className="bg-surface-page px-4 py-spacing-6 md:px-spacing-10">
         <div className="mx-auto max-w-container-max space-y-spacing-6">
           <StatsPageOverview />
+
+          <DatasetsByYearChart />
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <StudentChart data={MOCK_STATS_DATA.studentsByYear} />

@@ -147,6 +147,8 @@
     "categoriesNote": "All education levels covered",
     "studentsByYear": "Students per year",
     "teachersByYear": "Teachers per year",
+    "datasetsByYear": "Datasets per year",
+    "noChartData": "No data available",
     "schoolsByYear": "Schools per year",
     "schoolsLegend": "Public schools",
     "datasetByCategory": "Datasets by category",

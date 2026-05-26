@@ -11,16 +11,13 @@ import CategoryFilter, {
   type CategorySortOption,
 } from "@/components/search/CategoryFilter";
 import Pagination from "@/components/search/Pagination";
-import {
-  getCategoryDatasets,
-  type CategoryPageData,
-  type SearchResultMock,
-} from "@/data/mockData";
+import type { CategoryPageData, SearchResultMock } from "@/data/mockData";
 
 const PAGE_SIZE = 10;
 
 type CategoryPageContentProps = {
   pageData: CategoryPageData;
+  datasets: SearchResultMock[];
 };
 
 function filterDatasets(
@@ -79,7 +76,10 @@ function ChevronRight() {
   );
 }
 
-export default function CategoryPageContent({ pageData }: CategoryPageContentProps) {
+export default function CategoryPageContent({
+  pageData,
+  datasets,
+}: CategoryPageContentProps) {
   const t = useTranslations("category");
   const locale = useLocale();
   const searchParams = useSearchParams();
@@ -100,7 +100,7 @@ export default function CategoryPageContent({ pageData }: CategoryPageContentPro
       ? category.nameTh
       : category.nameEn;
 
-  const allDatasets = useMemo(() => getCategoryDatasets(pageData), [pageData]);
+  const allDatasets = datasets;
 
   const { totalCount, pageItems, totalPages } = useMemo(() => {
     const filtered = filterDatasets(

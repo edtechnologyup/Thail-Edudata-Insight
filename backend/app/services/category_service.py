@@ -16,12 +16,31 @@ from app.schemas.dataset_schema import (
 )
 
 
-def _make_slug(name_en: str) -> str:
-    slug = name_en.lower().strip()
+def _slugify_text(value: str) -> str:
+    slug = value.lower().strip()
     slug = re.sub(r"[^a-z0-9\s-]", "", slug)
     slug = re.sub(r"[\s]+", "-", slug)
     slug = re.sub(r"-+", "-", slug).strip("-")
     return slug
+
+
+def _make_slug(name_en: str, name_th: str | None = None) -> str:
+    slug = _slugify_text(name_en)
+    if not slug and name_th:
+        slug = _slugify_text(name_th)
+    if not slug:
+        slug = f"category-{uuid.uuid4().hex[:8]}"
+    return slug
+
+
+def _ensure_slug_available(
+    db: Session,
+    slug: str,
+    *,
+    exclude_id: uuid.UUID | None = None,
+) -> None:
+    if cat_repo.is_slug_taken(db, slug, exclude_id=exclude_id):
+        raise_app_error("CATEGORY_SLUG_EXISTS")
 
 
 def create_category(
@@ -29,10 +48,8 @@ def create_category(
     request: CategoryCreateRequest,
     current_user: dict,
 ) -> CategoryResponse:
-    slug = _make_slug(request.name_en)
-    existing = cat_repo.get_category_by_slug(db, slug)
-    if existing is not None:
-        raise_app_error("CATEGORY_SLUG_EXISTS")
+    slug = _make_slug(request.name_en, request.name_th)
+    _ensure_slug_available(db, slug)
 
     level = 1
     if request.parent_id is not None:
@@ -80,10 +97,8 @@ def create_subcategory(
         if str(parent.created_by) != current_user["sub"]:
             raise_app_error("CATEGORY_NOT_OWNED")
 
-    slug = _make_slug(request.name_en)
-    existing = cat_repo.get_category_by_slug(db, slug)
-    if existing is not None:
-        raise_app_error("CATEGORY_SLUG_EXISTS")
+    slug = _make_slug(request.name_en, request.name_th)
+    _ensure_slug_available(db, slug)
 
     category = cat_repo.create_category(
         db,
@@ -118,13 +133,16 @@ def update_category(
         fields["name_th"] = request.name_th
     if request.name_en is not None:
         fields["name_en"] = request.name_en
-        fields["slug"] = _make_slug(request.name_en)
+        fields["slug"] = _make_slug(
+            request.name_en,
+            request.name_th or category.name_th,
+        )
 
     if fields:
         if "slug" in fields:
-            existing = cat_repo.get_category_by_slug(db, fields["slug"])
-            if existing is not None and existing.id != category_id:
-                raise_app_error("CATEGORY_SLUG_EXISTS")
+            _ensure_slug_available(
+                db, fields["slug"], exclude_id=category_id
+            )
         cat_repo.update_category(db, category_id, **fields)
 
     db.commit()

@@ -1,19 +1,11 @@
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import CategoryPageContent from "@/components/category/CategoryPageContent";
-import { findCategoryPage } from "@/data/mockData";
+import CategorySlugPageClient from "@/components/category/CategorySlugPageClient";
 
 type CategoryPageProps = {
   params: { locale: string; slug: string };
 };
 
 export default function CategoryPage({ params }: CategoryPageProps) {
-  const pageData = findCategoryPage(params.slug);
-
-  if (!pageData) {
-    notFound();
-  }
-
   return (
     <Suspense
       fallback={
@@ -22,7 +14,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         </div>
       }
     >
-      <CategoryPageContent pageData={pageData} />
+      <CategorySlugPageClient slug={params.slug} />
     </Suspense>
   );
 }

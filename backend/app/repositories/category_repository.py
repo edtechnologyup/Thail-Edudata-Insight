@@ -104,3 +104,20 @@ def get_category_by_slug(db: Session, slug: str) -> Category | None:
         .filter(Category.slug == slug, Category.is_deleted.is_(False))
         .first()
     )
+
+
+def is_slug_taken(
+    db: Session,
+    slug: str,
+    *,
+    exclude_id: uuid.UUID | None = None,
+) -> bool:
+    """เช็ค slug ซ้ำรวมแถวที่ soft-delete แล้ว (unique constraint บน DB ครอบทุกแถว)"""
+    query = (
+        db.query(Category.id)
+        .filter(Category.slug == slug)
+        .execution_options(include_deleted=True)
+    )
+    if exclude_id is not None:
+        query = query.filter(Category.id != exclude_id)
+    return query.first() is not None

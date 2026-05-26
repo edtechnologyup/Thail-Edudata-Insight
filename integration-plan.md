@@ -158,11 +158,11 @@ NEXT_PUBLIC_APP_ENV=development
 | 3 | หน้าหลัก New Releases | GET /stats/new-releases | ⏳ |
 | 4 | ค้นหา | GET /search | ⏳ |
 | 5 | Search Autocomplete | GET /search/autocomplete | ⏳ |
-| 6 | รายละเอียด Dataset | GET /datasets/{id} | ⏳ |
+| 6 | รายละเอียด Dataset | GET /datasets/{id} | ✅ |
 | 7 | Preview | GET /datasets/{id}/preview | ⏳ |
 | 8 | Download | GET /datasets/{id}/download | ⏳ |
 | 9 | Citation | GET /datasets/{id}/citation | ⏳ |
-| 10 | หมวดหมู่ | GET /categories | ⏳ |
+| 10 | หมวดหมู่ | GET /categories | ✅ |
 | 11 | สถิติภาพรวม | GET /stats/overview | ⏳ |
 | 12 | เปรียบเทียบ | GET /stats/compare | ⏳ |
 | 13 | Static Pages | GET /pages/{slug} | ⏳ |

@@ -212,6 +212,10 @@
     "jumpTo": "Jump to..."
   },
   "category": {
+    "indexTitle": "Data categories",
+    "indexSubtitle": "Browse published datasets by category",
+    "indexEmpty": "No categories available yet",
+    "loadError": "Could not load categories. Please try again.",
     "datasetsIn": "Datasets in category",
     "notFound": "Category not found",
     "datasets": "{count} datasets found",
@@ -387,7 +391,8 @@
       "bookmark": "Bookmark",
       "compare": "Compare",
       "quote": "Citation",
-      "openDataCommon": "Open Data Common"
+      "openDataCommon": "Open Data Common",
+      "loadError": "Could not load dataset details. Please try again."
     },
     "download": {
       "title": "Select file format and purpose",
@@ -512,6 +517,8 @@
       "fieldCategoryL1Placeholder": "Select parent category",
       "fieldCategoryL2": "Category level 2",
       "fieldCategoryL2Placeholder": "Select subcategory",
+      "fieldCategoryLoadError": "Could not load categories",
+      "fieldCategoryL2Empty": "No subcategories yet — create one in category management",
       "fieldLicense": "License",
       "fieldLicenseError": "Please select a license",
       "licenseOpen": "Open Data (Public Domain)",

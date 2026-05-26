@@ -217,10 +217,10 @@ export default function AgencySidebar() {
       match: (p) => p.startsWith(`${base}/datasets/bulk-upload`),
     },
     {
-      href: `${base}/categories`,
+      href: `${base}/manage/categories`,
       labelKey: "categories",
       icon: "categories",
-      match: (p) => p.startsWith(`${base}/categories`),
+      match: (p) => p.startsWith(`${base}/manage/categories`),
     },
     {
       href: `${base}/saved`,

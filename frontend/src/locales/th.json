@@ -212,6 +212,10 @@
     "jumpTo": "ไปยังหัวข้อ..."
   },
   "category": {
+    "indexTitle": "หมวดหมู่ข้อมูล",
+    "indexSubtitle": "เลือกหมวดหมู่เพื่อดูชุดข้อมูลที่เผยแพร่แล้ว",
+    "indexEmpty": "ยังไม่มีหมวดหมู่ในระบบ",
+    "loadError": "โหลดหมวดหมู่ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
     "datasetsIn": "ชุดข้อมูลในหมวด",
     "notFound": "ไม่พบหมวดหมู่นี้",
     "datasets": "พบ {count} Dataset",
@@ -387,7 +391,8 @@
       "bookmark": "บุ๊กมาร์ก",
       "compare": "เปรียบเทียบ",
       "quote": "อ้างอิง",
-      "openDataCommon": "Open Data Common"
+      "openDataCommon": "Open Data Common",
+      "loadError": "โหลดข้อมูล Dataset ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"
     },
     "download": {
       "title": "เลือกรูปแบบไฟล์และวัตถุประสงค์",
@@ -512,6 +517,8 @@
       "fieldCategoryL1Placeholder": "เลือกหมวดหมู่หลัก",
       "fieldCategoryL2": "Category Level 2",
       "fieldCategoryL2Placeholder": "เลือกหมวดหมู่ย่อย",
+      "fieldCategoryLoadError": "โหลดหมวดหมู่ไม่สำเร็จ",
+      "fieldCategoryL2Empty": "ยังไม่มีหมวดหมู่ย่อย — สร้างที่จัดการหมวดหมู่ก่อน",
       "fieldLicense": "Select License",
       "fieldLicenseError": "กรุณาเลือก License",
       "licenseOpen": "Open Data (Public Domain)",

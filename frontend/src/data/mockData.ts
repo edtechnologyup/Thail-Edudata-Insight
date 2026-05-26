@@ -146,6 +146,7 @@ export const MOCK_LATEST_DATASETS: HomeDatasetMock[] = [
 ];
 
 export type CategorySubcategoryMock = {
+  id?: string;
   slug: string;
   nameTh: string;
   nameEn: string;
@@ -154,6 +155,7 @@ export type CategorySubcategoryMock = {
 };
 
 export type CategoryMock = {
+  id?: string;
   slug: string;
   nameTh: string;
   nameEn: string;

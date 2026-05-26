@@ -48,6 +48,8 @@ class SoftDeleteMixin:
 def _apply_soft_delete_filter(execute_state) -> None:
     if not execute_state.is_select:
         return
+    if execute_state.execution_options.get("include_deleted"):
+        return
     execute_state.statement = execute_state.statement.options(
         with_loader_criteria(
             SoftDeleteMixin,

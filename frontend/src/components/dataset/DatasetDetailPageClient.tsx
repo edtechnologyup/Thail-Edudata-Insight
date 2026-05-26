@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import DatasetDetail from "@/components/dataset/DatasetDetail";
+import DatasetDetailSkeleton from "@/components/dataset/DatasetDetailSkeleton";
+import { useCategories } from "@/hooks/useCategories";
+import { useDatasetCitation } from "@/hooks/useDatasetCitation";
 import { useDatasetDetail } from "@/hooks/useDatasetDetail";
+import { buildDatasetDetailView } from "@/utils/datasetDetailMappers";
 
 type DatasetDetailPageClientProps = {
   id: string;
@@ -28,23 +32,29 @@ export default function DatasetDetailPageClient({
   locale,
 }: DatasetDetailPageClientProps) {
   const t = useTranslations("dataset");
-  const tCommon = useTranslations("common");
   const base = `/${locale}`;
+  const uiLocale = useLocale();
 
-  const { data: dataset, isLoading, isError, error } = useDatasetDetail(id);
+  const {
+    data: apiDataset,
+    isLoading: detailLoading,
+    isError: detailError,
+    error: detailErr,
+  } = useDatasetDetail(id);
 
-  if (isLoading) {
-    return (
-      <div className="mx-auto max-w-container-max px-4 py-16 text-center">
-        <p className="font-sarabun text-body-md text-text-muted">
-          {tCommon("loading")}
-        </p>
-      </div>
-    );
+  const { data: categories = [] } = useCategories();
+
+  const { data: citation } = useDatasetCitation(
+    id,
+    Boolean(apiDataset) && !detailLoading
+  );
+
+  if (detailLoading) {
+    return <DatasetDetailSkeleton />;
   }
 
-  if (isError || !dataset) {
-    const code = (error as Error & { code?: string })?.code;
+  if (detailError || !apiDataset) {
+    const code = (detailErr as Error & { code?: string })?.code;
     const isNotFound = code === "DATASET_NOT_FOUND";
 
     return (
@@ -52,9 +62,9 @@ export default function DatasetDetailPageClient({
         <p className="font-kanit text-heading-3 text-text-primary">
           {isNotFound ? t("notFound") : t("detail.loadError")}
         </p>
-        {error?.message && !isNotFound && (
+        {detailErr?.message && !isNotFound && (
           <p className="mt-2 font-sarabun text-body-md text-text-secondary">
-            {error.message}
+            {detailErr.message}
           </p>
         )}
         <Link
@@ -67,11 +77,19 @@ export default function DatasetDetailPageClient({
     );
   }
 
+  const detail = buildDatasetDetailView(
+    apiDataset,
+    categories,
+    uiLocale,
+    citation?.agency_name
+  );
+
   return (
     <DatasetDetail
-      dataset={dataset}
-      publishedDateLabel={formatPublishedDate(dataset.publishedAt, locale)}
-      downloadCountLabel={formatDownloadCount(dataset.downloadCount, locale)}
+      datasetId={id}
+      detail={detail}
+      publishedDateLabel={formatPublishedDate(detail.publishedAt, locale)}
+      downloadCountLabel={formatDownloadCount(detail.downloadCount, locale)}
     />
   );
 }

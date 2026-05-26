@@ -45,14 +45,22 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       const requestUrl = error.config?.url ?? "";
       const isLoginRequest = requestUrl.includes("/auth/login");
+      const hadAuth = Boolean(error.config?.headers?.Authorization);
+      const isPublicDatasetEndpoint =
+        /\/datasets\/[^/]+(\/preview|\/download|\/citation)?$/.test(
+          requestUrl.split("?")[0] ?? ""
+        );
 
-      if (!isLoginRequest && typeof window !== "undefined") {
+      if (!isLoginRequest && hadAuth && typeof window !== "undefined") {
         localStorage.removeItem("token");
         localStorage.removeItem("auth");
-        const locale = localStorage.getItem("locale") || "th";
-        const pathLocale =
-          window.location.pathname.split("/")[1] === "en" ? "en" : locale;
-        window.location.href = `/${pathLocale}/login`;
+
+        if (!isPublicDatasetEndpoint) {
+          const locale = localStorage.getItem("locale") || "th";
+          const pathLocale =
+            window.location.pathname.split("/")[1] === "en" ? "en" : locale;
+          window.location.href = `/${pathLocale}/login`;
+        }
       }
     }
 

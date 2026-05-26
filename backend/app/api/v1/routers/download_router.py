@@ -103,10 +103,14 @@ def download_dataset(
         f'attachment; filename="{ascii_filename}"; '
         f"filename*=UTF-8''{filename_encoded}"
     )
+    response_headers = {"Content-Disposition": content_disposition}
+    if file_format == "csv":
+        response_headers["Content-Type"] = "text/csv; charset=utf-8-sig"
+
     return StreamingResponse(
         io.BytesIO(file_bytes),
         media_type=media_type,
-        headers={"Content-Disposition": content_disposition},
+        headers=response_headers,
     )
 
 

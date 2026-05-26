@@ -114,8 +114,10 @@ def _convert_dataframe_to_bytes(
     ).strip("_") or "dataset"
 
     if file_format == "csv":
-        content = df.to_csv(index=False).encode("utf-8")
-        return content, "text/csv", f"{safe_name}.csv"
+        csv_text = df.to_csv(index=False)
+        # UTF-8 BOM so Excel on Windows opens Thai text correctly
+        content = b"\xef\xbb\xbf" + csv_text.encode("utf-8")
+        return content, "text/csv; charset=utf-8-sig", f"{safe_name}.csv"
     if file_format == "json":
         content = df.to_json(orient="records", force_ascii=False).encode("utf-8")
         return content, "application/json", f"{safe_name}.json"

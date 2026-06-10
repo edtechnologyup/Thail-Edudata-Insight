@@ -187,32 +187,36 @@ def search_datasets(
                 }
             )
 
-    should_clauses: list[dict] = [
-        {
-            "multi_match": {
-                "query": keyword,
-                "fields": ["title", "description", "agency_name", "tags"],
-                "operator": "or",
-                "analyzer": "thai",
-            }
-        },
-        {
-            "wildcard": {
-                "tags": {"value": f"*{keyword.lower()}*", "case_insensitive": True}
-            }
-        },
-    ]
-
     sort_field = _resolve_sort_field(es_client, pagination.sort)
 
+    # ถ้ามี keyword → ค้นด้วย keyword (should) ร่วมกับ filter (must)
+    # ถ้าไม่มี keyword → filter-only search ใช้แค่ must ตาม #31
+    if keyword.strip():
+        should_clauses: list[dict] = [
+            {
+                "multi_match": {
+                    "query": keyword,
+                    "fields": ["title", "description", "agency_name", "tags"],
+                    "operator": "or",
+                    "analyzer": "thai",
+                }
+            },
+            {
+                "wildcard": {
+                    "tags": {"value": f"*{keyword.lower()}*", "case_insensitive": True}
+                }
+            },
+        ]
+        bool_query: dict[str, Any] = {
+            "must": must_clauses,
+            "should": should_clauses,
+            "minimum_should_match": 1,
+        }
+    else:
+        bool_query = {"must": must_clauses}
+
     body: dict[str, Any] = {
-        "query": {
-            "bool": {
-                "must": must_clauses,
-                "should": should_clauses,
-                "minimum_should_match": 1,
-            }
-        },
+        "query": {"bool": bool_query},
         "from": pagination.offset,
         "size": pagination.page_size,
         "sort": [{sort_field: {"order": pagination.order}}],

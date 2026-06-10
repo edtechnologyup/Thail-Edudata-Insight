@@ -1,12 +1,13 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import {
   MOCK_FILTER_AGENCIES,
   MOCK_FILTER_FORMATS,
   MOCK_FILTER_YEARS,
 } from "@/data/mockData";
+import { THAI_PROVINCES } from "@/data/thaiProvinces";
 import FilterTree from "./FilterTree";
 import {
   parseListParam,
@@ -14,12 +15,16 @@ import {
   useSearchParamsUpdate,
 } from "./useSearchParamsUpdate";
 
+const LICENSE_OPTIONS = ["open", "conditional", "cc"] as const;
+
 type SearchFilterProps = {
   selectedCategory: string | null;
   selectedAgencies: string[];
   selectedYears: string[];
   selectedFormats: string[];
   selectedTag: string;
+  selectedLicense: string;
+  selectedProvince: string;
   filterQuery: string;
   className?: string;
 };
@@ -30,6 +35,8 @@ export default function SearchFilter({
   selectedYears,
   selectedFormats,
   selectedTag,
+  selectedLicense,
+  selectedProvince,
   filterQuery,
   className = "",
 }: SearchFilterProps) {
@@ -37,6 +44,28 @@ export default function SearchFilter({
   const locale = useLocale();
   const updateParams = useSearchParamsUpdate();
   const [localFilter, setLocalFilter] = useState(filterQuery);
+  const [provinceQuery, setProvinceQuery] = useState("");
+  const [provinceOpen, setProvinceOpen] = useState(false);
+
+  const provinceLabelMap = useMemo(() => {
+    const map = new Map<string, string>();
+    THAI_PROVINCES.forEach((p) =>
+      map.set(p.value, locale === "th" ? p.labelTh : p.labelEn)
+    );
+    return map;
+  }, [locale]);
+
+  const filteredProvinces = useMemo(() => {
+    const query = provinceQuery.trim().toLowerCase();
+    const options = THAI_PROVINCES.map((p) => ({
+      value: p.value,
+      label: locale === "th" ? p.labelTh : p.labelEn,
+    }));
+    if (!query) return options.slice(0, 5);
+    return options
+      .filter((p) => p.label.toLowerCase().includes(query))
+      .slice(0, 5);
+  }, [provinceQuery, locale]);
 
   function handleFilterInResults(e: FormEvent) {
     e.preventDefault();
@@ -58,6 +87,24 @@ export default function SearchFilter({
     updateParams({ format: next.length ? next.join(",") : null });
   }
 
+  function toggleLicense(value: string) {
+    updateParams({
+      license: selectedLicense === value ? null : value,
+      page: null,
+    });
+  }
+
+  function selectProvince(value: string) {
+    updateParams({ province: value || null, page: null });
+    setProvinceQuery("");
+    setProvinceOpen(false);
+  }
+
+  function clearProvince() {
+    updateParams({ province: null, page: null });
+    setProvinceQuery("");
+  }
+
   function clearAll() {
     updateParams({
       category: null,
@@ -66,10 +113,12 @@ export default function SearchFilter({
       format: null,
       tag: null,
       license: null,
+      province: null,
       fq: null,
       page: null,
     });
     setLocalFilter("");
+    setProvinceQuery("");
   }
 
   return (
@@ -209,6 +258,108 @@ export default function SearchFilter({
         </div>
       </div>
 
+      <hr className="border-border-default/60" />
+
+      <div className="flex flex-col gap-3">
+        <span className="font-sarabun text-label font-medium text-text-secondary">
+          {t("license")}
+        </span>
+        <div className="flex flex-wrap gap-2">
+          {LICENSE_OPTIONS.map((value) => {
+            const active = selectedLicense === value;
+            const label =
+              value === "open"
+                ? t("licenseOpen")
+                : value === "conditional"
+                  ? t("licenseConditional")
+                  : t("licenseCc");
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => toggleLicense(value)}
+                className={`rounded-radius-full border px-3 py-1 font-sarabun text-caption font-medium transition-colors ${
+                  active
+                    ? "border-primary/30 bg-primary text-white"
+                    : "border-border-default/80 bg-surface-container text-text-secondary hover:bg-primary-light"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <hr className="border-border-default/60" />
+
+      <div className="flex flex-col gap-3">
+        <span className="font-sarabun text-label font-medium text-text-secondary">
+          {t("province")}
+        </span>
+        {selectedProvince ? (
+          <div className="flex items-center justify-between gap-2 rounded-radius-md border border-primary/30 bg-primary-light px-3 py-2">
+            <span className="font-sarabun text-label font-medium text-primary-dark">
+              {selectedProvince === "all"
+                ? t("provinceAll")
+                : provinceLabelMap.get(selectedProvince) ?? selectedProvince}
+            </span>
+            <button
+              type="button"
+              onClick={clearProvince}
+              className="text-primary-dark transition-colors hover:text-status-error"
+              aria-label={t("clearFilter")}
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <div className="relative">
+            <input
+              type="text"
+              value={provinceQuery}
+              onChange={(e) => {
+                setProvinceQuery(e.target.value);
+                setProvinceOpen(true);
+              }}
+              onFocus={() => setProvinceOpen(true)}
+              onBlur={() => setTimeout(() => setProvinceOpen(false), 150)}
+              placeholder={t("provincePlaceholder")}
+              className="w-full rounded-radius-md border border-border-input px-3 py-2 font-sarabun text-label text-text-primary outline-none focus:border-border-focus focus:ring-1 focus:ring-primary-dark/30"
+            />
+            {provinceOpen ? (
+              <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-radius-md border border-border-default bg-surface-card shadow-level-2">
+                <button
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectProvince("all");
+                  }}
+                  className="block w-full px-3 py-2 text-left font-sarabun text-label text-text-primary transition-colors hover:bg-primary-light"
+                >
+                  {t("provinceAll")}
+                </button>
+                {filteredProvinces.map((p) => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      selectProvince(p.value);
+                    }}
+                    className="block w-full px-3 py-2 text-left font-sarabun text-label text-text-primary transition-colors hover:bg-primary-light"
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
+
       <div className="mt-2 flex flex-col gap-3">
         <button
           type="button"
@@ -243,6 +394,8 @@ export function useSearchFilterParams(searchParams: URLSearchParams) {
     selectedYears: parseListParam(searchParams.get("year")),
     selectedFormats: parseListParam(searchParams.get("format")),
     selectedTag: searchParams.get("tag") ?? "",
+    selectedLicense: searchParams.get("license") ?? "",
+    selectedProvince: searchParams.get("province") ?? "",
     filterQuery: searchParams.get("fq") ?? "",
   };
 }

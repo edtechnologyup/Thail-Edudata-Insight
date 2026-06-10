@@ -3,7 +3,7 @@ services:
     image: postgres:15
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -85,6 +85,8 @@ services:
       - "8000:8000"
     env_file:
       - ./backend/.env
+    volumes:
+      - ./backend:/app
     depends_on:
       postgres:
         condition: service_healthy

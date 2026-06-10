@@ -37,7 +37,7 @@ def get_agency_dashboard(
 def list_agency_datasets(
     status: str | None = Query(
         default=None,
-        description="กรอง status: draft | submitted | published (ไม่ส่ง = ทั้งหมด)",
+        description="กรอง status: draft | published (ไม่ส่ง = ทั้งหมด)",
     ),
     pagination: PaginationParams = Depends(get_pagination_params),
     payload: dict = Depends(require_roles("agency", "admin")),

@@ -28,7 +28,6 @@ ALLOWED_FILTER_KEYS = frozenset({
 })
 
 ADMIN_USERS_PATH = "/admin/users"
-ADMIN_DATASETS_PATH = "/admin/datasets"
 DATASET_PATH_PREFIX = "/datasets"
 
 
@@ -99,14 +98,6 @@ def _get_subscriber_emails(
     return [row[0] for row in rows]
 
 
-def _get_agency_owner(db: Session, user_id: uuid.UUID) -> User | None:
-    return (
-        db.query(User)
-        .filter(User.id == user_id, User.is_deleted.is_(False))
-        .first()
-    )
-
-
 def _dataset_matches_saved_search_filters(dataset, filters: dict) -> bool:
     if not filters or not isinstance(filters, dict):
         return False
@@ -175,49 +166,6 @@ def _task_notify_agency_register_success(
         "สมัครสำเร็จ รอ Admin อนุมัติบัญชีก่อน Login"
     )
     send_email(user_email, subject, body)
-
-
-def _task_notify_admins_dataset_submitted(
-    admin_emails: list[str],
-    dataset_title: str,
-    agency_name: str,
-    dataset_id: str,
-) -> None:
-    subject = "มี Dataset ใหม่รอการอนุมัติ"
-    body = (
-        f"ชื่อ Dataset: {dataset_title}\n"
-        f"หน่วยงาน: {agency_name}\n"
-        f"Link: {ADMIN_DATASETS_PATH} (Dataset ID: {dataset_id})"
-    )
-    _send_to_many(admin_emails, subject, body)
-
-
-def _task_notify_agency_dataset_approved(
-    agency_email: str,
-    dataset_title: str,
-    dataset_id: str,
-) -> None:
-    subject = "Dataset ของคุณได้รับการอนุมัติแล้ว"
-    body = (
-        f"ชื่อ Dataset: {dataset_title}\n"
-        f"Link: {DATASET_PATH_PREFIX}/{dataset_id}"
-    )
-    send_email(agency_email, subject, body)
-
-
-def _task_notify_agency_dataset_rejected(
-    agency_email: str,
-    dataset_title: str,
-    dataset_id: str,
-    comment: str,
-) -> None:
-    subject = "Dataset ของคุณถูกส่งกลับเพื่อแก้ไข"
-    body = (
-        f"ชื่อ Dataset: {dataset_title}\n"
-        f"เหตุผล: {comment}\n"
-        f"Link: {DATASET_PATH_PREFIX}/{dataset_id}/edit"
-    )
-    send_email(agency_email, subject, body)
 
 
 def _task_notify_subscribers(
@@ -296,57 +244,6 @@ def notify_agency_register_success(
     )
 
 
-def notify_admin_dataset_submitted(
-    background_tasks: BackgroundTasks,
-    db: Session,
-    dataset,
-) -> None:
-    admin_emails = _get_admin_emails(db)
-    if not admin_emails:
-        return
-    owner = _get_agency_owner(db, dataset.user_id)
-    agency_name = owner.agency_name if owner else "-"
-    background_tasks.add_task(
-        _task_notify_admins_dataset_submitted,
-        admin_emails,
-        dataset.title,
-        agency_name,
-        str(dataset.id),
-    )
-
-
-def notify_agency_dataset_approved(
-    background_tasks: BackgroundTasks,
-    db: Session,
-    dataset,
-) -> None:
-    owner = _get_agency_owner(db, dataset.user_id)
-    if owner is None:
-        return
-    background_tasks.add_task(
-        _task_notify_agency_dataset_approved,
-        owner.email,
-        dataset.title,
-        str(dataset.id),
-    )
-
-
-def notify_agency_dataset_rejected(
-    background_tasks: BackgroundTasks,
-    db: Session,
-    dataset,
-    comment: str,
-) -> None:
-    owner = _get_agency_owner(db, dataset.user_id)
-    if owner is None:
-        return
-    background_tasks.add_task(
-        _task_notify_agency_dataset_rejected,
-        owner.email,
-        dataset.title,
-        str(dataset.id),
-        comment,
-    )
 
 
 def notify_subscribers_new_dataset(

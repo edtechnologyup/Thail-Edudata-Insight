@@ -34,6 +34,8 @@ export default function SearchPageContent() {
       selectedYears={filterParams.selectedYears}
       selectedFormats={filterParams.selectedFormats}
       selectedTag={filterParams.selectedTag}
+      selectedLicense={filterParams.selectedLicense}
+      selectedProvince={filterParams.selectedProvince}
       filterQuery={filterParams.filterQuery}
     />
   );

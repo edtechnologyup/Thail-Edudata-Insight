@@ -19,6 +19,7 @@ type DatasetDetailProps = {
   datasetId: string;
   detail: DatasetDetailView;
   publishedDateLabel: string;
+  isUpdated: boolean;
   downloadCountLabel: string;
 };
 
@@ -45,6 +46,7 @@ export default function DatasetDetail({
   datasetId,
   detail,
   publishedDateLabel,
+  isUpdated,
   downloadCountLabel,
 }: DatasetDetailProps) {
   const t = useTranslations("dataset");
@@ -137,7 +139,7 @@ export default function DatasetDetail({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   <span className="font-sarabun text-label" suppressHydrationWarning>
-                    {tDetail("publishedAt")}: {publishedDateLabel}
+                    {isUpdated ? tDetail("updatedAt") : tDetail("publishedAt")}: {publishedDateLabel}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-text-secondary">

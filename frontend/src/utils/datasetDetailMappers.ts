@@ -54,6 +54,8 @@ export function buildDatasetDetailView(
     agencyName: agencyName ?? "—",
     publishedAt:
       dataset.published_at ?? dataset.created_at ?? new Date().toISOString(),
+    createdAt: dataset.created_at ?? new Date().toISOString(),
+    updatedAt: dataset.updated_at ?? dataset.created_at ?? new Date().toISOString(),
     downloadCount: dataset.download_count ?? 0,
     qualityScore: dataset.quality_score ?? 0,
     license: dataset.license as DatasetLicense,

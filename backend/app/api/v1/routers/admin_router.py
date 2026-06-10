@@ -259,7 +259,7 @@ def admin_hide_dataset(
     db: Session = Depends(get_db),
 ):
     """
-    Admin ซ่อน Dataset ที่ไม่เหมาะสม (published → draft) ตาม #5 M6
+    Admin ซ่อน Dataset ที่ไม่เหมาะสมด้วย Soft Delete (is_deleted = true) ตาม #5 M6, #15
     - Auth ✅ Admin
     """
     result = dataset_service.hide_dataset(

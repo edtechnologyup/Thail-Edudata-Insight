@@ -43,6 +43,8 @@ export type DatasetDetailView = {
   subcategoryLabel: string;
   agencyName: string;
   publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
   downloadCount: number;
   qualityScore: number;
   license: DatasetLicense;

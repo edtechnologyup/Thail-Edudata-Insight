@@ -328,7 +328,7 @@ def hide_dataset(
     background_tasks: BackgroundTasks,
     es_client,
 ) -> DatasetResponse:
-    """Admin ซ่อน Dataset ที่ไม่เหมาะสม (published → draft) ตาม #5 M6."""
+    """Admin ซ่อน Dataset ที่ไม่เหมาะสมด้วย Soft Delete (is_deleted = true) ตาม #5 M6, #15."""
     if current_user.get("role") != "admin":
         raise_app_error("AUTH_PERMISSION_DENIED")
 
@@ -336,7 +336,10 @@ def hide_dataset(
     if dataset is None:
         raise_app_error("DATASET_NOT_FOUND")
 
-    dataset_repo.update_dataset(db, dataset_id, status="draft")
+    # สร้าง response ก่อน Soft Delete เพราะหลังลบจะ query Dataset ไม่เจอแล้ว
+    response = _build_dataset_response(db, dataset_id)
+
+    dataset_repo.soft_delete_dataset(db, dataset_id)
     dataset_repo.create_audit_log(
         db,
         user_id=uuid.UUID(current_user["sub"]),
@@ -351,7 +354,7 @@ def hide_dataset(
     from app.utils.elasticsearch_utils import delete_dataset_index as es_delete
     background_tasks.add_task(es_delete, es_client, str(dataset_id))
 
-    return _build_dataset_response(db, dataset_id)
+    return response
 
 
 def can_view_dataset(dataset, current_user: dict | None) -> bool:

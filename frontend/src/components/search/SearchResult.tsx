@@ -20,6 +20,8 @@ type SearchResultProps = {
   selectedYears: string[];
   selectedFormats: string[];
   selectedTag: string;
+  selectedLicense: string;
+  selectedProvince: string;
   sort: SortOption;
   page: number;
 };
@@ -184,17 +186,44 @@ export default function SearchResult(props: SearchResultProps) {
       props.filterQuery,
       props.selectedCategory,
       props.selectedTag,
+      props.selectedLicense,
+      props.selectedProvince,
       props.page,
       props.sort,
     ],
     queryFn: async () => {
-      const keyword = (props.keyword || props.filterQuery || "ข้อมูล").trim();
+      const keyword = (props.keyword || props.filterQuery || "").trim();
       const filters: Record<string, string> = {};
       if (props.selectedCategory) {
         filters.category_id = props.selectedCategory;
       }
       if (props.selectedTag) {
         filters.tag = props.selectedTag;
+      }
+      if (props.selectedLicense) {
+        filters.license = props.selectedLicense;
+      }
+      if (props.selectedProvince && props.selectedProvince !== "all") {
+        filters.province = props.selectedProvince;
+      }
+
+      const hasKeyword = keyword.length >= 2;
+      const hasFilters = Object.keys(filters).length > 0;
+
+      // ไม่มี keyword และไม่มี filter → แสดง Dataset ทั้งหมดจาก /datasets ตาม #31
+      if (!hasKeyword && !hasFilters) {
+        const response = await apiClient.get<{
+          data: ApiSearchItem[];
+          pagination: { total_items: number; total_pages: number };
+        }>("/datasets", {
+          params: {
+            page: props.page,
+            page_size: PAGE_SIZE,
+            sort: mapSortToApi(props.sort),
+            order: "desc",
+          },
+        });
+        return response.data;
       }
 
       const response = await apiClient.get<{
@@ -270,6 +299,8 @@ export function parseSearchPageParams(searchParams: URLSearchParams) {
     selectedYears: parseListParam(searchParams.get("year")),
     selectedFormats: parseListParam(searchParams.get("format")),
     selectedTag: searchParams.get("tag") ?? "",
+    selectedLicense: searchParams.get("license") ?? "",
+    selectedProvince: searchParams.get("province") ?? "",
     sort,
     page,
   };

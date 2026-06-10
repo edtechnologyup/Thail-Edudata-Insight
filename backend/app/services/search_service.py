@@ -112,12 +112,20 @@ def search(
     pagination: PaginationParams,
 ) -> tuple[list[SearchResponse], int]:
     kw = (keyword or "").strip()
-    if len(kw) < 2:
-        raise_app_error("SEARCH_KEYWORD_TOO_SHORT")
-
     validated_filters = _validate_filters(filters)
 
-    result = search_datasets(es_client, kw, validated_filters, pagination)
+    # อนุญาตให้ค้นแบบ filter-only ได้ (ไม่ต้องมี keyword) ตาม #31
+    # แต่ถ้ามี keyword ต้องยาวอย่างน้อย 2 ตัวอักษร
+    has_filters = bool(validated_filters)
+    if len(kw) < 2 and not has_filters:
+        raise_app_error("SEARCH_KEYWORD_TOO_SHORT")
+
+    # keyword สั้นเกินไปแต่มี filter → ค้นแบบ filter-only (ไม่ใช้ keyword)
+    effective_keyword = kw if len(kw) >= 2 else ""
+
+    result = search_datasets(
+        es_client, effective_keyword, validated_filters, pagination
+    )
     responses = [_map_to_search_response(item) for item in result.items]
     return responses, result.total
 

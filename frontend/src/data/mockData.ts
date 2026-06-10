@@ -3001,7 +3001,7 @@ export function updateDatasetMock(
     updatedAt: new Date().toISOString().slice(0, 10),
   };
 
-  if (previousStatus === "published" && nextStatus === "submitted") {
+  if (previousStatus === "published" && nextStatus === "draft") {
     mockAgencyStats.publishedDatasets = Math.max(
       0,
       mockAgencyStats.publishedDatasets - 1

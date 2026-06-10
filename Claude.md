@@ -1024,10 +1024,17 @@ Enum file_format {
 | POST | /api/v1/datasets/bulk-upload | Bulk Upload | ✅ |
 | GET | /api/v1/datasets/{id}/quality-score | ดู Quality Score | ✅ |
 
+**Agency**
+| Method | Endpoint | ใช้ทำอะไร | Auth |
+|---|---|---|---|
+| GET | /api/v1/agency/dashboard | Dashboard สถิติของ Agency | ✅ Agency/Admin |
+| GET | /api/v1/agency/datasets | รายการ Dataset ของตัวเอง (ทุก status) | ✅ Agency/Admin |
+| GET | /api/v1/agency/activity-logs | ประวัติการทำงานของตัวเอง | ✅ Agency/Admin |
+
 **M3 · Search**
 | Method | Endpoint | ใช้ทำอะไร | Auth |
 |---|---|---|---|
-| GET | /api/v1/search | ค้นหา Dataset | ❌ |
+| GET | /api/v1/search | ค้นหา Dataset (รองรับ filter-only) | ❌ |
 | GET | /api/v1/search/autocomplete | Autocomplete | ❌ |
 | POST | /api/v1/saved-searches | บันทึกการค้นหา | ✅ |
 | GET | /api/v1/saved-searches | ดูรายการค้นหาที่บันทึก | ✅ |
@@ -1055,11 +1062,15 @@ Enum file_format {
 | Method | Endpoint | ใช้ทำอะไร | Auth |
 |---|---|---|---|
 | GET | /api/v1/admin/stats | Dashboard ภาพรวมระบบ | ✅ Admin |
+| GET | /api/v1/admin/stats/years | ดูปีที่มีข้อมูล Dataset/Download | ✅ Admin |
+| GET | /api/v1/admin/stats/monthly | สถิติ Dataset และ Download รายเดือน | ✅ Admin |
 | GET | /api/v1/admin/users | ดูรายการ User ทั้งหมด | ✅ Admin |
 | PATCH | /api/v1/admin/users/{id} | แก้ไข User | ✅ Admin |
+| PATCH | /api/v1/admin/users/{id}/role | เปลี่ยน Role ผู้ใช้ | ✅ Admin |
 | POST | /api/v1/admin/users/{id}/approve | อนุมัติบัญชี Agency | ✅ Admin |
 | POST | /api/v1/admin/users/{id}/reject | ปฏิเสธบัญชี Agency | ✅ Admin |
 | POST | /api/v1/admin/users/{id}/suspend | Suspend User | ✅ Admin |
+| POST | /api/v1/admin/datasets/{id}/hide | ซ่อน Dataset (Soft Delete) | ✅ Admin |
 | GET | /api/v1/admin/categories | ดูรายการหมวดหมู่ทั้งหมดทุก Agency | ✅ Admin |
 | POST | /api/v1/admin/categories | เพิ่มหมวดหมู่ของ Agency ใดก็ได้ | ✅ Admin |
 | PATCH | /api/v1/admin/categories/{id} | แก้ไขหมวดหมู่ของ Agency ใดก็ได้ | ✅ Admin |
@@ -1522,17 +1533,20 @@ draft  → published  (แก้ไขแล้วกด "เผยแพร่"
 
 **Search Flow**
 ```
-1. User พิมพ์คำค้นหาแล้วกดค้นหาที่ GET /api/v1/search
-2. ตรวจสอบว่าคำค้นหาสั้นเกินไปมั้ย → น้อยกว่า 2 ตัวอักษร → คืน SEARCH_KEYWORD_TOO_SHORT 400
-3. ตรวจสอบว่า Filter ที่ส่งมาถูกต้องมั้ย → ไม่ถูกต้อง → คืน SEARCH_INVALID_FILTER 400
-4. ตัดคำภาษาไทยด้วย PyThaiNLP
-5. ส่งคำที่ตัดแล้วไปค้นหาใน Elasticsearch
-   - ค้นจากชื่อ คำอธิบาย แท็ก หน่วยงาน
+1. User เปิดหน้าค้นหาหรือพิมพ์คำค้นหา
+2. ถ้าไม่มี keyword และไม่มี filter → Frontend ดึง Dataset ทั้งหมดจาก GET /api/v1/datasets (published) แทน
+3. ถ้ามี filter (ไม่มี keyword หรือ keyword สั้นกว่า 2 ตัว) → เรียก GET /api/v1/search แบบ filter-only (ไม่บังคับ keyword match)
+4. ถ้ามี keyword ≥ 2 ตัว → เรียก GET /api/v1/search พร้อม keyword + filter (ถ้ามี)
+5. ถ้าเรียก GET /api/v1/search โดยไม่มี keyword และไม่มี filter → คืน SEARCH_KEYWORD_TOO_SHORT 400
+6. ตรวจสอบว่า Filter ที่ส่งมาถูกต้องมั้ย → ไม่ถูกต้อง → คืน SEARCH_INVALID_FILTER 400
+7. ตัดคำภาษาไทยด้วย PyThaiNLP (เมื่อมี keyword)
+8. ส่งไปค้นหาใน Elasticsearch
+   - ค้นจากชื่อ คำอธิบาย แท็ก หน่วยงาน (เมื่อมี keyword)
    - กรองเฉพาะ Status = published เท่านั้น
-   - กรองตาม Filter ที่ส่งมา
-6. เรียงลำดับผลลัพธ์ตามที่เลือก
-7. แบ่งหน้าตาม Pagination Standard
-8. คืนผลลัพธ์พร้อม Pagination Object
+   - กรองตาม Filter: category_id, license, year, province, agency_user_id, tag
+9. เรียงลำดับผลลัพธ์ตามที่เลือก
+10. แบ่งหน้าตาม Pagination Standard
+11. คืนผลลัพธ์พร้อม Pagination Object
 ```
 
 **Autocomplete Flow**

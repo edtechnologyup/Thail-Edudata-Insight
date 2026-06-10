@@ -84,11 +84,20 @@ export default function DatasetDetailPageClient({
     citation?.agency_name
   );
 
+  // ถ้า updated_at != created_at → แสดง "อัปเดตล่าสุด" ถ้าเหมือนกัน → "เผยแพร่เมื่อ" ตาม #5 M5
+  const isUpdated =
+    new Date(detail.updatedAt).getTime() !== new Date(detail.createdAt).getTime();
+  const dateLabel = formatPublishedDate(
+    isUpdated ? detail.updatedAt : detail.publishedAt,
+    locale
+  );
+
   return (
     <DatasetDetail
       datasetId={id}
       detail={detail}
-      publishedDateLabel={formatPublishedDate(detail.publishedAt, locale)}
+      publishedDateLabel={dateLabel}
+      isUpdated={isUpdated}
       downloadCountLabel={formatDownloadCount(detail.downloadCount, locale)}
     />
   );

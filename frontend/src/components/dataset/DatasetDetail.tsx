@@ -21,6 +21,7 @@ type DatasetDetailProps = {
   publishedDateLabel: string;
   isUpdated: boolean;
   downloadCountLabel: string;
+  sourceFileFormat?: string | null;
 };
 
 type DetailTab = "preview" | "citation";
@@ -48,6 +49,7 @@ export default function DatasetDetail({
   publishedDateLabel,
   isUpdated,
   downloadCountLabel,
+  sourceFileFormat,
 }: DatasetDetailProps) {
   const t = useTranslations("dataset");
   const tDetail = useTranslations("dataset.detail");
@@ -307,6 +309,7 @@ export default function DatasetDetail({
         open={downloadOpen}
         onClose={() => setDownloadOpen(false)}
         datasetId={datasetId}
+        sourceFileFormat={sourceFileFormat}
       />
     </>
   );

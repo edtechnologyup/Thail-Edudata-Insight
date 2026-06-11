@@ -28,6 +28,22 @@ class MonthlyStatsResponse(BaseModel):
     downloads_by_month: list[MonthlyDataPoint]
 
 
+class YearlyDataPoint(BaseModel):
+    year: int
+    count: int
+
+
+class DownloadSourceMonthlyResponse(BaseModel):
+    year: int
+    web_by_month: list[MonthlyDataPoint]
+    api_by_month: list[MonthlyDataPoint]
+
+
+class DownloadSourceYearlyResponse(BaseModel):
+    web_by_year: list[YearlyDataPoint]
+    api_by_year: list[YearlyDataPoint]
+
+
 class AdminUserListFilters(BaseModel):
     status: str | None = None
     role: str | None = None

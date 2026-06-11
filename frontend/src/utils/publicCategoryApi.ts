@@ -130,6 +130,7 @@ export function mapApiDatasetToSearchResult(
     downloadCount: item.download_count ?? 0,
     createdAt: item.created_at,
     updatedAt: item.updated_at,
+    publishedAt: item.published_at ?? item.created_at,
     license: (item.license as SearchResultMock["license"]) ?? "open",
     fileFormats: [],
     year,

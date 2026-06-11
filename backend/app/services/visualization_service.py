@@ -10,11 +10,14 @@ import app.repositories.dataset_repository as dataset_repo
 import app.repositories.visualization_repository as viz_repo
 from app.models.user_model import User
 from app.schemas.dataset_schema import DatasetResponse
+from app.models.category_model import Category
 from app.schemas.visualization_schema import (
+    CategoryStatItem,
     CompareResponse,
     DashboardLayoutResponse,
     DatasetYearStat,
     NewReleasesResponse,
+    StatsByCategoryResponse,
     StatsOverviewResponse,
     TrendingResponse,
 )
@@ -23,6 +26,8 @@ from app.schemas.visualization_schema import (
 def _datasets_to_responses(
     db: Session, datasets: list
 ) -> list[DatasetResponse]:
+    from app.services.dataset_service import _resolve_category_names
+
     responses: list[DatasetResponse] = []
     for dataset in datasets:
         tag_ids = dataset_repo.get_dataset_tag_ids(db, dataset.id)
@@ -30,8 +35,42 @@ def _datasets_to_responses(
         item = DatasetResponse.model_validate(dataset)
         item.tags = tag_ids
         item.agency_name = owner.agency_name if owner else None
+        name_th, name_en = _resolve_category_names(db, dataset.category_id)
+        item.category_name_th = name_th
+        item.category_name_en = name_en
+        item.file_format = dataset_repo.get_latest_dataset_file_format(
+            db, dataset.id
+        )
         responses.append(item)
     return responses
+
+
+def get_stats_by_category(
+    db: Session, category_id: uuid.UUID | None = None
+) -> StatsByCategoryResponse:
+    if category_id is not None:
+        category = (
+            db.query(Category)
+            .filter(
+                Category.id == category_id,
+                Category.is_deleted.is_(False),
+                Category.level == 1,
+            )
+            .first()
+        )
+        if category is None:
+            from app.core.errors import raise_app_error
+
+            raise_app_error("CATEGORY_NOT_FOUND")
+
+    data = viz_repo.get_stats_by_category(db, category_id)
+    return StatsByCategoryResponse(
+        categories=[CategoryStatItem(**row) for row in data["categories"]],
+        datasets_by_year=[
+            DatasetYearStat(**row) for row in data["datasets_by_year"]
+        ],
+        selected_category_id=data["selected_category_id"],
+    )
 
 
 def get_stats_overview(db: Session) -> StatsOverviewResponse:

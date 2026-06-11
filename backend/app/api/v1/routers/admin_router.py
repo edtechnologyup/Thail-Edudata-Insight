@@ -109,6 +109,30 @@ def admin_monthly_stats(
     return success_response(result.model_dump(mode="json"))
 
 
+@router.get("/stats/downloads", status_code=status.HTTP_200_OK)
+def admin_download_source_stats(
+    granularity: str = Query(default="month", pattern="^(month|year)$"),
+    year: int = Query(default=None),
+    payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """
+    สถิติดาวน์โหลดแยกตาม source (web = กดดาวน์โหลดหน้าเว็บ / api = Public API)
+
+    - **Query**: granularity (month|year), year (เฉพาะ granularity=month, default = ปีปัจจุบัน)
+    - **Auth**: ✅ Admin
+    - **Errors**: VALIDATION_ERROR
+    """
+    from datetime import datetime
+
+    if granularity == "year":
+        result = admin_service.get_download_source_yearly(db)
+    else:
+        resolved_year = year if year else datetime.now().year
+        result = admin_service.get_download_source_monthly(db, resolved_year)
+    return success_response(result.model_dump(mode="json"))
+
+
 def get_admin_user_list_filters(
     status: str | None = Query(default=None),
     role: str | None = Query(default=None),

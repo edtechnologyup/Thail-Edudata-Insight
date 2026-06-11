@@ -50,6 +50,7 @@ export function mapApiDatasetToHomeCard(
     updatedAt:
       dataset.updated_at ?? dataset.published_at ?? dataset.created_at,
     createdAt: dataset.created_at,
+    publishedAt: dataset.published_at ?? dataset.created_at,
     license: dataset.license as DatasetLicense,
   };
 }

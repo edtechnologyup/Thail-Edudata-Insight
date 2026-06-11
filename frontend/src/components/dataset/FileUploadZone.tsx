@@ -5,12 +5,24 @@ import { DragEvent, useRef, useState } from "react";
 import { fetchMockFileAnalysis, type FileAnalysisResult } from "@/data/mockData";
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
-const ACCEPTED_EXTENSIONS = [".csv", ".xlsx", ".xls", ".json"];
+const ACCEPTED_EXTENSIONS = [
+  ".csv",
+  ".xlsx",
+  ".xls",
+  ".json",
+  ".pdf",
+  ".sql",
+];
 const ACCEPTED_MIME_TYPES = [
   "text/csv",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.ms-excel",
   "application/json",
+  "application/pdf",
+  "text/plain",
+  "application/octet-stream",
+  "application/sql",
+  "text/x-sql",
 ];
 
 type FileUploadZoneProps = {
@@ -131,7 +143,7 @@ export default function FileUploadZone({
         <input
           ref={inputRef}
           type="file"
-          accept=".csv,.xlsx,.xls,.json"
+          accept=".csv,.xlsx,.xls,.json,.pdf,.sql"
           className="hidden"
           disabled={disabled || isUploading}
           onChange={(event) => {

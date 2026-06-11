@@ -9,6 +9,7 @@ from app.api.v1.routers.download_router import router as download_router
 from app.api.v1.routers.public_router import router as public_router
 from app.api.v1.routers.search_router import router as search_router
 from app.api.v1.routers.tag_router import router as tag_router
+from app.api.v1.routers.notification_router import router as notification_router
 from app.api.v1.routers.visualization_router import router as visualization_router
 
 api_router = APIRouter()
@@ -21,4 +22,5 @@ api_router.include_router(tag_router, tags=["Tag"])
 api_router.include_router(search_router, tags=["Search"])
 api_router.include_router(download_router, tags=["Download"])
 api_router.include_router(visualization_router, tags=["Visualization"])
+api_router.include_router(notification_router, tags=["Notification"])
 api_router.include_router(public_router, tags=["Public API"])

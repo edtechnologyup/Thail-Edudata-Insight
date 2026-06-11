@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 class DownloadRequest(BaseModel):
     purpose: str = Field(min_length=10, max_length=500)
-    format: str = Field(pattern="^(csv|excel|json|xml)$")
+    format: str = Field(pattern="^(csv|excel|json|xml|pdf|sql)$")
 
 
 class PreviewResponse(BaseModel):
@@ -17,6 +17,8 @@ class PreviewResponse(BaseModel):
     total_rows: int
     columns: list[str]
     masked_columns: list[str]
+    file_type: str | None = None
+    preview_note: str | None = None
 
 
 class CitationResponse(BaseModel):

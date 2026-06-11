@@ -7,12 +7,16 @@ from pythainlp.tokenize import word_tokenize
 from sqlalchemy.orm import Session
 
 import app.repositories.saved_search_repository as saved_search_repo
+import app.repositories.search_repository as search_repo
 from app.core.errors import raise_app_error
 from app.core.pagination import PaginationParams
 from app.schemas.search_schema import (
     AutocompleteResponse,
     SavedSearchCreateRequest,
     SavedSearchResponse,
+    SearchFilterAgencyOption,
+    SearchFilterCategoryOption,
+    SearchFiltersResponse,
     SearchRequest,
     SearchResponse,
 )
@@ -108,6 +112,35 @@ def _map_to_search_response(item: dict) -> SearchResponse:
         download_count=item.get("download_count", 0),
         published_at=item.get("published_at"),
         agency_name=item.get("agency_name"),
+    )
+
+
+def get_filter_options(db: Session) -> SearchFiltersResponse:
+    raw = search_repo.get_search_filter_options(db)
+    categories = [
+        SearchFilterCategoryOption(
+            id=c.id,
+            parent_id=c.parent_id,
+            level=c.level,
+            name_th=c.name_th,
+            name_en=c.name_en,
+            slug=c.slug,
+        )
+        for c in raw["categories"]
+    ]
+    agencies = [
+        SearchFilterAgencyOption(
+            agency_user_id=item["agency_user_id"],
+            agency_name=item["agency_name"],
+        )
+        for item in raw["agencies"]
+    ]
+    return SearchFiltersResponse(
+        categories=categories,
+        agencies=agencies,
+        years=raw["years"],
+        provinces=raw["provinces"],
+        formats=raw["formats"],
     )
 
 

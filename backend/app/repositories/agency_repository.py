@@ -13,6 +13,7 @@ from app.models.audit_log_model import AuditLog
 from app.models.category_model import Category
 from app.models.dataset_model import Dataset
 from app.models.download_log_model import DownloadLog
+import app.repositories.dataset_repository as dataset_repo
 
 _UNCATEGORIZED_TH = "ไม่ระบุหมวดหมู่"
 _UNCATEGORIZED_EN = "Uncategorized"
@@ -289,6 +290,9 @@ def list_agency_datasets(
                 "quality_score": dataset.quality_score if dataset.quality_score is not None else 0,
                 "download_count": dataset.download_count,
                 "updated_at": dataset.updated_at,
+                "file_format": dataset_repo.get_latest_dataset_file_format(
+                    db, dataset.id
+                ),
             }
         )
     return items, total

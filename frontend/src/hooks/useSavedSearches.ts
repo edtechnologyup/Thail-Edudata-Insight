@@ -2,18 +2,39 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import type {
-  AgencySavedSearchMock,
-  SavedSearchFilters,
-} from "@/data/mockData";
-import { fetchSavedSearches } from "@/utils/savedItemsApi";
+import type { SavedSearchFilters } from "@/data/mockData";
+
+export type SavedSearch = {
+  id: string;
+  name: string;
+  filters: SavedSearchFilters;
+  created_at: string;
+  createdAt: string;
+};
+
+type SavedSearchesResponse = {
+  success: boolean;
+  data: SavedSearch[];
+};
+
+async function fetchSavedSearches(): Promise<SavedSearch[]> {
+  const res = await apiClient.get<SavedSearchesResponse>("/saved-searches");
+  return (res.data.data ?? []).map((item) => ({
+    ...item,
+    createdAt: item.created_at,
+  }));
+}
+
+async function deleteSavedSearch(savedSearchId: string): Promise<void> {
+  await apiClient.delete(`/saved-searches/${savedSearchId}`);
+}
 
 export function useSavedSearches() {
-  return useQuery<AgencySavedSearchMock[]>({
+  return useQuery<SavedSearch[]>({
     queryKey: ["agency", "saved-searches"],
     queryFn: fetchSavedSearches,
     retry: 1,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 30 * 1000,
   });
 }
 
@@ -43,7 +64,7 @@ export function useDeleteSavedSearch() {
 
   return useMutation({
     mutationFn: async (savedSearchId: string) => {
-      await apiClient.delete(`/saved-searches/${savedSearchId}`);
+      await deleteSavedSearch(savedSearchId);
     },
     retry: 0,
     onSuccess: () => {

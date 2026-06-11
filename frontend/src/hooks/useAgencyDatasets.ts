@@ -34,6 +34,8 @@ type ApiAgencyDataset = {
   download_count?: number;
   updatedAt?: string;
   updated_at?: string;
+  fileFormat?: string | null;
+  file_format?: string | null;
 };
 
 type ListResponse = {
@@ -66,6 +68,7 @@ function mapDataset(item: ApiAgencyDataset): AgencyDatasetRow {
     qualityScore: item.qualityScore ?? item.quality_score ?? 0,
     downloadCount: item.downloadCount ?? item.download_count ?? 0,
     updatedAt: item.updatedAt ?? item.updated_at ?? new Date().toISOString(),
+    fileFormat: item.fileFormat ?? item.file_format ?? null,
   };
 }
 

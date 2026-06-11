@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import apiClient from "@/services/api";
 
-export type DownloadFormat = "csv" | "excel" | "json" | "xml";
+export type DownloadFormat = "csv" | "excel" | "json" | "xml" | "pdf" | "sql";
 
 export type DownloadDatasetVariables = {
   datasetId: string;

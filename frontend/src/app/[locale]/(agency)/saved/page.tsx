@@ -1,23 +1,50 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import BookmarkList from "@/components/dashboard/BookmarkList";
-import SavedSearchList from "@/components/dashboard/SavedSearchList";
-import SubscriptionList from "@/components/dashboard/SubscriptionList";
+import SavedSearchList from "@/components/saved-search/SavedSearchList";
+import SubscriptionForm from "@/components/subscription/SubscriptionForm";
+import SubscriptionList from "@/components/subscription/SubscriptionList";
 import { useBookmarks } from "@/hooks/useBookmarks";
+import { useCategories } from "@/hooks/useCategories";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useSubscriptions } from "@/hooks/useSubscriptions";
+import apiClient from "@/services/api";
+
+type SubscriptionOption = {
+  id: string;
+  label: string;
+};
+
+type PublicAgency = {
+  agency_user_id: string;
+  agency_name: string | null;
+  agency_name_en?: string | null;
+};
 
 type SavedTab = "bookmark" | "subscription" | "saved-search";
 
 export default function AgencySavedPage() {
   const t = useTranslations("agency.saved");
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState<SavedTab>("bookmark");
 
   const { data: bookmarks } = useBookmarks();
   const { data: subscriptions } = useSubscriptions();
   const { data: savedSearches } = useSavedSearches();
+  const { data: categories = [] } = useCategories();
+  const { data: agencies = [] } = useQuery({
+    queryKey: ["public", "agencies"],
+    queryFn: async (): Promise<PublicAgency[]> => {
+      const response = await apiClient.get("/public/agencies");
+      return (response.data as { data?: PublicAgency[] }).data ?? [];
+    },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const bookmarkCount = bookmarks?.length ?? 0;
   const subscriptionCount = subscriptions?.length ?? 0;
@@ -34,6 +61,18 @@ export default function AgencySavedPage() {
       label: t("tabSavedSearch", { count: savedSearchCount }),
     },
   ];
+
+  const categoryOptions: SubscriptionOption[] = categories.map((category) => ({
+    id: String(category.id),
+    label: locale === "th" ? category.name_th : category.name_en,
+  }));
+  const agencyOptions: SubscriptionOption[] = agencies.map((agency) => ({
+    id: String(agency.agency_user_id),
+    label:
+      locale === "th"
+        ? agency.agency_name ?? agency.agency_name_en ?? "-"
+        : agency.agency_name_en ?? agency.agency_name ?? "-",
+  }));
 
   return (
     <div className="space-y-0">
@@ -70,7 +109,18 @@ export default function AgencySavedPage() {
 
       <div className="pt-8">
         {activeTab === "bookmark" && <BookmarkList />}
-        {activeTab === "subscription" && <SubscriptionList />}
+        {activeTab === "subscription" && (
+          <div className="max-w-4xl space-y-6">
+            <SubscriptionForm
+              categories={categoryOptions}
+              agencies={agencyOptions}
+            />
+            <SubscriptionList
+              categories={categoryOptions}
+              agencies={agencyOptions}
+            />
+          </div>
+        )}
         {activeTab === "saved-search" && <SavedSearchList />}
       </div>
     </div>

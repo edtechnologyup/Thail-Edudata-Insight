@@ -2,8 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import AdminDatasetChart from "@/components/admin/AdminDatasetChart";
-import AdminDownloadChart from "@/components/admin/AdminDownloadChart";
+import AdminDownloadSourceChart from "@/components/admin/AdminDownloadSourceChart";
 import AdminStatsCard from "@/components/admin/AdminStatsCard";
 import PendingUserTable from "@/components/admin/PendingUserTable";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
@@ -133,8 +132,8 @@ export default function AdminDashboardPage() {
           </section>
 
           <section className="grid grid-cols-1 gap-spacing-6 lg:grid-cols-2">
-            <AdminDatasetChart />
-            <AdminDownloadChart />
+            <AdminDownloadSourceChart source="web" />
+            <AdminDownloadSourceChart source="api" />
           </section>
 
           <PendingUserTable

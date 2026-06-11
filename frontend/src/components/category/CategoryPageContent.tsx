@@ -246,6 +246,7 @@ export default function CategoryPageContent({
                     downloadCount={item.downloadCount}
                     createdAt={item.createdAt}
                     updatedAt={item.updatedAt}
+                    publishedAt={item.publishedAt ?? item.createdAt}
                     license={item.license}
                     variant="popular"
                   />

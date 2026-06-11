@@ -49,6 +49,7 @@ class AgencyDatasetListItem(BaseModel):
     quality_score: int | None = Field(serialization_alias="qualityScore")
     download_count: int = Field(serialization_alias="downloadCount")
     updated_at: datetime = Field(serialization_alias="updatedAt")
+    file_format: str | None = Field(default=None, serialization_alias="fileFormat")
 
     model_config = {"populate_by_name": True}
 

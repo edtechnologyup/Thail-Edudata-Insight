@@ -88,6 +88,14 @@ def update_dataset(
     return dataset
 
 
+def increment_view_count(db: Session, dataset_id: uuid.UUID) -> None:
+    dataset = get_dataset_by_id(db, dataset_id)
+    if dataset is None:
+        return
+    dataset.view_count += 1
+    db.flush()
+
+
 def soft_delete_dataset(db: Session, dataset_id: uuid.UUID) -> None:
     from app.core.errors import raise_app_error
 
@@ -135,6 +143,19 @@ def get_dataset_versions(
         .order_by(DatasetVersion.version_number.desc())
         .all()
     )
+
+
+def get_latest_dataset_file_format(db: Session, dataset_id: uuid.UUID) -> str | None:
+    row = (
+        db.query(DatasetFile.file_format)
+        .filter(
+            DatasetFile.dataset_id == dataset_id,
+            DatasetFile.is_deleted.is_(False),
+        )
+        .order_by(DatasetFile.created_at.desc())
+        .first()
+    )
+    return row[0] if row else None
 
 
 def get_latest_version_number(db: Session, dataset_id: uuid.UUID) -> int:

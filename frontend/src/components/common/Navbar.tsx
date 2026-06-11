@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
-import MegaMenu from "@/components/common/MegaMenu";
+import NotificationBell from "@/components/common/NotificationBell";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 type NavbarProps = {
@@ -50,6 +50,19 @@ function MenuIcon() {
   );
 }
 
+function UserIcon() {
+  return (
+    <svg
+      className="h-5 w-5"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z" />
+    </svg>
+  );
+}
+
 export default function Navbar({ variant }: NavbarProps) {
   const t = useTranslations("nav");
   const tAdminNav = useTranslations("admin.nav");
@@ -60,8 +73,6 @@ export default function Navbar({ variant }: NavbarProps) {
   const locale = pathname.split("/")[1] || "th";
   const base = `/${locale}`;
 
-  const [megaOpen, setMegaOpen] = useState(false);
-  const [megaDrawerOpen, setMegaDrawerOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -74,14 +85,13 @@ export default function Navbar({ variant }: NavbarProps) {
 
   useEffect(() => {
     setMobileOpen(false);
-    setMegaOpen(false);
-    setMegaDrawerOpen(false);
   }, [pathname]);
 
   const navLinks = [
     { href: base, label: t("home"), match: (p: string) => p === base || p === `${base}/` },
     { href: `${base}/search`, label: t("search"), match: (p: string) => p.startsWith(`${base}/search`) },
     { href: `${base}/stats`, label: t("stats"), match: (p: string) => p.startsWith(`${base}/stats`) },
+    { href: `${base}/scholarship`, label: t("scholarship"), match: (p: string) => p.startsWith(`${base}/scholarship`) },
   ];
 
   const linkClass = (active: boolean) =>
@@ -137,6 +147,7 @@ export default function Navbar({ variant }: NavbarProps) {
             Thai EduData Insight
           </Link>
           <div className="ml-auto flex items-center gap-4">
+            <NotificationBell />
             <LanguageSwitcher />
             <div className="flex items-center gap-3 border-l border-border-default pl-4">
               <span className="hidden font-sarabun text-label font-bold text-text-primary sm:inline">
@@ -176,10 +187,16 @@ export default function Navbar({ variant }: NavbarProps) {
             Thai EduData Insight
           </Link>
           <div className="ml-auto flex items-center gap-4">
+            <NotificationBell />
             <LanguageSwitcher />
-            <span className="font-sarabun text-label text-text-muted">
-              User menu
-            </span>
+            <Link
+              href={`${base}/profile`}
+              className="inline-flex min-h-[40px] items-center gap-2 rounded-radius-sm px-3 font-sarabun text-label font-medium text-text-secondary transition-colors hover:bg-surface-container hover:text-primary-dark"
+              aria-label={t("profile")}
+            >
+              <UserIcon />
+              <span className="hidden sm:inline">{t("profile")}</span>
+            </Link>
           </div>
         </div>
       </header>
@@ -223,6 +240,7 @@ export default function Navbar({ variant }: NavbarProps) {
           </div>
 
           <div className="flex items-center gap-3 md:gap-4">
+            <NotificationBell />
             <LanguageSwitcher />
             <Link
               href={`${base}/login`}
@@ -253,45 +271,6 @@ export default function Navbar({ variant }: NavbarProps) {
                 {link.label}
               </Link>
             ))}
-
-            <div
-              className="relative flex h-full items-center"
-              onMouseEnter={() => setMegaOpen(true)}
-              onMouseLeave={() => setMegaOpen(false)}
-            >
-              <button
-                type="button"
-                className={`flex h-full items-center gap-1 px-2 font-sarabun text-label transition-colors ${
-                  megaOpen
-                    ? "font-medium text-primary-dark"
-                    : "text-text-secondary hover:text-primary-dark"
-                }`}
-                onClick={() => setMegaOpen((v) => !v)}
-                aria-expanded={megaOpen}
-                aria-haspopup="true"
-              >
-                {t("categories")}
-                <svg
-                  className={`h-4 w-4 transition-transform ${megaOpen ? "rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              <MegaMenu
-                open={megaOpen}
-                onClose={() => setMegaOpen(false)}
-                variant="dropdown"
-              />
-            </div>
 
             <Link
               href={`${base}/api-docs`}
@@ -353,16 +332,6 @@ export default function Navbar({ variant }: NavbarProps) {
                   {link.label}
                 </Link>
               ))}
-              <button
-                type="button"
-                className="min-h-[44px] rounded-radius-sm px-3 py-2 text-left font-sarabun text-label text-text-secondary"
-                onClick={() => {
-                  setMobileOpen(false);
-                  setMegaDrawerOpen(true);
-                }}
-              >
-                {t("categories")}
-              </button>
               <Link
                 href={`${base}/api-docs`}
                 className={`min-h-[44px] rounded-radius-sm px-3 py-2 font-sarabun text-label ${
@@ -383,12 +352,6 @@ export default function Navbar({ variant }: NavbarProps) {
           </div>
         </div>
       )}
-
-      <MegaMenu
-        open={megaDrawerOpen}
-        onClose={() => setMegaDrawerOpen(false)}
-        variant="drawer"
-      />
     </>
   );
 }

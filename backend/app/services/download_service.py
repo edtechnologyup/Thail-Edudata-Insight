@@ -26,7 +26,7 @@ PREVIEW_ROW_LIMIT = 100
 PREVIEW_CACHE_TTL_SECONDS = 3600
 PREVIEW_CACHE_PREFIX = "preview:"
 
-ALLOWED_DOWNLOAD_FORMATS = frozenset({"csv", "excel", "json", "xml"})
+ALLOWED_DOWNLOAD_FORMATS = frozenset({"csv", "excel", "json", "xml", "pdf", "sql"})
 
 _PII_COLUMN_KEYWORDS = (
     "ชื่อ", "นามสกุล", "เบอร์", "โทร", "บัตร", "รหัส",
@@ -75,11 +75,16 @@ def _fetch_file_content(minio_client: Minio, file_path: str) -> bytes:
 
 def _infer_source_format(file_path: str) -> str:
     ext = file_path.rsplit(".", 1)[-1].lower()
-    if ext == "json":
-        return "json"
-    if ext in ("xlsx", "xls"):
-        return "excel"
-    return "csv"
+    mapping = {
+        "json": "json",
+        "xlsx": "excel",
+        "xls": "excel",
+        "csv": "csv",
+        "xml": "xml",
+        "pdf": "pdf",
+        "sql": "sql",
+    }
+    return mapping.get(ext, "csv")
 
 
 def _read_dataframe(content: bytes, source_format: str) -> pd.DataFrame:
@@ -165,6 +170,7 @@ def download(
     file_format: str | None,
     user_id: uuid.UUID | None,
     ip_address: str,
+    source: str = "web",
 ) -> tuple[bytes, str, str]:
     cleaned_purpose = _validate_purpose(purpose)
     target_format = _validate_download_format(file_format)
@@ -173,10 +179,28 @@ def download(
     file_path = _get_latest_file_path(db, dataset_id)
     content = _fetch_file_content(minio_client, file_path)
     source_format = _infer_source_format(file_path)
-    df = _read_dataframe(content, source_format)
-    file_bytes, media_type, filename = _convert_dataframe_to_bytes(
-        df, target_format, dataset.title
-    )
+
+    if source_format in ("pdf", "sql"):
+        if target_format != source_format:
+            raise_app_error("DOWNLOAD_INVALID_FORMAT")
+        safe_name = "".join(
+            c if c.isalnum() or c in ("-", "_") else "_"
+            for c in dataset.title[:80]
+        ).strip("_") or "dataset"
+        media_types = {
+            "pdf": "application/pdf",
+            "sql": "text/plain; charset=utf-8",
+        }
+        file_bytes = content
+        media_type = media_types[source_format]
+        filename = f"{safe_name}.{source_format}"
+    else:
+        if target_format in ("pdf", "sql"):
+            raise_app_error("DOWNLOAD_INVALID_FORMAT")
+        df = _read_dataframe(content, source_format)
+        file_bytes, media_type, filename = _convert_dataframe_to_bytes(
+            df, target_format, dataset.title
+        )
 
     try:
         download_repo.create_download_log(
@@ -186,6 +210,7 @@ def download(
             ip_address=ip_address,
             purpose=cleaned_purpose,
             file_format=target_format,
+            source=source,
         )
         download_repo.increment_download_count(db, dataset_id)
         db.commit()
@@ -213,15 +238,38 @@ def preview(
     file_path = _get_latest_file_path(db, dataset_id)
     content = _fetch_file_content(minio_client, file_path)
     source_format = _infer_source_format(file_path)
-    df = _read_dataframe(content, source_format)
 
-    masked_columns = _detect_masked_columns(list(df.columns))
-    response = PreviewResponse(
-        rows=_rows_from_dataframe(df),
-        total_rows=len(df),
-        columns=[str(c) for c in df.columns],
-        masked_columns=masked_columns,
-    )
+    if source_format == "sql":
+        lines = content.decode("utf-8", errors="replace").splitlines()
+        rows = [
+            {"line": index + 1, "content": line}
+            for index, line in enumerate(lines[:PREVIEW_ROW_LIMIT])
+        ]
+        response = PreviewResponse(
+            rows=rows,
+            total_rows=len(lines),
+            columns=["line", "content"],
+            masked_columns=[],
+            file_type="sql",
+        )
+    elif source_format == "pdf":
+        response = PreviewResponse(
+            rows=[],
+            total_rows=0,
+            columns=[],
+            masked_columns=[],
+            file_type="pdf",
+            preview_note="PDF preview is not available. Please download the file.",
+        )
+    else:
+        df = _read_dataframe(content, source_format)
+        masked_columns = _detect_masked_columns(list(df.columns))
+        response = PreviewResponse(
+            rows=_rows_from_dataframe(df),
+            total_rows=len(df),
+            columns=[str(c) for c in df.columns],
+            masked_columns=masked_columns,
+        )
 
     redis_client.setex(
         cache_key,
@@ -281,6 +329,8 @@ def export_pdf(
         file_path = _get_latest_file_path(db, dataset_id)
         content = _fetch_file_content(minio_client, file_path)
         source_format = _infer_source_format(file_path)
+        if source_format in ("pdf", "sql"):
+            raise ValueError("tabular chart not available for pdf/sql")
         df = _read_dataframe(content, source_format).head(PREVIEW_ROW_LIMIT)
         numeric_cols = df.select_dtypes(include="number").columns.tolist()
         if numeric_cols:

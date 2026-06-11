@@ -28,7 +28,7 @@ class DatasetFile(SoftDeleteMixin, BaseModel):
     file_size: Mapped[int] = mapped_column(BigInteger, nullable=False)
     file_format: Mapped[str] = mapped_column(
         Enum(
-            "csv", "excel", "json", "xml",
+            "csv", "excel", "json", "xml", "sql", "pdf",
             name="file_format",
             create_type=False,
         ),

@@ -11,6 +11,7 @@ export type HomeDatasetMock = {
   downloadCount: number;
   updatedAt: string;
   createdAt?: string;
+  publishedAt?: string | null;
   license: DatasetLicense;
 };
 
@@ -315,6 +316,7 @@ export type SearchResultMock = {
   downloadCount: number;
   createdAt?: string;
   updatedAt: string;
+  publishedAt?: string | null;
   license: DatasetLicense;
   fileFormats: SearchFileFormat[];
   year: number;
@@ -2009,6 +2011,7 @@ export type AgencyDatasetRow = {
   qualityScore: number;
   downloadCount: number;
   updatedAt: string;
+  fileFormat?: string | null;
 };
 
 export const mockAgencyStats: AgencyDashboardStats = {

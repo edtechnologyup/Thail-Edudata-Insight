@@ -41,6 +41,7 @@
     "search": "Search",
     "searchPlaceholder": "Search data, e.g. student statistics 2024",
     "stats": "Statistics",
+    "scholarship": "Scholarships",
     "apiDocs": "API Documentation",
     "categories": "Categories",
     "login": "Log in",
@@ -132,6 +133,18 @@
     "copyright": "© {year} Thai Education Data Catalog. All rights reserved. Digital Government Development Agency (DGA).",
     "poweredBy": "Powered by Thai Government Open Data Infrastructure"
   },
+  "scholarship": {
+    "title": "Scholarships",
+    "subtitle": "Major scholarships in Thai education",
+    "comingSoon": "Information coming soon",
+    "underConstruction": "This page is under construction — scholarship information will be added gradually",
+    "categories": {
+      "gsl": "Student Loan Fund (GSL)",
+      "eef": "Equitable Education Fund (EEF)",
+      "government": "Government scholarships",
+      "university": "University scholarships"
+    }
+  },
   "stats": {
     "title": "Thai education statistics",
     "subtitle": "Education statistics from government agencies",
@@ -163,7 +176,14 @@
     "schoolsByYear": "Schools per year",
     "schoolsLegend": "Public schools",
     "datasetByCategory": "Datasets by category",
+    "datasetByCategorySubtitle": "Top-level categories — published datasets only",
+    "categoryFilter": "Filter by main category",
+    "categoryFilterHint": "Select a category to view its datasets by year",
+    "allCategories": "All categories",
+    "categoryLoadError": "Failed to load category statistics. Please try again.",
     "topDatasets": "Popular datasets",
+    "topDatasetsLoadError": "Failed to load popular datasets. Please try again.",
+    "views": "Views",
     "downloads": "Downloads",
     "categoryLabel": "Category",
     "studentsChart": "Students (millions)",
@@ -557,6 +577,8 @@
     "download": {
       "title": "Select file format and purpose",
       "format": "File format",
+      "formatFixed": "Available format for this dataset: {format}",
+      "formatLoading": "Loading file format...",
       "purpose": "Purpose of use",
       "purposePlaceholder": "Please describe how you will use this data (at least 10 characters)",
       "submit": "Confirm download",
@@ -737,7 +759,7 @@
       "fileSection": "Upload file",
       "dropzone": "Drag and drop your file here, or",
       "dropzoneClick": "Choose a file",
-      "dropzoneHint": "CSV, Excel (.xlsx), or JSON up to 100MB",
+      "dropzoneHint": "CSV, Excel (.xlsx), JSON, PDF, or SQL up to 100MB",
       "uploading": "Uploading and analyzing...",
       "qualityScore": "Data quality score",
       "qualityScoreHint": "Data quality looks good and is ready to publish.",
@@ -781,7 +803,7 @@
       "saveDraft": "Save draft",
       "submitForApproval": "Submit for approval",
       "publish": "Publish",
-      "fileInvalidType": "Only CSV, Excel, or JSON files are allowed",
+      "fileInvalidType": "Only CSV, Excel, JSON, PDF, or SQL files are allowed",
       "fileTooLarge": "File exceeds 100MB",
       "fileUploadFailed": "Upload failed. Please try again.",
       "fileRequired": "Please upload a file before saving",
@@ -1077,6 +1099,11 @@
       "todayBadge": "Today",
       "datasetChart": "Monthly datasets",
       "downloadChart": "Monthly downloads",
+      "webDownloadChart": "Web downloads",
+      "apiDownloadChart": "API downloads",
+      "monthlyToggle": "Monthly",
+      "yearlyToggle": "Yearly",
+      "chartLoadError": "Failed to load data",
       "downloadLegend": "Target",
       "yearLabel": "Select year",
       "yearPrefix": "Year",
@@ -1379,6 +1406,32 @@
       "paginationSummary": "Showing {start} - {end} of {total} entries",
       "prevPage": "Previous page",
       "nextPage": "Next page"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "pageTitle": "All notifications",
+    "pageSubtitle": "Admin announcements, new datasets, and scholarships",
+    "bellLabel": "Open notifications",
+    "viewAll": "View all",
+    "loading": "Loading...",
+    "empty": "No notifications yet",
+    "loadError": "Could not load notifications. Please try again.",
+    "markAllRead": "Mark all as read",
+    "backHome": "Back to home",
+    "openLink": "Open details",
+    "prev": "Previous",
+    "next": "Next",
+    "newBadge": "NEW",
+    "visitorNote": "Visitors: read status is saved on this device only",
+    "typeAnnouncement": "Announcement",
+    "typeNewDataset": "New dataset",
+    "typeScholarship": "Scholarship",
+    "typeSystem": "System",
+    "announcementBanner": {
+      "badge": "Urgent notice",
+      "fromAdmin": "From administrator",
+      "dismiss": "Dismiss"
     }
   }
 }

@@ -1,8 +1,8 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
-import { MOCK_FILTER_CATEGORIES } from "@/data/mockData";
+import { useMemo, useState } from "react";
+import { useSearchFilters } from "@/hooks/useSearchFilters";
 import { useSearchParamsUpdate } from "./useSearchParamsUpdate";
 
 type FilterTreeProps = {
@@ -13,10 +13,23 @@ export default function FilterTree({ selectedCategory }: FilterTreeProps) {
   const t = useTranslations("search");
   const locale = useLocale();
   const updateParams = useSearchParamsUpdate();
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    primary: true,
-    secondary: false,
-  });
+  const { data: filterOptions } = useSearchFilters();
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const tree = useMemo(() => {
+    const categories = filterOptions?.categories ?? [];
+    const l1List = categories.filter((c) => c.level === 1);
+    const l2List = categories.filter((c) => c.level === 2);
+
+    return l1List.map((parent) => ({
+      parent,
+      children: l2List.filter((c) => c.parent_id === parent.id),
+    }));
+  }, [filterOptions?.categories]);
+
+  if (tree.length === 0) {
+    return null;
+  }
 
   function toggleExpand(id: string) {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -24,9 +37,9 @@ export default function FilterTree({ selectedCategory }: FilterTreeProps) {
 
   function selectCategory(id: string) {
     if (selectedCategory === id) {
-      updateParams({ category: null });
+      updateParams({ category: null, page: null });
     } else {
-      updateParams({ category: id });
+      updateParams({ category: id, page: null });
     }
   }
 
@@ -36,10 +49,12 @@ export default function FilterTree({ selectedCategory }: FilterTreeProps) {
         <span>{t("categories")}</span>
       </div>
       <div className="flex flex-col gap-1">
-        {MOCK_FILTER_CATEGORIES.map((parent) => {
-          const isExpanded = expanded[parent.id] ?? false;
-          const parentLabel = locale === "th" ? parent.labelTh : parent.labelEn;
+        {tree.map(({ parent, children }) => {
+          const isExpanded = expanded[parent.id] ?? children.length > 0;
+          const parentLabel =
+            locale === "th" ? parent.name_th : parent.name_en;
           const isParentSelected = selectedCategory === parent.id;
+          const hasChildren = children.length > 0;
 
           return (
             <div key={parent.id}>
@@ -50,23 +65,27 @@ export default function FilterTree({ selectedCategory }: FilterTreeProps) {
                     : ""
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={() => toggleExpand(parent.id)}
-                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center text-text-muted"
-                  aria-expanded={isExpanded}
-                  aria-label={parentLabel}
-                >
-                  {isExpanded ? (
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  ) : (
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  )}
-                </button>
+                {hasChildren ? (
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(parent.id)}
+                    className="inline-flex h-5 w-5 shrink-0 items-center justify-center text-text-muted"
+                    aria-expanded={isExpanded}
+                    aria-label={parentLabel}
+                  >
+                    {isExpanded ? (
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    )}
+                  </button>
+                ) : (
+                  <span className="inline-block h-5 w-5 shrink-0" aria-hidden />
+                )}
                 <button
                   type="button"
                   onClick={() => selectCategory(parent.id)}
@@ -75,11 +94,11 @@ export default function FilterTree({ selectedCategory }: FilterTreeProps) {
                   {parentLabel}
                 </button>
               </div>
-              {isExpanded && parent.children && (
+              {hasChildren && isExpanded && (
                 <div className="ml-4 flex flex-col gap-1">
-                  {parent.children.map((child) => {
+                  {children.map((child) => {
                     const childLabel =
-                      locale === "th" ? child.labelTh : child.labelEn;
+                      locale === "th" ? child.name_th : child.name_en;
                     const isActive = selectedCategory === child.id;
 
                     return (

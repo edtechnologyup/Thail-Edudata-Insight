@@ -116,3 +116,12 @@ def scan_and_mask(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
             masked_columns.append(str(col))
 
     return masked_df, masked_columns
+
+
+def mask_text_content(text: str) -> str:
+    """Mask PII ในเนื้อหา text (เช่น ไฟล์ .sql) ตาม pattern เดียวกับ #46"""
+    masked = _mask_national_id(text)
+    masked = _mask_phone(masked)
+    masked = _mask_email(masked)
+    masked = _mask_student_id(masked)
+    return masked

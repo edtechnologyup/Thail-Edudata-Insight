@@ -33,11 +33,20 @@ class DownloadLog(Base):
     purpose: Mapped[str] = mapped_column(Text, nullable=False)
     file_format: Mapped[str] = mapped_column(
         Enum(
-            "csv", "excel", "json", "xml",
+            "csv", "excel", "json", "xml", "sql", "pdf",
             name="file_format",
             create_type=False,
         ),
         nullable=False,
+    )
+    # web = กดดาวน์โหลดหน้าเว็บ, api = ผ่าน Public API, NULL = ข้อมูลเก่าก่อนแยก source
+    source: Mapped[str | None] = mapped_column(
+        Enum(
+            "web", "api",
+            name="download_source",
+            create_type=False,
+        ),
+        nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

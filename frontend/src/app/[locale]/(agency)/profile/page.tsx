@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import apiClient from "@/services/api";
+import LoginHistoryTable from "@/components/profile/LoginHistoryTable";
 
 type MeProfile = {
   id: string;
@@ -123,6 +124,18 @@ export default function ProfilePage() {
             ))}
           </dl>
         )}
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-kanit text-heading-2 text-text-primary">
+            ประวัติการเข้าสู่ระบบ
+          </h2>
+          <p className="mt-1 font-sarabun text-label text-text-muted">
+            รายการการเข้าสู่ระบบล่าสุดของบัญชีนี้
+          </p>
+        </div>
+        <LoginHistoryTable />
       </section>
 
       <div className="flex justify-end">

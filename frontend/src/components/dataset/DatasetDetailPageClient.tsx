@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import DatasetDetail from "@/components/dataset/DatasetDetail";
 import DatasetDetailSkeleton from "@/components/dataset/DatasetDetailSkeleton";
@@ -8,6 +9,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { useDatasetCitation } from "@/hooks/useDatasetCitation";
 import { useDatasetDetail } from "@/hooks/useDatasetDetail";
 import { buildDatasetDetailView } from "@/utils/datasetDetailMappers";
+import { markDatasetAsViewed } from "@/utils/datasetNew";
 
 type DatasetDetailPageClientProps = {
   id: string;
@@ -48,6 +50,12 @@ export default function DatasetDetailPageClient({
     id,
     Boolean(apiDataset) && !detailLoading
   );
+
+  useEffect(() => {
+    if (apiDataset && !detailLoading) {
+      markDatasetAsViewed(id);
+    }
+  }, [apiDataset, detailLoading, id]);
 
   if (detailLoading) {
     return <DatasetDetailSkeleton />;
@@ -99,6 +107,7 @@ export default function DatasetDetailPageClient({
       publishedDateLabel={dateLabel}
       isUpdated={isUpdated}
       downloadCountLabel={formatDownloadCount(detail.downloadCount, locale)}
+      sourceFileFormat={apiDataset.file_format}
     />
   );
 }

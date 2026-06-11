@@ -76,6 +76,15 @@ const config: Config = {
       maxWidth: {
         "container-max": "1280px",
       },
+      keyframes: {
+        "new-blink": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.45", transform: "scale(0.94)" },
+        },
+      },
+      animation: {
+        "new-blink": "new-blink 1.1s ease-in-out infinite",
+      },
     },
   },
   plugins: [],

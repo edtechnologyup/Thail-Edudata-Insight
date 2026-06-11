@@ -24,6 +24,16 @@ def _get_es():
     return Elasticsearch(settings.ELASTICSEARCH_URL)
 
 
+@router.get("/search/filters", status_code=status.HTTP_200_OK)
+def search_filters_endpoint(db: Session = Depends(get_db)):
+    """
+    ตัวเลือก Filter สำหรับหน้าค้นหา — แสดงเฉพาะค่าที่มีใน Dataset ที่เผยแพร่แล้ว
+    - Auth ❌
+    """
+    result = search_service.get_filter_options(db)
+    return success_response(result.model_dump(mode="json"))
+
+
 @router.get("/search", status_code=status.HTTP_200_OK)
 def search_datasets_endpoint(
     keyword: str | None = None,

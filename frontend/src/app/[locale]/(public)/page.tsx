@@ -1,4 +1,4 @@
-import Banner from "@/components/common/Banner";
+import AnnouncementBanner from "@/components/common/AnnouncementBanner";
 import HeroSearch from "@/components/common/HeroSearch";
 import HomeCtaSection from "@/components/home/HomeCtaSection";
 import HomeDatasetSectionClient from "@/components/home/HomeDatasetSectionClient";
@@ -12,7 +12,7 @@ export default function HomePage({ params }: HomePageProps) {
 
   return (
     <>
-      <Banner />
+      <AnnouncementBanner />
       <HeroSearch />
       <HomeDatasetSectionClient locale={locale} variant="popular" />
       <HomeDatasetSectionClient locale={locale} variant="latest" />

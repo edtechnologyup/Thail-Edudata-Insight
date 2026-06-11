@@ -1,10 +1,9 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import { type FormEvent, useMemo, useState } from "react";
 import { THAI_PROVINCES } from "@/data/thaiProvinces";
-import apiClient from "@/services/api";
+import { useSearchFilters } from "@/hooks/useSearchFilters";
 import FilterTree from "./FilterTree";
 import {
   parseListParam,
@@ -12,19 +11,13 @@ import {
   useSearchParamsUpdate,
 } from "./useSearchParamsUpdate";
 
-const LICENSE_OPTIONS = ["open", "conditional", "cc"] as const;
-
-const FORMAT_OPTIONS = [
-  { id: "csv", label: "CSV" },
-  { id: "excel", label: "XLSX" },
-  { id: "json", label: "JSON" },
-  { id: "xml", label: "XML" },
-] as const;
-
-type PublicAgency = {
-  agency_user_id: string;
-  agency_name: string | null;
-  agency_name_en?: string | null;
+const FORMAT_LABELS: Record<string, string> = {
+  csv: "CSV",
+  excel: "XLSX",
+  json: "JSON",
+  xml: "XML",
+  pdf: "PDF",
+  sql: "SQL",
 };
 
 type SearchFilterProps = {
@@ -33,7 +26,6 @@ type SearchFilterProps = {
   selectedYears: string[];
   selectedFormats: string[];
   selectedTag: string;
-  selectedLicense: string;
   selectedProvince: string;
   filterQuery: string;
   className?: string;
@@ -45,7 +37,6 @@ export default function SearchFilter({
   selectedYears,
   selectedFormats,
   selectedTag,
-  selectedLicense,
   selectedProvince,
   filterQuery,
   className = "",
@@ -53,80 +44,78 @@ export default function SearchFilter({
   const t = useTranslations("search");
   const locale = useLocale();
   const updateParams = useSearchParamsUpdate();
+  const { data: filterOptions } = useSearchFilters();
   const [localFilter, setLocalFilter] = useState(filterQuery);
   const [provinceQuery, setProvinceQuery] = useState("");
   const [provinceOpen, setProvinceOpen] = useState(false);
 
-  // TODO: แสดง filter หน่วยงานเมื่อ GET /api/v1/public/agencies พร้อมใช้งาน
-  const { data: agencies } = useQuery({
-    queryKey: ["public", "agencies"],
-    queryFn: async (): Promise<PublicAgency[] | null> => {
-      try {
-        const response = await apiClient.get("/public/agencies");
-        const data = (response.data as { data?: PublicAgency[] }).data;
-        return data ?? [];
-      } catch {
-        return null;
-      }
-    },
-    retry: false,
-    staleTime: 10 * 60 * 1000,
-  });
+  const agencyOptions = useMemo(
+    () => filterOptions?.agencies ?? [],
+    [filterOptions?.agencies]
+  );
 
-  const yearOptions = useMemo(() => {
-    const currentBE = new Date().getFullYear() + 543;
-    return Array.from({ length: 10 }, (_, index) =>
-      String(currentBE - index)
-    );
-  }, []);
+  const yearOptions = useMemo(
+    () => (filterOptions?.years ?? []).map(String),
+    [filterOptions?.years]
+  );
+
+  const formatOptions = useMemo(
+    () => filterOptions?.formats ?? [],
+    [filterOptions?.formats]
+  );
 
   const provinceLabelMap = useMemo(() => {
     const map = new Map<string, string>();
     THAI_PROVINCES.forEach((p) =>
       map.set(p.value, locale === "th" ? p.labelTh : p.labelEn)
     );
+    map.set("all", t("provinceAll"));
     return map;
-  }, [locale]);
+  }, [locale, t]);
+
+  const availableProvinces = useMemo(() => {
+    const values = filterOptions?.provinces ?? [];
+    return values.map((value) => ({
+      value,
+      label: provinceLabelMap.get(value) ?? value,
+    }));
+  }, [filterOptions?.provinces, provinceLabelMap]);
 
   const filteredProvinces = useMemo(() => {
     const query = provinceQuery.trim().toLowerCase();
-    const options = THAI_PROVINCES.map((p) => ({
-      value: p.value,
-      label: locale === "th" ? p.labelTh : p.labelEn,
-    }));
-    if (!query) return options.slice(0, 5);
-    return options
+    if (!query) return availableProvinces.slice(0, 8);
+    return availableProvinces
       .filter((p) => p.label.toLowerCase().includes(query))
-      .slice(0, 5);
-  }, [provinceQuery, locale]);
+      .slice(0, 8);
+  }, [provinceQuery, availableProvinces]);
 
-  const showAgencyFilter = Array.isArray(agencies) && agencies.length > 0;
+  const showAgencyFilter = agencyOptions.length > 0;
+  const showYearFilter = yearOptions.length > 0;
+  const showFormatFilter = formatOptions.length > 0;
+  const showProvinceFilter = availableProvinces.length > 0;
+  const showCategoryFilter = (filterOptions?.categories?.length ?? 0) > 0;
 
   function handleFilterInResults(e: FormEvent) {
     e.preventDefault();
-    updateParams({ fq: localFilter.trim() || null });
+    updateParams({ fq: localFilter.trim() || null, page: null });
   }
 
-  function toggleAgency(agencyUserId: string) {
-    const next = toggleListParam(selectedAgencies, agencyUserId);
-    updateParams({ agency: next.length ? next.join(",") : null });
+  function selectAgency(agencyUserId: string) {
+    const isSelected = selectedAgencies.includes(agencyUserId);
+    updateParams({
+      agency: isSelected ? null : agencyUserId,
+      page: null,
+    });
   }
 
   function toggleYear(year: string) {
     const next = toggleListParam(selectedYears, year);
-    updateParams({ year: next.length ? next.join(",") : null });
+    updateParams({ year: next.length ? next.join(",") : null, page: null });
   }
 
   function toggleFormat(id: string) {
     const next = toggleListParam(selectedFormats, id);
-    updateParams({ format: next.length ? next.join(",") : null });
-  }
-
-  function toggleLicense(value: string) {
-    updateParams({
-      license: selectedLicense === value ? null : value,
-      page: null,
-    });
+    updateParams({ format: next.length ? next.join(",") : null, page: null });
   }
 
   function selectProvince(value: string) {
@@ -147,7 +136,6 @@ export default function SearchFilter({
       year: null,
       format: null,
       tag: null,
-      license: null,
       province: null,
       fq: null,
       page: null,
@@ -189,9 +177,47 @@ export default function SearchFilter({
         </form>
       </div>
 
-      <FilterTree selectedCategory={selectedCategory} />
+      {showCategoryFilter ? (
+        <>
+          <FilterTree selectedCategory={selectedCategory} />
+          <hr className="border-border-default/60" />
+        </>
+      ) : null}
 
-      <hr className="border-border-default/60" />
+      {showAgencyFilter ? (
+        <>
+          <div className="flex flex-col gap-3">
+            <span className="font-sarabun text-label font-medium text-text-secondary">
+              {t("agency")}
+            </span>
+            {agencyOptions.map((agency) => {
+              const checked = selectedAgencies.includes(agency.agency_user_id);
+              return (
+                <label
+                  key={agency.agency_user_id}
+                  className="group flex cursor-pointer items-center gap-3"
+                >
+                  <input
+                    type="radio"
+                    name="search-agency-filter"
+                    checked={checked}
+                    onChange={() => selectAgency(agency.agency_user_id)}
+                    className="h-5 w-5 border-border-input accent-primary-dark focus:ring-primary-dark/30"
+                  />
+                  <span
+                    className={`font-sarabun text-label transition-colors group-hover:text-primary-dark ${
+                      checked ? "font-bold text-primary-dark" : "text-text-primary"
+                    }`}
+                  >
+                    {agency.agency_name}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+          <hr className="border-border-default/60" />
+        </>
+      ) : null}
 
       <div className="flex flex-col gap-3">
         <span className="font-sarabun text-label font-medium text-text-secondary">
@@ -200,35 +226,30 @@ export default function SearchFilter({
         <input
           type="text"
           defaultValue={selectedTag}
-          onBlur={(e) => updateParams({ tag: e.target.value.trim() || null })}
+          onBlur={(e) =>
+            updateParams({ tag: e.target.value.trim() || null, page: null })
+          }
           placeholder={t("tagPlaceholder")}
           className="w-full rounded-radius-md border border-border-input px-3 py-2 font-sarabun text-label text-text-primary outline-none focus:border-border-focus focus:ring-1 focus:ring-primary-dark/30"
         />
       </div>
 
-      {showAgencyFilter ? (
+      {showYearFilter ? (
         <>
           <hr className="border-border-default/60" />
 
           <div className="flex flex-col gap-3">
             <span className="font-sarabun text-label font-medium text-text-secondary">
-              {t("agency")}
+              {t("academicYear")}
             </span>
-            {agencies.map((agency) => {
-              const label =
-                locale === "th"
-                  ? agency.agency_name ?? agency.agency_name_en ?? "-"
-                  : agency.agency_name_en ?? agency.agency_name ?? "-";
-              const checked = selectedAgencies.includes(agency.agency_user_id);
+            {yearOptions.map((year) => {
+              const checked = selectedYears.includes(year);
               return (
-                <label
-                  key={agency.agency_user_id}
-                  className="group flex cursor-pointer items-center gap-3"
-                >
+                <label key={year} className="group flex cursor-pointer items-center gap-3">
                   <input
                     type="checkbox"
                     checked={checked}
-                    onChange={() => toggleAgency(agency.agency_user_id)}
+                    onChange={() => toggleYear(year)}
                     className="h-5 w-5 rounded-radius-sm border-border-input accent-primary-dark focus:ring-primary-dark/30"
                   />
                   <span
@@ -236,7 +257,7 @@ export default function SearchFilter({
                       checked ? "font-bold text-primary-dark" : "text-text-primary"
                     }`}
                   >
-                    {label}
+                    {year}
                   </span>
                 </label>
               );
@@ -245,162 +266,97 @@ export default function SearchFilter({
         </>
       ) : null}
 
-      <hr className="border-border-default/60" />
+      {showFormatFilter ? (
+        <>
+          <hr className="border-border-default/60" />
 
-      <div className="flex flex-col gap-3">
-        <span className="font-sarabun text-label font-medium text-text-secondary">
-          {t("academicYear")}
-        </span>
-        {yearOptions.map((year) => {
-          const checked = selectedYears.includes(year);
-          return (
-            <label key={year} className="group flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={() => toggleYear(year)}
-                className="h-5 w-5 rounded-radius-sm border-border-input accent-primary-dark focus:ring-primary-dark/30"
-              />
-              <span
-                className={`font-sarabun text-label transition-colors group-hover:text-primary-dark ${
-                  checked ? "font-bold text-primary-dark" : "text-text-primary"
-                }`}
-              >
-                {year}
-              </span>
-            </label>
-          );
-        })}
-      </div>
-
-      <hr className="border-border-default/60" />
-
-      <div className="flex flex-col gap-3">
-        <span className="font-sarabun text-label font-medium text-text-secondary">
-          {t("fileFormat")}
-        </span>
-        <div className="flex flex-wrap gap-2">
-          {FORMAT_OPTIONS.map((fmt) => {
-            const active = selectedFormats.includes(fmt.id);
-            return (
-              <button
-                key={fmt.id}
-                type="button"
-                onClick={() => toggleFormat(fmt.id)}
-                className={`rounded-radius-full border px-3 py-1 font-sarabun text-caption font-medium transition-colors ${
-                  active
-                    ? "border-primary/30 bg-primary text-white"
-                    : "border-border-default/80 bg-surface-container text-text-secondary hover:bg-primary-light"
-                }`}
-              >
-                {fmt.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <hr className="border-border-default/60" />
-
-      <div className="flex flex-col gap-3">
-        <span className="font-sarabun text-label font-medium text-text-secondary">
-          {t("license")}
-        </span>
-        <div className="flex flex-wrap gap-2">
-          {LICENSE_OPTIONS.map((value) => {
-            const active = selectedLicense === value;
-            const label =
-              value === "open"
-                ? t("licenseOpen")
-                : value === "conditional"
-                  ? t("licenseConditional")
-                  : t("licenseCc");
-            return (
-              <button
-                key={value}
-                type="button"
-                onClick={() => toggleLicense(value)}
-                className={`rounded-radius-full border px-3 py-1 font-sarabun text-caption font-medium transition-colors ${
-                  active
-                    ? "border-primary/30 bg-primary text-white"
-                    : "border-border-default/80 bg-surface-container text-text-secondary hover:bg-primary-light"
-                }`}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <hr className="border-border-default/60" />
-
-      <div className="flex flex-col gap-3">
-        <span className="font-sarabun text-label font-medium text-text-secondary">
-          {t("province")}
-        </span>
-        {selectedProvince ? (
-          <div className="flex items-center justify-between gap-2 rounded-radius-md border border-primary/30 bg-primary-light px-3 py-2">
-            <span className="font-sarabun text-label font-medium text-primary-dark">
-              {selectedProvince === "all"
-                ? t("provinceAll")
-                : provinceLabelMap.get(selectedProvince) ?? selectedProvince}
+          <div className="flex flex-col gap-3">
+            <span className="font-sarabun text-label font-medium text-text-secondary">
+              {t("fileFormat")}
             </span>
-            <button
-              type="button"
-              onClick={clearProvince}
-              className="text-primary-dark transition-colors hover:text-status-error"
-              aria-label={t("clearFilter")}
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <div className="flex flex-wrap gap-2">
+              {formatOptions.map((fmt) => {
+                const active = selectedFormats.includes(fmt);
+                return (
+                  <button
+                    key={fmt}
+                    type="button"
+                    onClick={() => toggleFormat(fmt)}
+                    className={`rounded-radius-full border px-3 py-1 font-sarabun text-caption font-medium transition-colors ${
+                      active
+                        ? "border-primary/30 bg-primary text-white"
+                        : "border-border-default/80 bg-surface-container text-text-secondary hover:bg-primary-light"
+                    }`}
+                  >
+                    {FORMAT_LABELS[fmt] ?? fmt.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        ) : (
-          <div className="relative">
-            <input
-              type="text"
-              value={provinceQuery}
-              onChange={(e) => {
-                setProvinceQuery(e.target.value);
-                setProvinceOpen(true);
-              }}
-              onFocus={() => setProvinceOpen(true)}
-              onBlur={() => setTimeout(() => setProvinceOpen(false), 150)}
-              placeholder={t("provincePlaceholder")}
-              className="w-full rounded-radius-md border border-border-input px-3 py-2 font-sarabun text-label text-text-primary outline-none focus:border-border-focus focus:ring-1 focus:ring-primary-dark/30"
-            />
-            {provinceOpen ? (
-              <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-radius-md border border-border-default bg-surface-card shadow-level-2">
+        </>
+      ) : null}
+
+      {showProvinceFilter ? (
+        <>
+          <hr className="border-border-default/60" />
+
+          <div className="flex flex-col gap-3">
+            <span className="font-sarabun text-label font-medium text-text-secondary">
+              {t("province")}
+            </span>
+            {selectedProvince ? (
+              <div className="flex items-center justify-between gap-2 rounded-radius-md border border-primary/30 bg-primary-light px-3 py-2">
+                <span className="font-sarabun text-label font-medium text-primary-dark">
+                  {provinceLabelMap.get(selectedProvince) ?? selectedProvince}
+                </span>
                 <button
                   type="button"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    selectProvince("all");
-                  }}
-                  className="block w-full px-3 py-2 text-left font-sarabun text-label text-text-primary transition-colors hover:bg-primary-light"
+                  onClick={clearProvince}
+                  className="text-primary-dark transition-colors hover:text-status-error"
+                  aria-label={t("clearFilter")}
                 >
-                  {t("provinceAll")}
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
-                {filteredProvinces.map((p) => (
-                  <button
-                    key={p.value}
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      selectProvince(p.value);
-                    }}
-                    className="block w-full px-3 py-2 text-left font-sarabun text-label text-text-primary transition-colors hover:bg-primary-light"
-                  >
-                    {p.label}
-                  </button>
-                ))}
               </div>
-            ) : null}
+            ) : (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={provinceQuery}
+                  onChange={(e) => {
+                    setProvinceQuery(e.target.value);
+                    setProvinceOpen(true);
+                  }}
+                  onFocus={() => setProvinceOpen(true)}
+                  onBlur={() => setTimeout(() => setProvinceOpen(false), 150)}
+                  placeholder={t("provincePlaceholder")}
+                  className="w-full rounded-radius-md border border-border-input px-3 py-2 font-sarabun text-label text-text-primary outline-none focus:border-border-focus focus:ring-1 focus:ring-primary-dark/30"
+                />
+                {provinceOpen && filteredProvinces.length > 0 ? (
+                  <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-radius-md border border-border-default bg-surface-card shadow-level-2">
+                    {filteredProvinces.map((p) => (
+                      <button
+                        key={p.value}
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          selectProvince(p.value);
+                        }}
+                        className="block w-full px-3 py-2 text-left font-sarabun text-label text-text-primary transition-colors hover:bg-primary-light"
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      ) : null}
 
       <div className="mt-2 flex flex-col gap-3">
         <button
@@ -436,7 +392,6 @@ export function useSearchFilterParams(searchParams: URLSearchParams) {
     selectedYears: parseListParam(searchParams.get("year")),
     selectedFormats: parseListParam(searchParams.get("format")),
     selectedTag: searchParams.get("tag") ?? "",
-    selectedLicense: searchParams.get("license") ?? "",
     selectedProvince: searchParams.get("province") ?? "",
     filterQuery: searchParams.get("fq") ?? "",
   };

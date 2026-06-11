@@ -41,6 +41,7 @@
     "search": "ค้นหา",
     "searchPlaceholder": "ค้นหาข้อมูล ตัวอย่างเช่น: สถิตินักเรียน 2567",
     "stats": "สถิติภาพรวม",
+    "scholarship": "ทุนการศึกษา",
     "apiDocs": "เครื่องมือ API",
     "categories": "หมวดหมู่",
     "login": "เข้าสู่ระบบ",
@@ -132,6 +133,18 @@
     "copyright": "© {year} Thai Education Data Catalog. All rights reserved. Digital Government Development Agency (DGA).",
     "poweredBy": "Powered by Thai Government Open Data Infrastructure"
   },
+  "scholarship": {
+    "title": "ทุนการศึกษา",
+    "subtitle": "รวมทุนการศึกษาสำคัญของการศึกษาไทย",
+    "comingSoon": "ข้อมูลจะเปิดให้ใช้งานเร็วๆ นี้",
+    "underConstruction": "หน้านี้อยู่ระหว่างจัดทำ — ข้อมูลทุนการศึกษาจะทยอยเพิ่มเข้ามา",
+    "categories": {
+      "gsl": "กองทุนเงินให้กู้ยืมเพื่อการศึกษา (กยศ.)",
+      "eef": "กองทุนเพื่อความเสมอภาคทางการศึกษา (กสศ.)",
+      "government": "ทุนรัฐบาล",
+      "university": "ทุนมหาวิทยาลัย"
+    }
+  },
   "stats": {
     "title": "สถิติการศึกษาไทย",
     "subtitle": "ข้อมูลสถิติการศึกษาจากหน่วยงานภาครัฐ",
@@ -163,7 +176,14 @@
     "schoolsByYear": "จำนวนโรงเรียนรายปี",
     "schoolsLegend": "โรงเรียนรัฐบาล",
     "datasetByCategory": "Dataset แยกตามหมวดหมู่",
+    "datasetByCategorySubtitle": "หมวดหมู่ใหญ่ (ระดับ 1) — ข้อมูลจาก Dataset ที่เผยแพร่แล้ว",
+    "categoryFilter": "กรองตามหมวดหมู่ใหญ่",
+    "categoryFilterHint": "เลือกหมวดหมู่เพื่อดูกราฟ Dataset รายปีของหมวดนั้น",
+    "allCategories": "ทุกหมวดหมู่",
+    "categoryLoadError": "โหลดสถิติตามหมวดหมู่ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
     "topDatasets": "Dataset ยอดนิยม",
+    "topDatasetsLoadError": "โหลด Dataset ยอดนิยมไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
+    "views": "เข้าชม",
     "downloads": "ดาวน์โหลด",
     "categoryLabel": "หมวดหมู่",
     "studentsChart": "จำนวนนักเรียน (ล้านคน)",
@@ -560,6 +580,8 @@
     "download": {
       "title": "เลือกรูปแบบไฟล์และวัตถุประสงค์",
       "format": "รูปแบบไฟล์",
+      "formatFixed": "รูปแบบไฟล์ของชุดข้อมูลนี้: {format}",
+      "formatLoading": "กำลังโหลดรูปแบบไฟล์...",
       "purpose": "วัตถุประสงค์การใช้งาน",
       "purposePlaceholder": "กรุณาระบุวัตถุประสงค์เพื่อพัฒนาคุณภาพการบริการข้อมูล (อย่างน้อย 10 ตัวอักษร)",
       "submit": "ยืนยันการดาวน์โหลด",
@@ -740,7 +762,7 @@
       "fileSection": "อัปโหลดไฟล์",
       "dropzone": "ลากไฟล์มาวางที่นี่ หรือ",
       "dropzoneClick": "คลิกเพื่อเลือกไฟล์",
-      "dropzoneHint": "รองรับ CSV, Excel (.xlsx), JSON ขนาดไม่เกิน 100MB",
+      "dropzoneHint": "รองรับ CSV, Excel (.xlsx), JSON, PDF, SQL ขนาดไม่เกิน 100MB",
       "uploading": "กำลังอัปโหลดและวิเคราะห์...",
       "qualityScore": "Data Quality Score",
       "qualityScoreHint": "คุณภาพข้อมูลอยู่ในเกณฑ์ดี พร้อมสำหรับการเผยแพร่",
@@ -784,7 +806,7 @@
       "saveDraft": "บันทึก Draft",
       "submitForApproval": "ส่งขอ Approve",
       "publish": "เผยแพร่",
-      "fileInvalidType": "ไฟล์ต้องเป็น CSV, Excel หรือ JSON เท่านั้น",
+      "fileInvalidType": "ไฟล์ต้องเป็น CSV, Excel, JSON, PDF หรือ SQL เท่านั้น",
       "fileTooLarge": "ไฟล์ใหญ่เกิน 100MB",
       "fileUploadFailed": "อัปโหลดไฟล์ไม่สำเร็จ กรุณาลองใหม่",
       "fileRequired": "กรุณาอัปโหลดไฟล์ก่อนบันทึก",
@@ -1080,6 +1102,11 @@
       "todayBadge": "วันนี้",
       "datasetChart": "Dataset รายเดือน",
       "downloadChart": "Download รายเดือน",
+      "webDownloadChart": "ดาวน์โหลดผ่านหน้าเว็บ",
+      "apiDownloadChart": "ดาวน์โหลดผ่าน API",
+      "monthlyToggle": "รายเดือน",
+      "yearlyToggle": "รายปี",
+      "chartLoadError": "โหลดข้อมูลไม่สำเร็จ",
       "downloadLegend": "เป้าหมาย",
       "yearLabel": "เลือกปี",
       "yearPrefix": "ปี",
@@ -1382,6 +1409,32 @@
       "paginationSummary": "แสดง {start} - {end} จากทั้งหมด {total} รายการ",
       "prevPage": "หน้าก่อน",
       "nextPage": "หน้าถัดไป"
+    }
+  },
+  "notifications": {
+    "title": "การแจ้งเตือน",
+    "pageTitle": "การแจ้งเตือนทั้งหมด",
+    "pageSubtitle": "ประกาศจากผู้ดูแลระบบ Dataset ใหม่ และทุนการศึกษา",
+    "bellLabel": "เปิดการแจ้งเตือน",
+    "viewAll": "ดูทั้งหมด",
+    "loading": "กำลังโหลด...",
+    "empty": "ยังไม่มีการแจ้งเตือน",
+    "loadError": "โหลดการแจ้งเตือนไม่สำเร็จ กรุณาลองใหม่",
+    "markAllRead": "อ่านทั้งหมดแล้ว",
+    "backHome": "กลับหน้าหลัก",
+    "openLink": "เปิดรายละเอียด",
+    "prev": "ก่อนหน้า",
+    "next": "ถัดไป",
+    "newBadge": "NEW",
+    "visitorNote": "ผู้เยี่ยมชม: สถานะอ่านแล้วจะบันทึกบนเครื่องนี้",
+    "typeAnnouncement": "ประกาศ",
+    "typeNewDataset": "Dataset ใหม่",
+    "typeScholarship": "ทุนการศึกษา",
+    "typeSystem": "ระบบ",
+    "announcementBanner": {
+      "badge": "ประกาศด่วน",
+      "fromAdmin": "จากผู้ดูแลระบบ",
+      "dismiss": "รับทราบ"
     }
   }
 }

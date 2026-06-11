@@ -396,3 +396,72 @@ def get_monthly_stats(db: Session, year: int) -> dict:
             {"month": m, "count": dl_by_month.get(m, 0)} for m in range(1, 13)
         ],
     }
+
+
+def get_download_source_monthly(db: Session, year: int) -> dict:
+    """คืนจำนวนดาวน์โหลดรายเดือน 12 เดือน แยกตาม source (web/api)
+
+    นับเฉพาะแถวที่มี source — แถวเก่าที่เป็น NULL (ก่อนเพิ่มคอลัมน์) ไม่ถูกนับ
+    """
+    rows = (
+        db.query(
+            DownloadLog.source,
+            func.extract("month", DownloadLog.created_at).label("month"),
+            func.count(DownloadLog.id).label("count"),
+        )
+        .filter(
+            func.extract("year", DownloadLog.created_at) == year,
+            DownloadLog.source.isnot(None),
+        )
+        .group_by(DownloadLog.source, func.extract("month", DownloadLog.created_at))
+        .all()
+    )
+
+    web_by_month: dict[int, int] = {}
+    api_by_month: dict[int, int] = {}
+    for row in rows:
+        target = web_by_month if row.source == "web" else api_by_month
+        target[int(row.month)] = int(row.count)
+
+    return {
+        "year": year,
+        "web_by_month": [
+            {"month": m, "count": web_by_month.get(m, 0)} for m in range(1, 13)
+        ],
+        "api_by_month": [
+            {"month": m, "count": api_by_month.get(m, 0)} for m in range(1, 13)
+        ],
+    }
+
+
+def get_download_source_yearly(db: Session) -> dict:
+    """คืนจำนวนดาวน์โหลดรายปี แยกตาม source (web/api) เฉพาะปีที่มีข้อมูล source"""
+    rows = (
+        db.query(
+            DownloadLog.source,
+            func.extract("year", DownloadLog.created_at).label("year"),
+            func.count(DownloadLog.id).label("count"),
+        )
+        .filter(DownloadLog.source.isnot(None))
+        .group_by(DownloadLog.source, func.extract("year", DownloadLog.created_at))
+        .all()
+    )
+
+    web_by_year: dict[int, int] = {}
+    api_by_year: dict[int, int] = {}
+    for row in rows:
+        target = web_by_year if row.source == "web" else api_by_year
+        target[int(row.year)] = int(row.count)
+
+    years = sorted(set(web_by_year) | set(api_by_year))
+    if not years:
+        years = [datetime.now(timezone.utc).year]
+
+    return {
+        "web_by_year": [
+            {"year": y, "count": web_by_year.get(y, 0)} for y in years
+        ],
+        "api_by_year": [
+            {"year": y, "count": api_by_year.get(y, 0)} for y in years
+        ],
+    }

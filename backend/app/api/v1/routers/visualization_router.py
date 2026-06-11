@@ -15,6 +15,21 @@ from app.schemas.visualization_schema import DashboardLayoutRequest
 router = APIRouter()
 
 
+@router.get("/stats/by-category", status_code=status.HTTP_200_OK)
+def stats_by_category(
+    category_id: uuid.UUID | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
+    """
+    สถิติ Dataset แยกตามหมวดหมู่ระดับ 1 และแนวโน้มรายปี
+    - Auth ❌
+    - Query: category_id (หมวดหมู่ระดับ 1 — ไม่ส่ง = ทั้งหมด)
+    - Errors: CATEGORY_NOT_FOUND
+    """
+    result = visualization_service.get_stats_by_category(db, category_id=category_id)
+    return success_response(result.model_dump(mode="json"))
+
+
 @router.get("/stats/overview", status_code=status.HTTP_200_OK)
 def stats_overview(db: Session = Depends(get_db)):
     """
@@ -31,7 +46,7 @@ def stats_trending(
     db: Session = Depends(get_db),
 ):
     """
-    Dataset ยอดนิยม ตาม #20
+    Dataset ยอดนิยม เรียงตาม view_count (การเข้าชม) ตาม #20
     - Auth ❌
     """
     result = visualization_service.get_trending(db, limit=limit)

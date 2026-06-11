@@ -77,6 +77,9 @@ class DatasetResponse(BaseModel):
     updated_at: datetime
     user_id: uuid.UUID
     agency_name: str | None = None
+    category_name_th: str | None = None
+    category_name_en: str | None = None
+    file_format: str | None = None
 
     model_config = {"from_attributes": True, "populate_by_name": True}
 

@@ -16,6 +16,7 @@ def create_download_log(
     ip_address: str,
     purpose: str,
     file_format: str,
+    source: str = "web",
 ) -> DownloadLog:
     log = DownloadLog(
         dataset_id=dataset_id,
@@ -23,6 +24,7 @@ def create_download_log(
         ip_address=ip_address,
         purpose=purpose,
         file_format=file_format,
+        source=source,
     )
     db.add(log)
     db.flush()

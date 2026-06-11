@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import type { DatasetLicense, DatasetStatus, HomeDatasetMock } from "@/data/mockData";
+import { useDatasetNewBadge } from "@/hooks/useDatasetNewBadge";
 
 type DatasetCardProps = HomeDatasetMock & {
   variant?: "popular" | "latest";
@@ -125,11 +126,14 @@ export default function DatasetCard({
   downloadCount,
   updatedAt,
   createdAt,
+  publishedAt,
   license,
   variant = "popular",
 }: DatasetCardProps) {
   const t = useTranslations("dataset");
+  const tCommon = useTranslations("notifications");
   const locale = useLocale();
+  const showNewBadge = useDatasetNewBadge(id, publishedAt);
 
   // ถ้า updated_at != created_at → "อัปเดตล่าสุด" ถ้าเหมือนกัน → "เผยแพร่เมื่อ"
   const isUpdated =
@@ -149,9 +153,17 @@ export default function DatasetCard({
       className={`group flex flex-col rounded-radius-lg border p-6 shadow-level-1 transition-all ${surfaceClass}`}
     >
       <div className="mb-4 flex items-start justify-between gap-2">
-        <span className="rounded-radius-sm bg-status-draft-bg px-2 py-1 font-sarabun text-caption font-bold uppercase text-status-draft">
-          {category}
-        </span>
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="rounded-radius-sm bg-status-draft-bg px-2 py-1 font-sarabun text-caption font-bold uppercase text-status-draft">
+            {category}
+          </span>
+          {showNewBadge && (
+            <span className="inline-flex animate-new-blink items-center gap-1 rounded-radius-full bg-status-error px-2 py-0.5 font-sarabun text-caption font-bold text-white shadow-[0_0_0_2px_rgba(255,255,255,0.85)]">
+              <span className="h-1.5 w-1.5 animate-new-blink rounded-radius-full bg-white" />
+              {tCommon("newBadge")}
+            </span>
+          )}
+        </div>
         {variant === "popular" && isPublished ? (
           <span className="flex items-center gap-1 rounded-radius-sm bg-primary-light px-2 py-1 font-sarabun text-caption font-bold text-primary-dark">
             <svg

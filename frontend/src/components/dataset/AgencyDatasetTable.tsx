@@ -94,7 +94,10 @@ export default function AgencyDatasetTable({
   const locale = useLocale();
   const base = `/${locale}`;
   const { data, isLoading, isError, error } = useAgencyDatasets(status, page);
-  const [downloadTargetId, setDownloadTargetId] = useState<string | null>(null);
+  const [downloadTarget, setDownloadTarget] = useState<{
+    id: string;
+    fileFormat: string | null;
+  } | null>(null);
 
   const rows = data?.data ?? [];
   const total = data?.total ?? 0;
@@ -216,7 +219,12 @@ export default function AgencyDatasetTable({
                         </Link>
                         <button
                           type="button"
-                          onClick={() => setDownloadTargetId(row.id)}
+                          onClick={() =>
+                            setDownloadTarget({
+                              id: row.id,
+                              fileFormat: row.fileFormat ?? null,
+                            })
+                          }
                           className="text-text-muted transition-colors hover:text-primary-dark"
                           aria-label={t("download")}
                           title={t("download")}
@@ -295,9 +303,10 @@ export default function AgencyDatasetTable({
       )}
 
       <DownloadModal
-        open={Boolean(downloadTargetId)}
-        datasetId={downloadTargetId ?? ""}
-        onClose={() => setDownloadTargetId(null)}
+        open={Boolean(downloadTarget)}
+        datasetId={downloadTarget?.id ?? ""}
+        sourceFileFormat={downloadTarget?.fileFormat}
+        onClose={() => setDownloadTarget(null)}
       />
     </>
   );

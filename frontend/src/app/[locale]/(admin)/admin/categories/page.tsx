@@ -12,6 +12,7 @@ import TagTable from "@/components/admin/TagTable";
 import type { AdminCategory, AdminSubcategory, AdminTag } from "@/data/mockData";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useAdminTags } from "@/hooks/useAdminTags";
+import { toast } from "@/stores/toastStore";
 
 export default function AdminCategoriesPage() {
   const t = useTranslations("admin.categories");
@@ -37,9 +38,6 @@ export default function AdminCategoriesPage() {
   const [tagFormMode, setTagFormMode] = useState<"create" | "edit">("create");
   const [editingTag, setEditingTag] = useState<AdminTag | null>(null);
 
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [toastError, setToastError] = useState<string | null>(null);
-
   const categoryFilters = useMemo(
     () => ({ search: appliedSearch || undefined, page }),
     [appliedSearch, page]
@@ -52,15 +50,11 @@ export default function AdminCategoriesPage() {
   );
 
   const showToast = (message: string) => {
-    setToastMessage(message);
-    setToastError(null);
-    window.setTimeout(() => setToastMessage(null), 3000);
+    toast.success(message);
   };
 
   const showError = (message: string) => {
-    setToastError(message);
-    setToastMessage(null);
-    window.setTimeout(() => setToastError(null), 3000);
+    toast.error(message);
   };
 
   const applySearch = () => {
@@ -266,32 +260,6 @@ export default function AdminCategoriesPage() {
         onClose={() => setTagFormOpen(false)}
         onError={showError}
       />
-
-      {toastMessage && (
-        <Toast message={toastMessage} variant="success" />
-      )}
-      {toastError && <Toast message={toastError} variant="error" />}
-    </div>
-  );
-}
-
-function Toast({
-  message,
-  variant,
-}: {
-  message: string;
-  variant: "success" | "error";
-}) {
-  return (
-    <div
-      className={`fixed bottom-6 right-6 z-[110] rounded-radius-lg px-5 py-3 font-sarabun text-body-md shadow-level-2 ${
-        variant === "success"
-          ? "bg-status-published text-surface-card"
-          : "bg-status-error text-surface-card"
-      }`}
-      role="status"
-    >
-      {message}
     </div>
   );
 }

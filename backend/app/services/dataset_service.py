@@ -40,6 +40,14 @@ ALLOWED_MIME_TYPES = {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "application/vnd.ms-excel",
     "application/json",
+    "application/pdf",
+}
+
+SQL_MIME_TYPES = {
+    "text/plain",
+    "application/octet-stream",
+    "application/sql",
+    "text/x-sql",
 }
 
 MIME_TO_FORMAT = {
@@ -47,6 +55,15 @@ MIME_TO_FORMAT = {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "excel",
     "application/vnd.ms-excel": "excel",
     "application/json": "json",
+    "application/pdf": "pdf",
+}
+
+FORMAT_TO_EXT = {
+    "csv": "csv",
+    "excel": "xlsx",
+    "json": "json",
+    "pdf": "pdf",
+    "sql": "sql",
 }
 
 
@@ -54,20 +71,27 @@ def _validate_file(file: UploadFile, content: bytes) -> str:
     if len(content) > MAX_FILE_SIZE_BYTES:
         raise_app_error("FILE_TOO_LARGE")
 
-    content_type = (file.content_type or "").split(";")[0].strip()
-    if content_type not in ALLOWED_MIME_TYPES:
-        raise_app_error("FILE_INVALID_FORMAT")
-
-    actual_mime = magic.from_buffer(content, mime=True)
-    if actual_mime not in ALLOWED_MIME_TYPES:
-        raise_app_error("INVALID_MIME_TYPE")
-
     filename = file.filename or ""
     parts = filename.split(".")
     if len(parts) > 2:
         raise_app_error("FILE_INVALID_FORMAT")
 
-    return content_type
+    ext = parts[-1].lower() if len(parts) > 1 else ""
+    content_type = (file.content_type or "").split(";")[0].strip()
+    actual_mime = magic.from_buffer(content, mime=True)
+
+    if ext == "sql":
+        if content_type in SQL_MIME_TYPES or actual_mime in SQL_MIME_TYPES:
+            return "sql"
+        raise_app_error("FILE_INVALID_FORMAT")
+
+    if content_type not in ALLOWED_MIME_TYPES:
+        raise_app_error("FILE_INVALID_FORMAT")
+
+    if actual_mime not in ALLOWED_MIME_TYPES:
+        raise_app_error("INVALID_MIME_TYPE")
+
+    return MIME_TO_FORMAT[content_type]
 
 
 def _read_dataframe(content: bytes, content_type: str) -> pd.DataFrame:
@@ -143,12 +167,41 @@ def _build_dataset_index_document(db: Session, dataset) -> dict:
         "category_id": str(dataset.category_id) if dataset.category_id else None,
         "user_id": str(dataset.user_id),
         "license": dataset.license,
+        "file_format": dataset_repo.get_latest_dataset_file_format(db, dataset.id),
         "status": dataset.status,
         "published_at": published_at,
         "download_count": dataset.download_count,
         "quality_score": dataset.quality_score,
         "metadata": _metadata_for_search(dataset.dataset_metadata),
     }
+
+
+def _resolve_category_names(
+    db: Session, category_id: uuid.UUID | None
+) -> tuple[str | None, str | None]:
+    from app.models.category_model import Category
+
+    if category_id is None:
+        return None, None
+    category = (
+        db.query(Category)
+        .filter(Category.id == category_id, Category.is_deleted.is_(False))
+        .first()
+    )
+    if category is None:
+        return None, None
+    if category.level == 2 and category.parent_id is not None:
+        parent = (
+            db.query(Category)
+            .filter(
+                Category.id == category.parent_id,
+                Category.is_deleted.is_(False),
+            )
+            .first()
+        )
+        if parent is not None:
+            return parent.name_th, parent.name_en
+    return category.name_th, category.name_en
 
 
 def _build_dataset_response(
@@ -160,7 +213,20 @@ def _build_dataset_response(
     data.tags = tag_ids
     owner = db.query(User).filter(User.id == dataset.user_id).first()
     data.agency_name = owner.agency_name if owner else None
+    name_th, name_en = _resolve_category_names(db, dataset.category_id)
+    data.category_name_th = name_th
+    data.category_name_en = name_en
+    data.file_format = dataset_repo.get_latest_dataset_file_format(db, dataset_id)
     return data
+
+
+def record_dataset_view(db: Session, dataset_id: uuid.UUID) -> None:
+    """บันทึกการเข้าชม Dataset ที่เผยแพร่แล้ว"""
+    dataset = dataset_repo.get_dataset_by_id(db, dataset_id)
+    if dataset is None or dataset.status != "published":
+        return
+    dataset_repo.increment_view_count(db, dataset_id)
+    db.commit()
 
 
 def upload(
@@ -173,23 +239,39 @@ def upload(
     current_user: dict,
     ip_address: str,
 ) -> DatasetResponse:
+    from app.utils.pii_masking import mask_text_content
+
     content = file.file.read()
-    content_type = _validate_file(file, content)
-    file_format = MIME_TO_FORMAT[content_type]
-    ext = file_format if file_format != "excel" else "xlsx"
+    file_format = _validate_file(file, content)
+    ext = FORMAT_TO_EXT[file_format]
+    masked_columns: list[str] = []
 
-    df = _read_dataframe(content, content_type)
-    masked_df, masked_columns = scan_and_mask(df)
-    quality_score = calculate_quality_score(masked_df)
-
-    if file_format == "csv":
-        masked_content = masked_df.to_csv(index=False).encode("utf-8")
-    elif file_format == "json":
-        masked_content = masked_df.to_json(orient="records", force_ascii=False).encode("utf-8")
+    if file_format == "sql":
+        text = content.decode("utf-8", errors="replace")
+        masked_content = mask_text_content(text).encode("utf-8")
+        quality_score = None
+    elif file_format == "pdf":
+        masked_content = content
+        quality_score = None
     else:
-        buf = io.BytesIO()
-        masked_df.to_excel(buf, index=False)
-        masked_content = buf.getvalue()
+        content_type = next(
+            (mime for mime, fmt in MIME_TO_FORMAT.items() if fmt == file_format),
+            "text/csv",
+        )
+        df = _read_dataframe(content, content_type)
+        masked_df, masked_columns = scan_and_mask(df)
+        quality_score = calculate_quality_score(masked_df)
+
+        if file_format == "csv":
+            masked_content = masked_df.to_csv(index=False).encode("utf-8")
+        elif file_format == "json":
+            masked_content = masked_df.to_json(
+                orient="records", force_ascii=False
+            ).encode("utf-8")
+        else:
+            buf = io.BytesIO()
+            masked_df.to_excel(buf, index=False)
+            masked_content = buf.getvalue()
 
     object_name: str | None = None
     try:
@@ -276,9 +358,12 @@ def upload(
 
     if dataset.status == "published":
         from app.utils.elasticsearch_utils import index_dataset
+        import app.services.notification_service as notification_service
 
         index_doc = _build_dataset_index_document(db, dataset)
         background_tasks.add_task(index_dataset, es_client, index_doc)
+        notification_service.notify_subscribers_new_dataset(db, dataset)
+        db.commit()
         email_service.notify_subscribers_new_dataset(background_tasks, db, dataset)
         email_service.notify_saved_search(background_tasks, db, dataset)
     return _build_dataset_response(db, dataset.id)
@@ -315,10 +400,15 @@ def publish_dataset_directly(
     db.commit()
 
     refreshed = dataset_repo.get_dataset_by_id(db, dataset_id)
-    if refreshed and es_client:
-        from app.utils.elasticsearch_utils import index_dataset
-        index_doc = _build_dataset_index_document(db, refreshed)
-        background_tasks.add_task(index_dataset, es_client, index_doc)
+    if refreshed:
+        import app.services.notification_service as notification_service
+
+        notification_service.notify_subscribers_new_dataset(db, refreshed)
+        db.commit()
+        if es_client:
+            from app.utils.elasticsearch_utils import index_dataset
+            index_doc = _build_dataset_index_document(db, refreshed)
+            background_tasks.add_task(index_dataset, es_client, index_doc)
         email_service.notify_subscribers_new_dataset(background_tasks, db, refreshed)
         email_service.notify_saved_search(background_tasks, db, refreshed)
 
@@ -382,6 +472,8 @@ def get_dataset(
         raise_app_error("DATASET_NOT_FOUND")
     if not can_view_dataset(dataset, current_user):
         raise_app_error("DATASET_NOT_FOUND")
+    if dataset.status == "published":
+        record_dataset_view(db, dataset_id)
     return _build_dataset_response(db, dataset_id)
 
 
@@ -404,6 +496,7 @@ def list_datasets(
         r = DatasetResponse.model_validate(ds)
         r.tags = tag_ids
         r.agency_name = owner.agency_name if owner else None
+        r.file_format = dataset_repo.get_latest_dataset_file_format(db, ds.id)
         responses.append(r)
     return responses, total
 
@@ -559,6 +652,8 @@ def update_dataset(
             created_by=uuid.UUID(current_user["sub"]),
         )
 
+    was_published = dataset.status == "published"
+
     dataset_repo.create_audit_log(
         db,
         user_id=uuid.UUID(current_user["sub"]),
@@ -570,20 +665,30 @@ def update_dataset(
     )
     db.commit()
 
-    if background_tasks is not None and es_client is not None:
-        updated = dataset_repo.get_dataset_by_id(db, dataset_id)
-        if updated is not None:
-            if updated.status == "published":
-                from app.utils.elasticsearch_utils import index_dataset
+    updated = dataset_repo.get_dataset_by_id(db, dataset_id)
+    if updated is not None and updated.status == "published" and not was_published:
+        import app.services.notification_service as notification_service
 
-                doc = _build_dataset_index_document(db, updated)
-                background_tasks.add_task(index_dataset, es_client, doc)
-            elif updated.status == "draft":
-                from app.utils.elasticsearch_utils import delete_dataset_index
+        notification_service.notify_subscribers_new_dataset(db, updated)
+        db.commit()
+        if background_tasks is not None:
+            email_service.notify_subscribers_new_dataset(
+                background_tasks, db, updated
+            )
+            email_service.notify_saved_search(background_tasks, db, updated)
 
-                background_tasks.add_task(
-                    delete_dataset_index, es_client, str(dataset_id)
-                )
+    if background_tasks is not None and es_client is not None and updated is not None:
+        if updated.status == "published":
+            from app.utils.elasticsearch_utils import index_dataset
+
+            doc = _build_dataset_index_document(db, updated)
+            background_tasks.add_task(index_dataset, es_client, doc)
+        elif updated.status == "draft":
+            from app.utils.elasticsearch_utils import delete_dataset_index
+
+            background_tasks.add_task(
+                delete_dataset_index, es_client, str(dataset_id)
+            )
 
     return _build_dataset_response(db, dataset_id)
 
@@ -807,6 +912,11 @@ def bulk_upload(
             )
             db.commit()
             success_count += 1
+
+            import app.services.notification_service as notification_service
+
+            notification_service.notify_subscribers_new_dataset(db, dataset)
+            db.commit()
 
             if es_client is not None:
                 from app.utils.elasticsearch_utils import index_dataset

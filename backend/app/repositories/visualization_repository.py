@@ -171,6 +171,142 @@ def get_stats_overview(db: Session) -> dict[str, Any]:
     }
 
 
+def _category_ids_under_level1(db: Session, level1_id: uuid.UUID) -> list[uuid.UUID]:
+    child_ids = (
+        db.query(Category.id)
+        .filter(
+            Category.parent_id == level1_id,
+            Category.is_deleted.is_(False),
+        )
+        .all()
+    )
+    return [level1_id] + [row[0] for row in child_ids]
+
+
+def _resolve_level1_category(
+    db: Session, category_id: uuid.UUID
+) -> Category | None:
+    """แมปหมวดหมู่ใดๆ (ระดับ 1 หรือ 2) ไปยังหมวดหมู่ใหญ่ระดับ 1"""
+    cat = (
+        db.query(Category)
+        .filter(Category.id == category_id, Category.is_deleted.is_(False))
+        .first()
+    )
+    if cat is None:
+        return None
+    if cat.level == 1:
+        return cat
+    if cat.parent_id is not None:
+        parent = (
+            db.query(Category)
+            .filter(
+                Category.id == cat.parent_id,
+                Category.is_deleted.is_(False),
+                Category.level == 1,
+            )
+            .first()
+        )
+        return parent
+    return None
+
+
+def get_stats_by_category(
+    db: Session, category_id: uuid.UUID | None = None
+) -> dict[str, Any]:
+    """สถิติ Dataset แยกตามหมวดหมู่ระดับ 1 และแนวโน้มรายปี (กรองตามหมวดได้)"""
+    published_filter = (
+        Dataset.is_deleted.is_(False),
+        Dataset.status == "published",
+    )
+
+    dataset_query = db.query(Dataset.category_id, func.count(Dataset.id)).filter(
+        *published_filter
+    )
+    if category_id is not None:
+        cat_ids = _category_ids_under_level1(db, category_id)
+        dataset_query = dataset_query.filter(Dataset.category_id.in_(cat_ids))
+
+    grouped_rows = dataset_query.group_by(Dataset.category_id).all()
+
+    level1_counts: dict[uuid.UUID, int] = {}
+    uncategorized_count = 0
+    for row_category_id, row_count in grouped_rows:
+        count = int(row_count or 0)
+        if count <= 0:
+            continue
+        if row_category_id is None:
+            uncategorized_count += count
+            continue
+        root = _resolve_level1_category(db, row_category_id)
+        if root is None:
+            uncategorized_count += count
+            continue
+        level1_counts[root.id] = level1_counts.get(root.id, 0) + count
+
+    categories_breakdown: list[dict[str, Any]] = []
+    if level1_counts:
+        root_ids = list(level1_counts.keys())
+        roots = (
+            db.query(Category)
+            .filter(Category.id.in_(root_ids), Category.is_deleted.is_(False))
+            .all()
+        )
+        roots_by_id = {cat.id: cat for cat in roots}
+        for root_id, count in sorted(
+            level1_counts.items(), key=lambda item: item[1], reverse=True
+        ):
+            cat = roots_by_id.get(root_id)
+            if cat is None:
+                continue
+            categories_breakdown.append(
+                {
+                    "id": str(cat.id),
+                    "name_th": cat.name_th,
+                    "name_en": cat.name_en,
+                    "slug": cat.slug,
+                    "count": count,
+                }
+            )
+
+    if uncategorized_count > 0:
+        categories_breakdown.append(
+            {
+                "id": None,
+                "name_th": "ไม่ระบุหมวดหมู่",
+                "name_en": "Uncategorized",
+                "slug": "uncategorized",
+                "count": uncategorized_count,
+            }
+        )
+
+    year_query = db.query(
+        extract("year", Dataset.published_at).label("year"),
+        func.count(Dataset.id).label("count"),
+    ).filter(*published_filter, Dataset.published_at.isnot(None))
+
+    if category_id is not None:
+        cat_ids = _category_ids_under_level1(db, category_id)
+        year_query = year_query.filter(Dataset.category_id.in_(cat_ids))
+
+    year_rows = (
+        year_query.group_by(extract("year", Dataset.published_at))
+        .order_by(extract("year", Dataset.published_at))
+        .all()
+    )
+
+    datasets_by_year = [
+        {"year": int(row.year), "count": int(row.count)}
+        for row in year_rows
+        if row.year is not None
+    ]
+
+    return {
+        "categories": categories_breakdown,
+        "datasets_by_year": datasets_by_year,
+        "selected_category_id": str(category_id) if category_id else None,
+    }
+
+
 def get_trending_datasets(db: Session, limit: int) -> list[Dataset]:
     return (
         db.query(Dataset)
@@ -178,7 +314,7 @@ def get_trending_datasets(db: Session, limit: int) -> list[Dataset]:
             Dataset.is_deleted.is_(False),
             Dataset.status == "published",
         )
-        .order_by(Dataset.download_count.desc())
+        .order_by(Dataset.view_count.desc(), Dataset.download_count.desc())
         .limit(limit)
         .all()
     )

@@ -20,7 +20,6 @@ type SearchResultProps = {
   selectedYears: string[];
   selectedFormats: string[];
   selectedTag: string;
-  selectedLicense: string;
   selectedProvince: string;
   sort: SortOption;
   page: number;
@@ -186,7 +185,6 @@ export default function SearchResult(props: SearchResultProps) {
       props.filterQuery,
       props.selectedCategory,
       props.selectedTag,
-      props.selectedLicense,
       props.selectedProvince,
       props.page,
       props.sort,
@@ -203,10 +201,7 @@ export default function SearchResult(props: SearchResultProps) {
       if (props.selectedTag) {
         filters.tag = props.selectedTag;
       }
-      if (props.selectedLicense) {
-        filters.license = props.selectedLicense;
-      }
-      if (props.selectedProvince && props.selectedProvince !== "all") {
+      if (props.selectedProvince) {
         filters.province = props.selectedProvince;
       }
       if (props.selectedAgencies.length > 0) {
@@ -311,7 +306,6 @@ export function parseSearchPageParams(searchParams: URLSearchParams) {
     selectedYears: parseListParam(searchParams.get("year")),
     selectedFormats: parseListParam(searchParams.get("format")),
     selectedTag: searchParams.get("tag") ?? "",
-    selectedLicense: searchParams.get("license") ?? "",
     selectedProvince: searchParams.get("province") ?? "",
     sort,
     page,

@@ -9,7 +9,7 @@ const HOME_LIMIT = 6;
 /** GET /api/v1/stats/trending — ไม่ต้อง Auth */
 export function useTrendingDatasets(limit = HOME_LIMIT) {
   return useQuery<TrendingDatasetsData, Error>({
-    queryKey: ["stats", "trending"],
+    queryKey: ["stats", "trending", limit],
     queryFn: async () => {
       const res = await apiClient.get<{ data: TrendingDatasetsData }>(
         "/stats/trending",

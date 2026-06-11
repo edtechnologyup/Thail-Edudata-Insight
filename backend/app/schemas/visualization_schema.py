@@ -15,6 +15,20 @@ class DatasetYearStat(BaseModel):
     count: int
 
 
+class CategoryStatItem(BaseModel):
+    id: str | None
+    name_th: str
+    name_en: str
+    slug: str
+    count: int
+
+
+class StatsByCategoryResponse(BaseModel):
+    categories: list[CategoryStatItem]
+    datasets_by_year: list[DatasetYearStat]
+    selected_category_id: str | None = None
+
+
 class StatsOverviewResponse(BaseModel):
     total_datasets: int
     total_downloads: int

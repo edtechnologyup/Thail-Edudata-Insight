@@ -35,6 +35,7 @@ INDEX_MAPPINGS = {
             "category_id": {"type": "keyword"},
             "user_id": {"type": "keyword"},
             "license": {"type": "keyword"},
+            "file_format": {"type": "keyword"},
             "status": {"type": "keyword"},
             "published_at": {"type": "date"},
             "created_at": {"type": "date"},
@@ -43,6 +44,8 @@ INDEX_MAPPINGS = {
             "metadata": {
                 "properties": {
                     "year": {"type": "integer"},
+                    "year_start": {"type": "integer"},
+                    "year_end": {"type": "integer"},
                     "province": {"type": "keyword"},
                 }
             },
@@ -168,13 +171,25 @@ def search_datasets(
                 {"term": {"user_id": str(filters["agency_user_id"])}}
             )
         if filters.get("year") is not None:
+            year_val = int(filters["year"])
             must_clauses.append(
-                {"term": {"metadata.year": int(filters["year"])}}
+                {
+                    "bool": {
+                        "should": [
+                            {"term": {"metadata.year": year_val}},
+                            {"term": {"metadata.year_start": year_val}},
+                            {"term": {"metadata.year_end": year_val}},
+                        ],
+                        "minimum_should_match": 1,
+                    }
+                }
             )
         if filters.get("province"):
             must_clauses.append(
                 {"term": {"metadata.province": filters["province"]}}
             )
+        if filters.get("format"):
+            must_clauses.append({"term": {"file_format": filters["format"]}})
         if filters.get("tag"):
             must_clauses.append(
                 {

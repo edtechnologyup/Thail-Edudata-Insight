@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import apiClient from "@/services/api";
+import { toast } from "@/stores/toastStore";
 
 const TERMS_VERSION = "1.0";
 const PDPA_VERSION = "1.0";
@@ -311,6 +312,9 @@ export default function RegisterForm() {
     },
     onSuccess: () => {
       setRegistered(true);
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : t("errorDefault"));
     },
   });
 

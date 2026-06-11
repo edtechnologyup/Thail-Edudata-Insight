@@ -110,8 +110,16 @@ def download_dataset(
         file_format=file_format,
         user_id=_get_optional_user_id(request),
         ip_address=get_client_ip(request),
+        source="web",
     )
-    _ascii_ext = {"csv": "csv", "excel": "xlsx", "json": "json", "xml": "xml"}
+    _ascii_ext = {
+        "csv": "csv",
+        "excel": "xlsx",
+        "json": "json",
+        "xml": "xml",
+        "pdf": "pdf",
+        "sql": "sql",
+    }
     filename_rfc = f"dataset_{id}.{file_format}"
     filename_encoded = quote(filename_rfc, encoding="utf-8")
     ascii_filename = f"dataset.{_ascii_ext.get(file_format, file_format)}"

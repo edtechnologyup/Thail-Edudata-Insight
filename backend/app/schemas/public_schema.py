@@ -13,3 +13,8 @@ class DatasetStatsResponse(BaseModel):
     view_count: int
     quality_score: int | None
     published_at: datetime | None
+
+
+class PublicAgencyResponse(BaseModel):
+    agency_user_id: uuid.UUID
+    agency_name: str

@@ -22,6 +22,7 @@ export default function DatasetList({ datasets }: DatasetListProps) {
           status="published"
           downloadCount={dataset.downloadCount}
           updatedAt={dataset.publishedAt}
+          publishedAt={dataset.publishedAt}
           license={dataset.license}
         />
       ))}

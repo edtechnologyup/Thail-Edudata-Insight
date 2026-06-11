@@ -73,6 +73,20 @@ def get_monthly_stats(db: Session, year: int):
     return MonthlyStatsResponse(**data)
 
 
+def get_download_source_monthly(db: Session, year: int):
+    from app.schemas.admin_schema import DownloadSourceMonthlyResponse
+
+    data = admin_repo.get_download_source_monthly(db, year)
+    return DownloadSourceMonthlyResponse(**data)
+
+
+def get_download_source_yearly(db: Session):
+    from app.schemas.admin_schema import DownloadSourceYearlyResponse
+
+    data = admin_repo.get_download_source_yearly(db)
+    return DownloadSourceYearlyResponse(**data)
+
+
 def get_all_users(
     db: Session,
     pagination: PaginationParams,
@@ -380,6 +394,8 @@ def create_announcement(
     request: AnnouncementCreateRequest,
     current_user: dict,
 ) -> AnnouncementResponse:
+    import app.services.notification_service as notification_service
+
     announcement = admin_repo.create_announcement(
         db,
         title=request.title,
@@ -387,6 +403,13 @@ def create_announcement(
         is_active=request.is_active,
         created_by=uuid.UUID(current_user["sub"]),
     )
+    if request.is_active:
+        notification_service.create_announcement_notification(
+            db,
+            title=request.title,
+            content=request.content,
+            announcement_id=announcement.id,
+        )
     db.commit()
     db.refresh(announcement)
     return AnnouncementResponse.model_validate(announcement)
@@ -417,9 +440,18 @@ def update_announcement(
     if request.is_active is not None:
         fields["is_active"] = request.is_active
 
+    import app.services.notification_service as notification_service
+
     announcement = admin_repo.update_announcement(
         db, announcement_id, **fields
     )
+    if request.is_active is True and announcement.is_active:
+        notification_service.create_announcement_notification(
+            db,
+            title=announcement.title,
+            content=announcement.content,
+            announcement_id=announcement.id,
+        )
     db.commit()
     db.refresh(announcement)
     return AnnouncementResponse.model_validate(announcement)

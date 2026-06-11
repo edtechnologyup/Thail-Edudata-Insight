@@ -1,7 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import CategoryPieChart from "@/components/dashboard/CategoryPieChart";
-import DatasetsByYearChart from "@/components/dashboard/DatasetsByYearChart";
-import SchoolChart from "@/components/dashboard/SchoolChart";
+import StatsChartsSection from "@/components/dashboard/StatsChartsSection";
 import StatsPageOverview from "@/components/dashboard/StatsPageOverview";
 import StudentChart from "@/components/dashboard/StudentChart";
 import TeacherChart from "@/components/dashboard/TeacherChart";
@@ -30,18 +28,18 @@ export default async function StatsPage(_props: StatsPageProps) {
         <div className="mx-auto max-w-container-max space-y-spacing-6">
           <StatsPageOverview />
 
-          <DatasetsByYearChart />
-
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <StudentChart data={MOCK_STATS_DATA.studentsByYear} />
             <TeacherChart data={MOCK_STATS_DATA.teachersByYear} />
           </div>
 
-          <SchoolChart data={MOCK_STATS_DATA.schoolsByYear} />
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <CategoryPieChart data={MOCK_STATS_DATA.datasetByCategory} />
-            <TopDatasetList items={MOCK_STATS_DATA.topDatasets} />
+          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
+            <div className="flex lg:col-span-2">
+              <StatsChartsSection />
+            </div>
+            <div className="flex lg:col-span-1">
+              <TopDatasetList />
+            </div>
           </div>
 
           <p className="text-center font-sarabun text-caption text-text-muted">

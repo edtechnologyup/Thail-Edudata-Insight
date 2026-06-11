@@ -50,6 +50,16 @@ def public_get_page(slug: str, db: Session = Depends(get_db)):
     return success_response(result.model_dump(mode="json"))
 
 
+@router.get("/agencies", status_code=200)
+def public_list_agencies(db: Session = Depends(get_db)):
+    """
+    รายการหน่วยงาน Agency ที่ active และมี Dataset เผยแพร่แล้ว
+    - Auth ❌
+    """
+    items = public_service.list_agencies_with_published_datasets(db)
+    return success_response([i.model_dump(mode="json") for i in items])
+
+
 @router.get("/announcements", status_code=200)
 def public_list_announcements(db: Session = Depends(get_db)):
     """
@@ -130,8 +140,16 @@ def public_download_dataset(
         file_format=file_format,
         user_id=None,
         ip_address=get_client_ip(request),
+        source="api",
     )
-    _ascii_ext = {"csv": "csv", "excel": "xlsx", "json": "json", "xml": "xml"}
+    _ascii_ext = {
+        "csv": "csv",
+        "excel": "xlsx",
+        "json": "json",
+        "xml": "xml",
+        "pdf": "pdf",
+        "sql": "sql",
+    }
     filename_rfc = f"dataset_{id}.{file_format}"
     filename_encoded = quote(filename_rfc, encoding="utf-8")
     ascii_filename = f"dataset.{_ascii_ext.get(file_format, file_format)}"

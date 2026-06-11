@@ -45,3 +45,25 @@ class SavedSearchResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class SearchFilterCategoryOption(BaseModel):
+    id: uuid.UUID
+    parent_id: uuid.UUID | None
+    level: int
+    name_th: str
+    name_en: str
+    slug: str
+
+
+class SearchFilterAgencyOption(BaseModel):
+    agency_user_id: uuid.UUID
+    agency_name: str
+
+
+class SearchFiltersResponse(BaseModel):
+    categories: list[SearchFilterCategoryOption] = Field(default_factory=list)
+    agencies: list[SearchFilterAgencyOption] = Field(default_factory=list)
+    years: list[int] = Field(default_factory=list)
+    provinces: list[str] = Field(default_factory=list)
+    formats: list[str] = Field(default_factory=list)

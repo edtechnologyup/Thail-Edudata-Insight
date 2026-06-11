@@ -16,6 +16,9 @@ export type ApiDataset = {
   created_at: string;
   updated_at?: string;
   agency_name?: string | null;
+  category_name_th?: string | null;
+  category_name_en?: string | null;
+  file_format?: string | null;
 };
 
 export type DatasetPreviewData = {

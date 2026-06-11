@@ -227,7 +227,18 @@
     "baseUrl": "Base URL",
     "breadcrumbHome": "Home",
     "breadcrumbCurrent": "API tools",
-    "jumpTo": "Jump to..."
+    "jumpTo": "Jump to...",
+    "portalEyebrow": "Developer Documentation Center",
+    "portalDescription": "API documentation for connecting to and using Thai education data from Thai EduData Insight.",
+    "sidebarTitle": "API Documentation",
+    "versionLabel": "Version",
+    "quickStartTitle": "Quick Start",
+    "quickStartDescription": "Start connecting to the API with the essential steps, from requesting access to trying a real data request.",
+    "quickStartNavDescription": "Getting started",
+    "endpointGroupLabel": "Endpoint Group",
+    "requestExample": "Request Example",
+    "expandEndpoint": "View Endpoint Details",
+    "collapseEndpoint": "Hide Endpoint Details"
   },
   "category": {
     "indexTitle": "Data categories",
@@ -1048,6 +1059,7 @@
       "announcements": "Announcements",
       "pages": "Static pages",
       "auditLogs": "Audit logs",
+      "emailLogs": "Email logs",
       "helpCenter": "Help Center",
       "logout": "Logout",
       "menu": "Open menu",

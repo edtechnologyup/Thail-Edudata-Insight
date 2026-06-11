@@ -13,12 +13,9 @@ import type { AdminCategory, AdminSubcategory, AdminTag } from "@/data/mockData"
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useAdminTags } from "@/hooks/useAdminTags";
 
-type TabId = "categories" | "tags";
-
 export default function AdminCategoriesPage() {
   const t = useTranslations("admin.categories");
 
-  const [tab, setTab] = useState<TabId>("categories");
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -51,7 +48,7 @@ export default function AdminCategoriesPage() {
   const { data: categoriesData, isLoading: categoriesLoading } =
     useAdminCategories(categoryFilters);
   const { data: tags = [], isLoading: tagsLoading } = useAdminTags(
-    tab === "tags" ? appliedSearch || undefined : undefined
+    appliedSearch || undefined
   );
 
   const showToast = (message: string) => {
@@ -104,11 +101,6 @@ export default function AdminCategoriesPage() {
     setTagFormOpen(true);
   };
 
-  const tabs: { id: TabId; label: string }[] = [
-    { id: "categories", label: t("tabCategories") },
-    { id: "tags", label: t("tabTags") },
-  ];
-
   const totalPages = categoriesData?.totalPages ?? 1;
 
   return (
@@ -123,26 +115,22 @@ export default function AdminCategoriesPage() {
           </p>
         </div>
         <div className="flex w-full gap-3 md:w-auto">
-          {tab === "categories" && (
-            <>
-              <button
-                type="button"
-                onClick={openCreateCategory}
-                className="flex flex-1 items-center justify-center gap-2 rounded-radius-lg bg-primary px-5 py-2.5 font-kanit text-label font-semibold text-surface-card shadow-level-1 transition-all hover:bg-primary-hover active:scale-95 md:flex-none"
-              >
-                <PlusIcon />
-                {t("addL1")}
-              </button>
-              <button
-                type="button"
-                onClick={() => showToast(t("exportSoon"))}
-                className="hidden items-center gap-2 rounded-radius-lg border border-border-default px-4 py-2.5 font-kanit text-label font-medium text-text-secondary transition-colors hover:bg-surface-container-low lg:flex"
-              >
-                <DownloadIcon />
-                {t("exportData")}
-              </button>
-            </>
-          )}
+          <button
+            type="button"
+            onClick={openCreateCategory}
+            className="flex flex-1 items-center justify-center gap-2 rounded-radius-lg bg-primary px-5 py-2.5 font-kanit text-label font-semibold text-surface-card shadow-level-1 transition-all hover:bg-primary-hover active:scale-95 md:flex-none"
+          >
+            <PlusIcon />
+            {t("addL1")}
+          </button>
+          <button
+            type="button"
+            onClick={() => showToast(t("exportSoon"))}
+            className="hidden items-center gap-2 rounded-radius-lg border border-border-default px-4 py-2.5 font-kanit text-label font-medium text-text-secondary transition-colors hover:bg-surface-container-low lg:flex"
+          >
+            <DownloadIcon />
+            {t("exportData")}
+          </button>
         </div>
       </header>
 
@@ -166,110 +154,92 @@ export default function AdminCategoriesPage() {
             />
           </div>
         </div>
-
-        <nav className="flex gap-8 overflow-x-auto">
-          {tabs.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setTab(item.id)}
-              className={`whitespace-nowrap py-4 font-kanit text-label font-semibold transition-colors ${
-                tab === item.id
-                  ? "border-b-[3px] border-primary text-primary"
-                  : "text-text-muted hover:text-primary"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
       </div>
 
       <div className="space-y-8 p-4 lg:p-8">
-        {tab === "categories" ? (
-          <>
-            <CategoryTree
-              categories={categoriesData?.data ?? []}
-              isLoading={categoriesLoading}
-              onEditL1={openEditCategoryL1}
-              onEditL2={openEditCategoryL2}
-              onDeleteL1={(category, displayName) =>
-                setDeleteTarget({ level: 1, category, displayName })
-              }
-              onDeleteL2={(subcategory, displayName) =>
-                setDeleteTarget({ level: 2, category: subcategory, displayName })
-              }
-            />
+        <CategoryTree
+          categories={categoriesData?.data ?? []}
+          isLoading={categoriesLoading}
+          onEditL1={openEditCategoryL1}
+          onEditL2={openEditCategoryL2}
+          onDeleteL1={(category, displayName) =>
+            setDeleteTarget({ level: 1, category, displayName })
+          }
+          onDeleteL2={(subcategory, displayName) =>
+            setDeleteTarget({ level: 2, category: subcategory, displayName })
+          }
+        />
 
-            <div className="flex flex-col items-center justify-between gap-4 font-sarabun text-body-sm text-text-muted sm:flex-row">
-              <p>
-                {t("paginationSummary", {
-                  l1: categoriesData?.totalL1 ?? 0,
-                  l2: categoriesData?.totalL2 ?? 0,
-                })}
-              </p>
-              <div className="flex items-center gap-2">
+        <div className="flex flex-col items-center justify-between gap-4 font-sarabun text-body-sm text-text-muted sm:flex-row">
+          <p>
+            {t("paginationSummary", {
+              l1: categoriesData?.totalL1 ?? 0,
+              l2: categoriesData?.totalL2 ?? 0,
+            })}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              disabled={page <= 1}
+              className="rounded-radius-lg p-1.5 text-text-muted transition-colors hover:bg-surface-container-low disabled:opacity-40"
+              aria-label={t("prevPage")}
+            >
+              <ChevronLeftIcon />
+            </button>
+            {Array.from({ length: totalPages }).map((_, index) => {
+              const pageNumber = index + 1;
+              return (
                 <button
+                  key={pageNumber}
                   type="button"
-                  onClick={() => setPage((current) => Math.max(1, current - 1))}
-                  disabled={page <= 1}
-                  className="rounded-radius-lg p-1.5 text-text-muted transition-colors hover:bg-surface-container-low disabled:opacity-40"
-                  aria-label={t("prevPage")}
+                  onClick={() => setPage(pageNumber)}
+                  className={`flex h-9 w-9 items-center justify-center rounded-radius-lg font-sarabun text-label font-bold transition-colors ${
+                    page === pageNumber
+                      ? "bg-primary text-surface-card shadow-level-1"
+                      : "hover:bg-surface-container-low"
+                  }`}
                 >
-                  <ChevronLeftIcon />
+                  {pageNumber}
                 </button>
-                {Array.from({ length: totalPages }).map((_, index) => {
-                  const pageNumber = index + 1;
-                  return (
-                    <button
-                      key={pageNumber}
-                      type="button"
-                      onClick={() => setPage(pageNumber)}
-                      className={`flex h-9 w-9 items-center justify-center rounded-radius-lg font-sarabun text-label font-bold transition-colors ${
-                        page === pageNumber
-                          ? "bg-primary text-surface-card shadow-level-1"
-                          : "hover:bg-surface-container-low"
-                      }`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                })}
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPage((current) => Math.min(totalPages, current + 1))
-                  }
-                  disabled={page >= totalPages}
-                  className="rounded-radius-lg p-1.5 text-text-muted transition-colors hover:bg-surface-container-low disabled:opacity-40"
-                  aria-label={t("nextPage")}
-                >
-                  <ChevronRightIcon />
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={openCreateTag}
-                className="flex items-center gap-2 rounded-radius-lg bg-primary px-5 py-2 font-kanit text-label font-semibold text-surface-card shadow-level-1 transition-all hover:bg-primary-hover"
-              >
-                <PlusIcon />
-                {t("addTag")}
-              </button>
-            </div>
-            <TagTable
-              tags={tags}
-              isLoading={tagsLoading}
-              onEdit={openEditTag}
-              onError={showError}
-              onSuccess={showToast}
-            />
-          </>
-        )}
+              );
+            })}
+            <button
+              type="button"
+              onClick={() =>
+                setPage((current) => Math.min(totalPages, current + 1))
+              }
+              disabled={page >= totalPages}
+              className="rounded-radius-lg p-1.5 text-text-muted transition-colors hover:bg-surface-container-low disabled:opacity-40"
+              aria-label={t("nextPage")}
+            >
+              <ChevronRightIcon />
+            </button>
+          </div>
+        </div>
+
+        <section className="space-y-4 border-t border-border-default/50 pt-8">
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+            <h2 className="font-kanit text-heading-2 text-text-primary">
+              จัดการแท็ก
+            </h2>
+            <button
+              type="button"
+              onClick={openCreateTag}
+              className="flex items-center justify-center gap-2 rounded-radius-lg bg-primary px-5 py-2 font-kanit text-label font-semibold text-surface-card shadow-level-1 transition-all hover:bg-primary-hover"
+            >
+              <PlusIcon />
+              {t("addTag")}
+            </button>
+          </div>
+          <TagTable
+            tags={tags}
+            isLoading={tagsLoading}
+            onEdit={openEditTag}
+            onError={showError}
+            onSuccess={showToast}
+          />
+        </section>
       </div>
 
       <CategoryForm

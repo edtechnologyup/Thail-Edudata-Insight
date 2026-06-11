@@ -227,7 +227,18 @@
     "baseUrl": "Base URL",
     "breadcrumbHome": "หน้าหลัก",
     "breadcrumbCurrent": "เครื่องมือ API",
-    "jumpTo": "ไปยังหัวข้อ..."
+    "jumpTo": "ไปยังหัวข้อ...",
+    "portalEyebrow": "ศูนย์เอกสารสำหรับนักพัฒนา",
+    "portalDescription": "เอกสาร API สำหรับเชื่อมต่อและใช้งานข้อมูลการศึกษาไทยจาก Thai EduData Insight",
+    "sidebarTitle": "เอกสาร API",
+    "versionLabel": "เวอร์ชัน",
+    "quickStartTitle": "Quick Start",
+    "quickStartDescription": "เริ่มต้นเชื่อมต่อ API ด้วยขั้นตอนพื้นฐาน ตั้งแต่ขอสิทธิ์ใช้งานจนถึงทดลองเรียกข้อมูลจริง",
+    "quickStartNavDescription": "เริ่มต้นใช้งาน",
+    "endpointGroupLabel": "หมวด Endpoint",
+    "requestExample": "ตัวอย่าง Request",
+    "expandEndpoint": "ดูรายละเอียด Endpoint",
+    "collapseEndpoint": "ซ่อนรายละเอียด Endpoint"
   },
   "category": {
     "indexTitle": "หมวดหมู่ข้อมูล",
@@ -1051,6 +1062,7 @@
       "announcements": "จัดการประกาศ",
       "pages": "จัดการหน้า Static",
       "auditLogs": "Audit Logs",
+      "emailLogs": "Email Logs",
       "helpCenter": "Help Center",
       "logout": "Logout",
       "menu": "เปิดเมนู",

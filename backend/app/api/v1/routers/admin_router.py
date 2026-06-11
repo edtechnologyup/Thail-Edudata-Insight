@@ -2,6 +2,8 @@
 # Feature: Admin API Endpoints ตาม #20
 
 import uuid
+from datetime import date, datetime, time
+from typing import Literal
 
 from fastapi import (
     APIRouter,
@@ -24,6 +26,7 @@ from app.core.database import get_db
 from app.core.pagination import PaginationParams, get_pagination_params
 from app.core.response import delete_response, list_response, success_response
 from app.core.security import get_client_ip, get_user_agent, require_roles
+from app.models.email_log_model import EmailLog
 from app.schemas.admin_schema import (
     AdminUserListFilters,
     AnnouncementCreateRequest,
@@ -318,6 +321,86 @@ def admin_hide_dataset(
         es_client=_get_es(),
     )
     return success_response(result.model_dump(mode="json"))
+
+
+def _parse_date_start(value: date | None) -> datetime | None:
+    if value is None:
+        return None
+    return datetime.combine(value, time.min)
+
+
+def _parse_date_end(value: date | None) -> datetime | None:
+    if value is None:
+        return None
+    return datetime.combine(value, time.max)
+
+
+def _serialize_email_log(log: EmailLog) -> dict:
+    return {
+        "id": str(log.id),
+        "user_id": str(log.user_id) if log.user_id else None,
+        "template_name": log.template_name,
+        "recipient_email": log.recipient_email,
+        "subject": log.subject,
+        "status": log.status,
+        "error_message": log.error_message,
+        "retry_count": log.retry_count,
+        "provider_message_id": log.provider_message_id,
+        "sent_at": log.sent_at.isoformat() if log.sent_at else None,
+        "delivered_at": log.delivered_at.isoformat() if log.delivered_at else None,
+        "created_at": log.created_at.isoformat(),
+    }
+
+
+@router.get("/email-logs", status_code=status.HTTP_200_OK)
+def admin_email_logs(
+    status_filter: Literal["delivered", "failed", "bounced"] | None = Query(
+        default=None,
+        alias="status",
+    ),
+    recipient_email: str | None = Query(default=None),
+    template_name: str | None = Query(default=None),
+    date_from: date | None = Query(default=None),
+    date_to: date | None = Query(default=None),
+    pagination: PaginationParams = Depends(get_pagination_params),
+    payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """
+    ดู Email Logs ตาม #20
+    - Query: status, recipient_email, template_name, date_from, date_to, page, page_size
+    - Auth ✅ Admin
+    """
+    query = db.query(EmailLog)
+
+    if status_filter:
+        query = query.filter(EmailLog.status == status_filter)
+    if recipient_email:
+        query = query.filter(EmailLog.recipient_email.ilike(f"%{recipient_email}%"))
+    if template_name:
+        query = query.filter(EmailLog.template_name == template_name)
+
+    parsed_date_from = _parse_date_start(date_from)
+    parsed_date_to = _parse_date_end(date_to)
+    if parsed_date_from:
+        query = query.filter(EmailLog.created_at >= parsed_date_from)
+    if parsed_date_to:
+        query = query.filter(EmailLog.created_at <= parsed_date_to)
+
+    total = query.count()
+    items = (
+        query.order_by(EmailLog.created_at.desc())
+        .offset(pagination.offset)
+        .limit(pagination.page_size)
+        .all()
+    )
+
+    return list_response(
+        data=[_serialize_email_log(item) for item in items],
+        page=pagination.page,
+        page_size=pagination.page_size,
+        total_items=total,
+    )
 
 
 def get_audit_log_filters(

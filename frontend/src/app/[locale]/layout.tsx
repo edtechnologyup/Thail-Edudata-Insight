@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { AppProviders } from "@/providers/AppProviders";
+import { RoleThemeProvider } from "@/providers/RoleThemeProvider";
 
 export default async function LocaleLayout({
   children,
@@ -16,10 +17,11 @@ export default async function LocaleLayout({
     <>
       <script
         dangerouslySetInnerHTML={{
-          __html: `document.documentElement.lang='${locale}'`,
+          __html: `document.documentElement.lang='${locale}';if(!document.documentElement.getAttribute('data-role')){document.documentElement.setAttribute('data-role','visitor');}`,
         }}
       />
       <NextIntlClientProvider locale={locale} messages={messages}>
+        <RoleThemeProvider />
         <AppProviders>{children}</AppProviders>
       </NextIntlClientProvider>
     </>

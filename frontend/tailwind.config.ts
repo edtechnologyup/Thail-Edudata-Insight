@@ -5,10 +5,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "primary-dark": "#006b5f",
-        primary: "#00a896",
-        "primary-hover": "#008f80",
-        "primary-light": "#e1f5ee",
+        "primary-dark": "var(--color-primary-dark)",
+        primary: "var(--color-primary)",
+        "primary-hover": "var(--color-primary-hover)",
+        "primary-light": "var(--color-primary-light)",
         "surface-page": "#f7f9fb",
         "surface-card": "#ffffff",
         "surface-container": "#eceef0",

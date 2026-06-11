@@ -7,6 +7,33 @@
 :root {
   --font-kanit: "Kanit", sans-serif;
   --font-sarabun: "Sarabun", sans-serif;
+
+  /* Role Color System — default = Visitor/Public */
+  --color-primary: #0a7e07;
+  --color-primary-dark: #086605;
+  --color-primary-hover: #096e06;
+  --color-primary-light: #e6f4e5;
+}
+
+[data-role="visitor"] {
+  --color-primary: #0a7e07;
+  --color-primary-dark: #086605;
+  --color-primary-hover: #096e06;
+  --color-primary-light: #e6f4e5;
+}
+
+[data-role="agency"] {
+  --color-primary: #26c6da;
+  --color-primary-dark: #1693a5;
+  --color-primary-hover: #1fb2c4;
+  --color-primary-light: #e0f7fa;
+}
+
+[data-role="admin"] {
+  --color-primary: #5677fc;
+  --color-primary-dark: #3a5ce0;
+  --color-primary-hover: #4567ec;
+  --color-primary-light: #e8edff;
 }
 
 @layer base {

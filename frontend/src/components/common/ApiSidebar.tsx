@@ -1,36 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ApiDocEndpoint } from "@/data/mockData";
+import type { LocalizedText } from "@/data/apiDocsContent";
+import { getLocalizedText } from "@/data/apiDocsContent";
 
-const MAIN_NAV_IDS = [
-  "getting-started",
-  "authentication",
-  "get-datasets",
-  "get-dataset",
-  "search",
-  "download",
-] as const;
-
-const FOOTER_NAV_IDS = ["error-codes", "rate-limits"] as const;
+export type ApiDocNavItem = {
+  id: string;
+  title: LocalizedText;
+  description?: LocalizedText;
+};
 
 type ApiSidebarProps = {
-  endpoints: ApiDocEndpoint[];
+  items: ApiDocNavItem[];
   locale: string;
   version: string;
   activeId: string;
   onNavigate: (id: string) => void;
+  title: string;
 };
-
-function getTitle(endpoint: ApiDocEndpoint, locale: string): string {
-  return locale === "th" ? endpoint.titleTh : endpoint.titleEn;
-}
 
 function NavIcon({ id }: { id: string }) {
   const className = "h-5 w-5 shrink-0";
 
   switch (id) {
-    case "getting-started":
+    case "quick-start":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 15h-2v-6h2Zm0-8h-2V7h2Z" />
@@ -42,40 +35,22 @@ function NavIcon({ id }: { id: string }) {
           <path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5Zm3 8H9V7a3 3 0 0 1 6 0Z" />
         </svg>
       );
-    case "get-datasets":
+    case "dataset-management":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M4 4h16v4H4Zm0 6h10v4H4Zm0 6h16v4H4Z" />
         </svg>
       );
-    case "get-dataset":
-      return (
-        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M4 4h16v4H4Zm0 6h16v4H4Zm0 6h16v4H4Z" />
-        </svg>
-      );
-    case "search":
+    case "search-discovery":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19Zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14Z" />
         </svg>
       );
-    case "download":
+    case "administration":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M19 9h-4V3H9v6H5l7 7 7-7ZM5 18v2h14v-2H5Z" />
-        </svg>
-      );
-    case "error-codes":
-      return (
-        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M12 2 1 21h22L12 2Zm1 15h-2v-2h2v2Zm0-4h-2v-4h2v4Z" />
-        </svg>
-      );
-    case "rate-limits":
-      return (
-        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M11 2v4.07A7.001 7.001 0 0 0 5.07 13H2v2h3.07A7.001 7.001 0 0 0 11 17.93V22h2v-4.07A7.001 7.001 0 0 0 18.93 13H22v-2h-3.07A7.001 7.001 0 0 0 13 6.07V2h-2Z" />
+          <path d="M12 2 4 5v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V5l-8-3Zm0 2.18 6 2.25V11c0 4.32-2.82 8.34-6 9.82C8.82 19.34 6 15.32 6 11V6.43l6-2.25Z" />
         </svg>
       );
     default:
@@ -88,101 +63,88 @@ function NavIcon({ id }: { id: string }) {
 }
 
 function NavLink({
-  endpoint,
+  item,
   locale,
   isActive,
   onNavigate,
 }: {
-  endpoint: ApiDocEndpoint;
+  item: ApiDocNavItem;
   locale: string;
   isActive: boolean;
   onNavigate: (id: string) => void;
 }) {
-  const title = getTitle(endpoint, locale);
+  const title = getLocalizedText(item.title, locale);
+  const description = item.description
+    ? getLocalizedText(item.description, locale)
+    : undefined;
 
   return (
     <a
-      href={`#${endpoint.id}`}
+      href={`#${item.id}`}
       onClick={(e) => {
         e.preventDefault();
-        onNavigate(endpoint.id);
+        onNavigate(item.id);
       }}
-      className={`flex items-center gap-3 rounded-r-radius-full px-4 py-3 font-sarabun text-label transition-all ${
+      className={`flex items-start gap-3 rounded-r-radius-full px-4 py-3 font-sarabun transition-all ${
         isActive
           ? "border-l-4 border-primary-dark bg-primary-light font-bold text-primary-dark"
           : "text-text-secondary hover:bg-surface-container"
       }`}
     >
-      <NavIcon id={endpoint.id} />
-      {title}
+      <NavIcon id={item.id} />
+      <span>
+        <span className="block text-label">{title}</span>
+        {description && (
+          <span className="mt-0.5 block text-caption font-normal text-text-muted">
+            {description}
+          </span>
+        )}
+      </span>
     </a>
   );
 }
 
 export default function ApiSidebar({
-  endpoints,
+  items,
   locale,
   version,
   activeId,
   onNavigate,
+  title,
 }: ApiSidebarProps) {
-  const endpointMap = new Map(endpoints.map((e) => [e.id, e]));
-  const mainItems = MAIN_NAV_IDS.map((id) => endpointMap.get(id)).filter(
-    Boolean
-  ) as ApiDocEndpoint[];
-  const footerItems = FOOTER_NAV_IDS.map((id) => endpointMap.get(id)).filter(
-    Boolean
-  ) as ApiDocEndpoint[];
-
   return (
-    <aside className="hidden h-[calc(100vh-5rem)] w-64 shrink-0 flex-col gap-2 overflow-y-auto border-r border-border-sidebar py-spacing-6 md:sticky md:top-20 md:flex">
+    <aside className="hidden h-[calc(100vh-5rem)] w-72 shrink-0 flex-col gap-2 overflow-y-auto border-r border-border-sidebar py-spacing-6 md:sticky md:top-20 md:flex">
       <div className="mb-spacing-6 px-4">
         <h2 className="font-kanit text-heading-3 text-primary-dark">
-          {locale === "th" ? "เอกสาร API" : "API Documentation"}
+          {title}
         </h2>
         <p className="font-sarabun text-label text-text-muted opacity-70">
           {version}
         </p>
       </div>
       <nav className="flex flex-col gap-1">
-        {mainItems.map((endpoint) => (
+        {items.map((item) => (
           <NavLink
-            key={endpoint.id}
-            endpoint={endpoint}
+            key={item.id}
+            item={item}
             locale={locale}
-            isActive={activeId === endpoint.id}
+            isActive={activeId === item.id}
             onNavigate={onNavigate}
           />
         ))}
-        <div className="mt-spacing-6 border-t border-border-default/30 pt-4">
-          {footerItems.map((endpoint) => (
-            <NavLink
-              key={endpoint.id}
-              endpoint={endpoint}
-              locale={locale}
-              isActive={activeId === endpoint.id}
-              onNavigate={onNavigate}
-            />
-          ))}
-        </div>
       </nav>
     </aside>
   );
 }
 
 export function ApiMobileNav({
-  endpoints,
+  items,
   locale,
   activeId,
   onNavigate,
   jumpLabel,
 }: ApiSidebarProps & { jumpLabel: string }) {
   const [open, setOpen] = useState(false);
-  const endpointMap = new Map(endpoints.map((e) => [e.id, e]));
-  const allIds = [...MAIN_NAV_IDS, ...FOOTER_NAV_IDS];
-  const items = allIds
-    .map((id) => endpointMap.get(id))
-    .filter(Boolean) as ApiDocEndpoint[];
 
   useEffect(() => {
     const close = () => setOpen(false);
@@ -217,7 +179,7 @@ export function ApiMobileNav({
                   : "text-text-secondary"
               }`}
             >
-              {getTitle(endpoint, locale)}
+              {getLocalizedText(endpoint.title, locale)}
             </a>
           ))}
         </div>

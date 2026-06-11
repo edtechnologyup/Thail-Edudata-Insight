@@ -2,240 +2,33 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import ApiSidebar, {
   ApiMobileNav,
+  type ApiDocNavItem,
   useActiveSection,
 } from "@/components/common/ApiSidebar";
-import CodeBlock from "@/components/common/CodeBlock";
-import MethodBadge from "@/components/common/MethodBadge";
-import type { ApiDocEndpoint, ApiDocParam } from "@/data/mockData";
+import EndpointCard from "@/components/common/EndpointCard";
+import QuickStart from "@/components/common/QuickStart";
+import {
+  API_ENDPOINT_GROUPS,
+  QUICK_START_STEPS,
+  getLocalizedText,
+} from "@/data/apiDocsContent";
 import { useApiDocs } from "@/hooks/useApiDocs";
-
-function ParamsTable({
-  params,
-  locale,
-  requiredLabel,
-  optionalLabel,
-  paramNameLabel,
-  paramTypeLabel,
-  paramRequiredLabel,
-  paramDescLabel,
-}: {
-  params: ApiDocParam[];
-  locale: string;
-  requiredLabel: string;
-  optionalLabel: string;
-  paramNameLabel: string;
-  paramTypeLabel: string;
-  paramRequiredLabel: string;
-  paramDescLabel: string;
-}) {
-  return (
-    <div className="mb-spacing-6 overflow-x-auto rounded-radius-lg border border-border-default/50">
-      <table className="w-full border-collapse text-left">
-        <thead>
-          <tr className="bg-surface-container font-sarabun text-label text-text-secondary">
-            <th className="p-4 font-semibold">{paramNameLabel}</th>
-            <th className="p-4 font-semibold">{paramTypeLabel}</th>
-            <th className="p-4 font-semibold">{paramRequiredLabel}</th>
-            <th className="p-4 font-semibold">{paramDescLabel}</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border-default/30 bg-surface-card">
-          {params.map((param) => (
-            <tr
-              key={param.name}
-              className="transition-colors hover:bg-surface-page"
-            >
-              <td className="p-4 font-mono text-code font-medium text-primary-dark">
-                {param.name}
-              </td>
-              <td className="p-4 font-sarabun text-body-md">{param.type}</td>
-              <td className="p-4 font-sarabun text-body-md">
-                {param.required ? (
-                  <span className="font-medium text-status-error">
-                    {requiredLabel}
-                  </span>
-                ) : (
-                  <span className="italic text-text-muted">{optionalLabel}</span>
-                )}
-              </td>
-              <td className="p-4 font-sarabun text-body-md">
-                {locale === "th" ? param.descTh : param.descEn}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function BaseUrlBlock({
-  baseUrl,
-  copyLabel,
-  copiedLabel,
-}: {
-  baseUrl: string;
-  copyLabel: string;
-  copiedLabel: string;
-}) {
-  return (
-    <CopyableInlineCode code={baseUrl} copyLabel={copyLabel} copiedLabel={copiedLabel} />
-  );
-}
-
-function CopyableInlineCode({
-  code,
-  copyLabel,
-  copiedLabel,
-}: {
-  code: string;
-  copyLabel: string;
-  copiedLabel: string;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  return (
-    <div className="flex items-center justify-between gap-4 overflow-hidden rounded-radius-md bg-text-primary p-4">
-      <code className="break-all font-mono text-code text-surface-card">{code}</code>
-      <button
-        type="button"
-        onClick={handleCopy}
-        className="flex shrink-0 items-center gap-1 font-sarabun text-caption text-text-muted transition-colors hover:text-surface-card"
-      >
-        <span>{copied ? copiedLabel : copyLabel}</span>
-      </button>
-    </div>
-  );
-}
-
-function EndpointSection({
-  endpoint,
-  locale,
-  requiredLabel,
-  optionalLabel,
-  paramNameLabel,
-  paramTypeLabel,
-  paramRequiredLabel,
-  paramDescLabel,
-  baseUrlLabel,
-  copyLabel,
-  copiedLabel,
-  globalBaseUrl,
-}: {
-  endpoint: ApiDocEndpoint;
-  locale: string;
-  requiredLabel: string;
-  optionalLabel: string;
-  paramNameLabel: string;
-  paramTypeLabel: string;
-  paramRequiredLabel: string;
-  paramDescLabel: string;
-  baseUrlLabel: string;
-  copyLabel: string;
-  copiedLabel: string;
-  globalBaseUrl: string;
-}) {
-  const title = locale === "th" ? endpoint.titleTh : endpoint.titleEn;
-  const desc =
-    locale === "th" ? endpoint.descTh : endpoint.descEn;
-  const content =
-    locale === "th" ? endpoint.contentTh : endpoint.contentEn;
-
-  if (!endpoint.method) {
-    return (
-      <section id={endpoint.id} className="scroll-mt-24">
-        <h2 className="mb-4 font-kanit text-heading-3 text-text-primary">
-          {title}
-        </h2>
-        {desc && (
-          <p className="mb-spacing-6 font-sarabun text-body-lg text-text-secondary">
-            {desc}
-          </p>
-        )}
-        {content && (
-          <p className="font-sarabun text-body-md text-text-secondary">
-            {content}
-          </p>
-        )}
-        {endpoint.id === "getting-started" && (
-          <div className="mt-spacing-6 rounded-radius-lg border border-border-default/50 bg-surface-container p-spacing-6">
-            <h3 className="mb-2 font-sarabun text-label font-bold uppercase tracking-wider text-text-secondary">
-              {baseUrlLabel}
-            </h3>
-            <BaseUrlBlock
-              baseUrl={globalBaseUrl}
-              copyLabel={copyLabel}
-              copiedLabel={copiedLabel}
-            />
-          </div>
-        )}
-        {endpoint.code && (
-          <div className="mt-spacing-6">
-            <CodeBlock code={endpoint.code} label="Header" showHeader={false} />
-          </div>
-        )}
-      </section>
-    );
-  }
-
-  return (
-    <section id={endpoint.id} className="scroll-mt-24">
-      <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center">
-        <MethodBadge method={endpoint.method} />
-        <h2 className="font-kanit text-heading-3 text-text-primary">{title}</h2>
-        {endpoint.path && (
-          <code className="font-mono text-code text-text-muted opacity-80">
-            {endpoint.path}
-          </code>
-        )}
-      </div>
-      {desc && (
-        <p className="mb-spacing-6 font-sarabun text-body-md text-text-secondary">
-          {desc}
-        </p>
-      )}
-      {endpoint.params && endpoint.params.length > 0 && (
-        <ParamsTable
-          params={endpoint.params}
-          locale={locale}
-          requiredLabel={requiredLabel}
-          optionalLabel={optionalLabel}
-          paramNameLabel={paramNameLabel}
-          paramTypeLabel={paramTypeLabel}
-          paramRequiredLabel={paramRequiredLabel}
-          paramDescLabel={paramDescLabel}
-        />
-      )}
-      {endpoint.response && <CodeBlock code={endpoint.response} />}
-    </section>
-  );
-}
 
 function ApiDocsSkeleton() {
   return (
-    <div className="flex flex-1 flex-col gap-spacing-8 py-spacing-6">
-      <div className="h-8 w-48 animate-pulse rounded-radius-sm bg-surface-container" />
-      <div className="h-20 w-full max-w-2xl animate-pulse rounded-radius-sm bg-surface-container" />
-      <div className="h-32 w-full animate-pulse rounded-radius-md bg-surface-container" />
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="space-y-4">
-          <div className="h-6 w-64 animate-pulse rounded-radius-sm bg-surface-container" />
-          <div className="h-40 w-full animate-pulse rounded-radius-md bg-surface-container" />
-        </div>
-      ))}
+    <div className="mx-auto flex max-w-container-max gap-spacing-6 px-4 py-spacing-8 md:px-spacing-10">
+      <div className="hidden w-72 shrink-0 md:block">
+        <div className="h-80 animate-pulse rounded-radius-xl bg-surface-container" />
+      </div>
+      <div className="flex-1 space-y-spacing-6">
+        <div className="h-9 w-72 animate-pulse rounded-radius-sm bg-surface-container" />
+        <div className="h-24 max-w-3xl animate-pulse rounded-radius-md bg-surface-container" />
+        <div className="h-72 animate-pulse rounded-radius-xl bg-surface-container" />
+        <div className="h-48 animate-pulse rounded-radius-xl bg-surface-container" />
+      </div>
     </div>
   );
 }
@@ -245,49 +38,53 @@ export default function ApiDocsPage() {
   const locale = useLocale();
   const { data, isLoading, isError, isFetching } = useApiDocs();
 
-  const docs = data;
-  const sectionIds = useMemo(
-    () => docs?.endpoints.map((e) => e.id) ?? [],
-    [docs?.endpoints]
+  const navItems = useMemo<ApiDocNavItem[]>(
+    () => [
+      {
+        id: "quick-start",
+        title: {
+          th: t("quickStartTitle"),
+          en: t("quickStartTitle"),
+        },
+        description: {
+          th: t("quickStartNavDescription"),
+          en: t("quickStartNavDescription"),
+        },
+      },
+      ...API_ENDPOINT_GROUPS.map((group) => ({
+        id: group.id,
+        title: group.title,
+        description: group.description,
+      })),
+    ],
+    [t]
   );
+
+  const sectionIds = useMemo(() => navItems.map((item) => item.id), [navItems]);
   const { activeId, scrollTo } = useActiveSection(sectionIds);
 
-  const showFallbackBanner = isError && !isLoading;
-  const showSkeleton = isLoading && !docs;
-
-  if (showSkeleton) {
-    return (
-      <div className="mx-auto flex max-w-container-max gap-spacing-6 px-4 py-spacing-6 md:px-spacing-10">
-        <div className="hidden w-64 shrink-0 md:block">
-          <div className="h-64 animate-pulse rounded-radius-md bg-surface-container" />
-        </div>
-        <ApiDocsSkeleton />
-      </div>
-    );
+  if (isLoading && !data) {
+    return <ApiDocsSkeleton />;
   }
 
-  if (!docs) {
-    return null;
-  }
-
-  const pageTitle = locale === "th" ? docs.titleTh : docs.titleEn;
-  const pageDesc =
-    locale === "th" ? docs.descriptionTh : docs.descriptionEn;
+  const docs = data;
+  const pageTitle =
+    locale === "th"
+      ? "Thai EduData Insight API Documentation"
+      : "Thai EduData Insight API Documentation";
+  const pageDescription = docs
+    ? locale === "th"
+      ? docs.descriptionTh
+      : docs.descriptionEn
+    : t("portalDescription");
+  const version = docs?.version ?? "v1";
 
   return (
     <>
-      <div className="mx-auto flex max-w-container-max gap-spacing-6 px-4 md:px-spacing-10">
-        <ApiSidebar
-          endpoints={docs.endpoints}
-          locale={locale}
-          version={docs.version}
-          activeId={activeId}
-          onNavigate={scrollTo}
-        />
-
-        <article className="min-w-0 flex-1 py-spacing-6">
-          <nav className="mb-spacing-3 flex items-center gap-2 font-sarabun text-label text-text-muted">
-            <Link href={`/${locale}`} className="hover:text-primary-dark">
+      <div className="border-b border-border-default bg-surface-card">
+        <div className="mx-auto max-w-container-max px-4 py-spacing-8 md:px-spacing-10">
+          <nav className="mb-spacing-4 flex items-center gap-2 font-sarabun text-label text-text-muted">
+            <Link href={`/${locale}`} className="transition-colors hover:text-primary-dark">
               {t("breadcrumbHome")}
             </Link>
             <span aria-hidden>/</span>
@@ -296,59 +93,108 @@ export default function ApiDocsPage() {
             </span>
           </nav>
 
-          {showFallbackBanner && (
-            <p className="mb-spacing-4 rounded-radius-md border border-status-warning bg-status-warning-bg px-4 py-3 font-sarabun text-body-md text-status-warning">
+          <div className="grid gap-spacing-8 lg:grid-cols-[1fr_320px] lg:items-end">
+            <div>
+              <p className="mb-3 inline-flex rounded-radius-full bg-primary-light px-4 py-1 font-sarabun text-caption font-semibold uppercase tracking-[0.18em] text-primary-dark">
+                {t("portalEyebrow")}
+              </p>
+              <h1 className="font-kanit text-heading-1 text-text-primary">
+                {pageTitle}
+              </h1>
+              <p className="mt-spacing-3 max-w-3xl font-sarabun text-body-lg text-text-secondary">
+                {pageDescription}
+              </p>
+            </div>
+
+            <div className="rounded-radius-xl border border-primary/20 bg-primary-light p-5">
+              <p className="font-sarabun text-caption font-semibold uppercase tracking-[0.18em] text-primary-dark">
+                {t("baseUrl")}
+              </p>
+              <code className="mt-2 block break-all rounded-radius-md bg-surface-card px-3 py-2 font-mono text-code text-text-primary">
+                {docs?.baseUrl ?? "http://127.0.0.1:8000/api/v1"}
+              </code>
+              <p className="mt-3 font-sarabun text-caption text-text-secondary">
+                {t("versionLabel")}: {version}
+              </p>
+            </div>
+          </div>
+
+          {isError && (
+            <p className="mt-spacing-4 rounded-radius-md border border-status-warning bg-status-warning-bg px-4 py-3 font-sarabun text-body-md text-status-warning">
               {t("fallback")}
             </p>
           )}
-
           {isFetching && !isLoading && (
-            <p className="mb-spacing-4 font-sarabun text-caption text-text-muted">
+            <p className="mt-spacing-4 font-sarabun text-caption text-text-muted">
               {t("loading")}
             </p>
           )}
+        </div>
+      </div>
 
-          <header className="mb-spacing-12">
-            <h1 className="mb-spacing-3 font-kanit text-heading-1 text-text-primary">
-              {pageTitle}
-            </h1>
-            <p className="max-w-2xl font-sarabun text-body-lg text-text-secondary">
-              {pageDesc}
-            </p>
-          </header>
+      <div className="mx-auto flex max-w-container-max gap-spacing-6 px-4 md:px-spacing-10">
+        <ApiSidebar
+          items={navItems}
+          locale={locale}
+          version={version}
+          activeId={activeId}
+          onNavigate={scrollTo}
+          title={t("sidebarTitle")}
+        />
 
+        <main className="min-w-0 flex-1 py-spacing-8">
           <div className="space-y-spacing-12">
-            {docs.endpoints.map((endpoint, index) => (
-              <div key={endpoint.id}>
-                <EndpointSection
-                  endpoint={endpoint}
-                  locale={locale}
-                  requiredLabel={t("required")}
-                  optionalLabel={t("optional")}
-                  paramNameLabel={t("paramName")}
-                  paramTypeLabel={t("paramType")}
-                  paramRequiredLabel={t("paramRequired")}
-                  paramDescLabel={t("paramDescription")}
-                  baseUrlLabel={t("baseUrl")}
-                  copyLabel={t("copy")}
-                  copiedLabel={t("copied")}
-                  globalBaseUrl={docs.baseUrl}
-                />
-                {index < docs.endpoints.length - 1 && (
-                  <hr className="mt-spacing-12 border-border-default/30" />
-                )}
-              </div>
+            <QuickStart
+              steps={QUICK_START_STEPS}
+              locale={locale}
+              title={t("quickStartTitle")}
+              description={t("quickStartDescription")}
+            />
+
+            {API_ENDPOINT_GROUPS.map((group) => (
+              <section
+                key={group.id}
+                id={group.id}
+                className="scroll-mt-28 space-y-spacing-6"
+              >
+                <div className="rounded-radius-xl border border-border-default bg-surface-card p-5 shadow-level-1 md:p-6">
+                  <p className="mb-2 font-sarabun text-caption font-semibold uppercase tracking-[0.18em] text-primary-dark">
+                    {t("endpointGroupLabel")}
+                  </p>
+                  <h2 className="font-kanit text-heading-2 text-text-primary">
+                    {getLocalizedText(group.title, locale)}
+                  </h2>
+                  <p className="mt-2 max-w-2xl font-sarabun text-body-md text-text-secondary">
+                    {getLocalizedText(group.description, locale)}
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  {group.endpoints.map((endpoint) => (
+                    <EndpointCard
+                      key={endpoint.id}
+                      endpoint={endpoint}
+                      locale={locale}
+                      requestLabel={t("requestExample")}
+                      responseLabel={t("response")}
+                      expandLabel={t("expandEndpoint")}
+                      collapseLabel={t("collapseEndpoint")}
+                    />
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
-        </article>
+        </main>
       </div>
 
       <ApiMobileNav
-        endpoints={docs.endpoints}
+        items={navItems}
         locale={locale}
-        version={docs.version}
+        version={version}
         activeId={activeId}
         onNavigate={scrollTo}
+        title={t("sidebarTitle")}
         jumpLabel={t("jumpTo")}
       />
     </>

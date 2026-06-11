@@ -195,6 +195,7 @@ def register_status(
 def forgot_password(
     request_body: ForgotPasswordRequest,
     background_tasks: BackgroundTasks,
+    request: Request,
     db: Session = Depends(get_db),
 ):
     """
@@ -205,6 +206,7 @@ def forgot_password(
         db=db,
         redis_client=get_redis_client(),
         email=request_body.email,
+        ip_address=get_client_ip(request),
         background_tasks=background_tasks,
     )
     return success_response(
@@ -219,6 +221,7 @@ def forgot_password(
 def reset_password(
     request_body: ResetPasswordRequest,
     request: Request,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
     """
@@ -232,6 +235,7 @@ def reset_password(
         new_password=request_body.new_password,
         ip_address=get_client_ip(request),
         user_agent=get_user_agent(request),
+        background_tasks=background_tasks,
     )
     return success_response(
         data=MessageResponse(message="ตั้งรหัสผ่านใหม่สำเร็จ").model_dump(mode="json"),

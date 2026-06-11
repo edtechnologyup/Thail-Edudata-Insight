@@ -1,6 +1,8 @@
 # Module: M1 Auth
 # Feature: Business Logic ตาม #5 #28 #33 #34 #43 #48 #56
 
+import hashlib
+import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -46,6 +48,33 @@ def _ensure_aware(dt: datetime) -> datetime:
 def _run_background_tasks(background_tasks: BackgroundTasks) -> None:
     for task in background_tasks.tasks:
         task()
+
+
+def _hash_reset_token(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def _enforce_hourly_rate_limit(
+    redis_client: redis_lib.Redis,
+    *,
+    prefix: str,
+    identifier: str,
+    limit: int,
+) -> None:
+    key = f"auth:rate:{prefix}:{identifier.strip().lower()}"
+    current = int(redis_client.incr(key))
+    if current == 1:
+        redis_client.expire(key, 60 * 60)
+    if current <= limit:
+        return
+
+    ttl = redis_client.ttl(key)
+    retry_after = int(ttl) if ttl is not None and ttl > 0 else 60 * 60
+    raise_app_error(
+        "RATE_LIMIT_EXCEEDED",
+        f"ขอ Reset Password เกินจำนวนที่กำหนด กรุณาลองใหม่ใน {retry_after} วินาที",
+        details={"retry_after": retry_after},
+    )
 
 
 def _log_login_audit(
@@ -298,22 +327,39 @@ def forgot_password(
     db: Session,
     redis_client: redis_lib.Redis,
     email: str,
+    ip_address: str,
     background_tasks: BackgroundTasks,
 ) -> None:
-    user = auth_repo.get_user_by_email(db, email)
+    normalized_email = email.strip().lower()
+    _enforce_hourly_rate_limit(
+        redis_client,
+        prefix="forgot_password_email",
+        identifier=normalized_email,
+        limit=5,
+    )
+    _enforce_hourly_rate_limit(
+        redis_client,
+        prefix="forgot_password_ip",
+        identifier=ip_address,
+        limit=10,
+    )
+
+    user = auth_repo.get_user_by_email(db, normalized_email)
     if user is None:
         return
 
-    enforce_cooldown(redis_client, "forgot_password", email)
+    enforce_cooldown(redis_client, "forgot_password", normalized_email)
 
     now = _utc_now()
-    user.reset_token = str(uuid.uuid4())
+    reset_token = secrets.token_urlsafe(32)
+    user.reset_token = None
+    user.reset_token_hash = _hash_reset_token(reset_token)
     user.reset_expires_at = now + timedelta(hours=1)
     db.commit()
     db.refresh(user)
 
-    email_service.send_password_reset(background_tasks, db, user)
-    set_cooldown(redis_client, "forgot_password", email)
+    set_cooldown(redis_client, "forgot_password", normalized_email)
+    email_service.send_password_reset(background_tasks, db, user, reset_token)
 
 
 def reset_password(
@@ -321,9 +367,10 @@ def reset_password(
     token: str,
     new_password: str,
     ip_address: str,
+    background_tasks: BackgroundTasks,
     user_agent: str | None = None,
 ) -> None:
-    user = auth_repo.get_user_by_reset_token(db, token)
+    user = auth_repo.get_user_by_reset_token_hash(db, _hash_reset_token(token))
     if user is None:
         raise_app_error("AUTH_TOKEN_INVALID")
 
@@ -338,6 +385,7 @@ def reset_password(
 
     user.password_hash = hash_password(new_password)
     user.reset_token = None
+    user.reset_token_hash = None
     user.reset_expires_at = None
     user.failed_login_count = 0
     user.locked_until = None
@@ -346,9 +394,7 @@ def reset_password(
 
     delete_session(str(user.id))
 
-    background_tasks = BackgroundTasks()
-    email_service.send_password_changed(background_tasks, user)
-    _run_background_tasks(background_tasks)
+    email_service.send_password_changed(background_tasks, user, now, ip_address)
 
 
 def get_login_history(
@@ -403,6 +449,7 @@ def delete_account(
     user.reject_reason = None
     user.verify_token = None
     user.reset_token = None
+    user.reset_token_hash = None
     user.is_deleted = True
 
     delete_session(str(user.id))

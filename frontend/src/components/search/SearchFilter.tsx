@@ -100,7 +100,7 @@ export default function SearchFilter({
       .slice(0, 5);
   }, [provinceQuery, locale]);
 
-  const showAgencyFilter = agencies !== null && agencies.length > 0;
+  const showAgencyFilter = Array.isArray(agencies) && agencies.length > 0;
 
   function handleFilterInResults(e: FormEvent) {
     e.preventDefault();

@@ -273,6 +273,14 @@ export default function LoginForm() {
                 {errors.password.message}
               </p>
             )}
+            <div className="mt-2 text-right">
+              <Link
+                href={`/${locale}/forgot-password`}
+                className="font-sarabun text-caption font-medium text-primary-dark hover:underline"
+              >
+                {t("forgotPasswordLink")}
+              </Link>
+            </div>
           </div>
 
           <button
@@ -297,6 +305,12 @@ export default function LoginForm() {
             {t("registerLink")}
           </Link>
         </p>
+        <Link
+          href={`/${locale}/register-status`}
+          className="mt-4 flex h-10 w-full items-center justify-center rounded-radius-sm border border-border-default bg-surface-card font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-surface-container"
+        >
+          {t("checkStatusLink")}
+        </Link>
       </div>
 
       {toastMessage && (

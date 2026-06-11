@@ -55,7 +55,7 @@ export default function VerifyEmailPage() {
   }, [token]);
 
   const cardClass =
-    "w-full max-w-md rounded-xl border border-border-default bg-surface-card p-8 shadow-level-1 text-center";
+    "mx-auto w-full max-w-md rounded-xl border border-border-default bg-surface-card p-8 shadow-level-1 text-center";
 
   if (status === "loading") {
     return (

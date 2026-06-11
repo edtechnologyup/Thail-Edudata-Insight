@@ -4,6 +4,7 @@
 import logging
 import smtplib
 import uuid
+from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -244,8 +245,8 @@ def _build_account_lockout_body(user: User) -> str:
     )
 
 
-def _build_password_reset_body(user: User) -> str:
-    reset_url = f"{settings.APP_BASE_URL}/reset-password?token={user.reset_token}"
+def _build_password_reset_body(user: User, reset_token: str) -> str:
+    reset_url = f"{settings.APP_BASE_URL}/th/reset-password?token={reset_token}"
     return (
         f"เรียน คุณ{user.agency_name or user.email}\n\n"
         "ท่านได้ขอตั้งรหัสผ่านใหม่ "
@@ -256,10 +257,18 @@ def _build_password_reset_body(user: User) -> str:
     )
 
 
-def _build_password_changed_body(user: User) -> str:
+def _build_password_changed_body(
+    user: User,
+    changed_at: datetime,
+    ip_address: str,
+) -> str:
+    local_time = changed_at.astimezone()
     return (
         f"เรียน คุณ{user.agency_name or user.email}\n\n"
-        "รหัสผ่านของท่านถูกเปลี่ยนเรียบร้อยแล้ว\n\n"
+        "รหัสผ่านของบัญชีคุณถูกเปลี่ยนแล้ว\n\n"
+        f"วันที่: {local_time:%d/%m/%Y}\n"
+        f"เวลา: {local_time:%H:%M}\n"
+        f"IP: {ip_address}\n\n"
         "หากท่านไม่ได้เป็นผู้ดำเนินการ กรุณาติดต่อผู้ดูแลระบบทันที"
         f"{EMAIL_FOOTER}"
     )
@@ -405,30 +414,45 @@ def send_password_reset(
     background_tasks: BackgroundTasks,
     db: Session,
     user: User,
+    reset_token: str,
 ) -> None:
-    """ส่งลิงก์ตั้งรหัสผ่านใหม่ — synchronous + email_logs."""
-    if not user.reset_token:
+    """ส่งลิงก์ตั้งรหัสผ่านใหม่ — background task (ไม่บล็อก request)."""
+    if not user.reset_token_hash:
         return
+
+    reset_url = f"{settings.APP_BASE_URL}/th/reset-password?token={reset_token}"
+    # Dev-mode fallback: print reset link to log so dev can test without SMTP
+    if settings.APP_ENV == "development":
+        log_request(
+            logger,
+            logging.INFO,
+            f"[DEV] Password reset link for {user.email}: {reset_url}",
+        )
+
     subject = _format_subject("ตั้งรหัสผ่านใหม่")
-    body = _build_password_reset_body(user)
-    _send_logged_email(
-        db,
+    body = _build_password_reset_body(user, reset_token)
+    user_id = user.id
+    background_tasks.add_task(
+        _send_logged_email_standalone,
         template=EmailTemplateType.PASSWORD_RESET,
         recipient_email=user.email,
         subject=subject,
         body=body,
-        user_id=user.id,
+        user_id=user_id,
     )
 
 
 def send_password_changed(
     background_tasks: BackgroundTasks,
     user: User,
+    changed_at: datetime,
+    ip_address: str,
 ) -> None:
-    """แจ้งเปลี่ยนรหัสผ่านสำเร็จ — synchronous + email_logs."""
+    """แจ้งเปลี่ยนรหัสผ่านสำเร็จหลังส่ง response — ไม่บล็อก reset flow."""
     subject = _format_subject("รหัสผ่านถูกเปลี่ยนแล้ว")
-    body = _build_password_changed_body(user)
-    _send_logged_email_standalone(
+    body = _build_password_changed_body(user, changed_at, ip_address)
+    background_tasks.add_task(
+        _send_logged_email_standalone,
         template=EmailTemplateType.PASSWORD_CHANGED,
         recipient_email=user.email,
         subject=subject,

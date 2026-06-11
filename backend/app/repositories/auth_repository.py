@@ -36,10 +36,10 @@ def get_user_by_verify_token(db: Session, token: str) -> User | None:
     )
 
 
-def get_user_by_reset_token(db: Session, token: str) -> User | None:
+def get_user_by_reset_token_hash(db: Session, token_hash: str) -> User | None:
     return (
         db.query(User)
-        .filter(User.reset_token == token, User.is_deleted.is_(False))
+        .filter(User.reset_token_hash == token_hash, User.is_deleted.is_(False))
         .first()
     )
 

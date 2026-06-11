@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -177,15 +177,11 @@ function PasswordStrengthIndicator({
 
 export default function RegisterForm() {
   const t = useTranslations("auth.register");
-  const router = useRouter();
   const params = useParams();
   const locale = (params.locale as string) || "th";
 
   const [showPassword, setShowPassword] = useState(false);
-  const [toast, setToast] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
+  const [registered, setRegistered] = useState(false);
 
   const registerSchema = useMemo(
     () =>
@@ -314,21 +310,11 @@ export default function RegisterForm() {
       await apiClient.post("/auth/register", formData);
     },
     onSuccess: () => {
-      setToast({ type: "success", message: t("success") });
-      window.setTimeout(() => {
-        router.push(`/${locale}/register-status`);
-      }, 1500);
-    },
-    onError: (error: Error) => {
-      setToast({
-        type: "error",
-        message: error.message || t("errorDefault"),
-      });
+      setRegistered(true);
     },
   });
 
   const onSubmit = (values: RegisterFormValues) => {
-    setToast(null);
     mutation.mutate(values);
   };
 
@@ -357,7 +343,36 @@ export default function RegisterForm() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+        {registered ? (
+          <div className="space-y-6 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-radius-full bg-status-success-bg font-kanit text-heading-2 text-status-success">
+              ✓
+            </div>
+            <div>
+              <h2 className="font-kanit text-heading-2 text-primary-dark">
+                {t("successTitle")}
+              </h2>
+              <p className="mt-2 font-sarabun text-body-md text-text-secondary">
+                {t("successMessage")}
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Link
+                href={`/${locale}/login`}
+                className="flex h-10 w-full items-center justify-center rounded-radius-sm bg-primary font-sarabun text-label font-medium text-white transition-colors hover:bg-primary-hover"
+              >
+                {t("goToLogin")}
+              </Link>
+              <Link
+                href={`/${locale}/register-status`}
+                className="flex h-10 w-full items-center justify-center rounded-radius-sm border border-border-default bg-surface-card font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-surface-container"
+              >
+                {t("checkStatus")}
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
           <div>
             <label
               htmlFor="agency_name"
@@ -684,46 +699,23 @@ export default function RegisterForm() {
               {t("pendingNote")}
             </p>
           </div>
-        </form>
+          </form>
+        )}
 
-        <div className="mt-8 border-t border-border-default pt-6 text-center">
-          <p className="font-sarabun text-body-md text-text-secondary">
-            {t("hasAccount")}{" "}
-            <Link
-              href={`/${locale}/login`}
-              className="font-medium text-primary-dark hover:underline"
-            >
-              {t("loginLink")}
-            </Link>
-          </p>
-        </div>
+        {!registered && (
+          <div className="mt-8 border-t border-border-default pt-6 text-center">
+            <p className="font-sarabun text-body-md text-text-secondary">
+              {t("hasAccount")}{" "}
+              <Link
+                href={`/${locale}/login`}
+                className="font-medium text-primary-dark hover:underline"
+              >
+                {t("loginLink")}
+              </Link>
+            </p>
+          </div>
+        )}
       </div>
-
-      {toast && (
-        <div
-          role="alert"
-          className={`fixed bottom-6 right-6 z-50 max-w-sm rounded-radius-md border-l-4 px-4 py-3 shadow-level-2 ${
-            toast.type === "success"
-              ? "border-primary bg-primary-light"
-              : "border-status-error bg-status-error-bg"
-          }`}
-        >
-          <p
-            className={`font-sarabun text-caption ${
-              toast.type === "success" ? "text-primary-dark" : "text-status-error"
-            }`}
-          >
-            {toast.message}
-          </p>
-          <button
-            type="button"
-            onClick={() => setToast(null)}
-            className="mt-2 font-sarabun text-caption text-text-secondary hover:text-text-primary"
-          >
-            ×
-          </button>
-        </div>
-      )}
     </>
   );
 }

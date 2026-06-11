@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
+from unittest.mock import patch
+
 import pytest
 
 from app.core.security import verify_password
@@ -75,16 +78,25 @@ def test_reset_password_flow(client):
     metadata = register_metadata(email, password="OldPassw0rd!")
     assert post_register(client, metadata).status_code == 201
 
-    forgot = client.post("/api/v1/auth/forgot-password", json={"email": email})
+    reset_token = "reset-token-from-email-123456789012345"
+    forgot = None
+    with patch(
+        "app.services.auth_service.secrets.token_urlsafe",
+        return_value=reset_token,
+    ):
+        forgot = client.post("/api/v1/auth/forgot-password", json={"email": email})
     assert forgot.status_code == 200
 
     user = get_user(email)
     assert user is not None
-    assert user.reset_token
+    assert user.reset_token is None
+    assert user.reset_token_hash == hashlib.sha256(
+        reset_token.encode("utf-8")
+    ).hexdigest()
 
     reset = client.post(
         "/api/v1/auth/reset-password",
-        json={"token": user.reset_token, "new_password": "NewPassw0rd!"},
+        json={"token": reset_token, "new_password": "NewPassw0rd!"},
     )
     assert reset.status_code == 200
 

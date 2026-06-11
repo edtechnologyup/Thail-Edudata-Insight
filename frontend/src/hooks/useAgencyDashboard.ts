@@ -15,42 +15,46 @@ type ApiMonthlyDownload = {
 };
 
 type ApiAgencyDashboardData = {
-  total_datasets: number;
-  published_datasets: number;
-  draft_datasets: number;
-  submitted_datasets: number;
-  total_downloads: number;
-  monthly_downloads: ApiMonthlyDownload[];
-  datasets_created_this_month: number;
-  datasets_created_last_month: number;
+  total_datasets?: number | null;
+  published_datasets?: number | null;
+  draft_datasets?: number | null;
+  submitted_datasets?: number | null;
+  total_downloads?: number | null;
+  monthly_downloads?: ApiMonthlyDownload[] | null;
+  datasets_created_this_month?: number | null;
+  datasets_created_last_month?: number | null;
   datasets_month_change_percent: number | null;
-  downloads_this_month: number;
+  downloads_this_month?: number | null;
   top_download_format: string | null;
   top_download_format_percent: number | null;
 };
 
+function numberOrZero(value: number | null | undefined): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
 function mapMonthlyDownloads(
-  items: ApiMonthlyDownload[]
+  items: ApiMonthlyDownload[] | null | undefined
 ): AgencyMonthlyDownload[] {
-  return items.map((item) => ({
+  return (items ?? []).map((item) => ({
     month: item.month,
     monthEn: item.monthEn ?? item.month_en ?? item.month,
-    count: item.count,
+    count: numberOrZero(item.count),
   }));
 }
 
 function mapAgencyDashboard(data: ApiAgencyDashboardData): AgencyDashboardStats {
   return {
-    totalDatasets: data.total_datasets,
-    publishedDatasets: data.published_datasets,
-    draftDatasets: data.draft_datasets,
-    submittedDatasets: data.submitted_datasets,
-    totalDownloads: data.total_downloads,
-    monthlyDownloads: mapMonthlyDownloads(data.monthly_downloads ?? []),
-    datasetsCreatedThisMonth: data.datasets_created_this_month ?? 0,
-    datasetsCreatedLastMonth: data.datasets_created_last_month ?? 0,
+    totalDatasets: numberOrZero(data.total_datasets),
+    publishedDatasets: numberOrZero(data.published_datasets),
+    draftDatasets: numberOrZero(data.draft_datasets),
+    submittedDatasets: numberOrZero(data.submitted_datasets),
+    totalDownloads: numberOrZero(data.total_downloads),
+    monthlyDownloads: mapMonthlyDownloads(data.monthly_downloads),
+    datasetsCreatedThisMonth: numberOrZero(data.datasets_created_this_month),
+    datasetsCreatedLastMonth: numberOrZero(data.datasets_created_last_month),
     datasetsMonthChangePercent: data.datasets_month_change_percent ?? null,
-    downloadsThisMonth: data.downloads_this_month ?? 0,
+    downloadsThisMonth: numberOrZero(data.downloads_this_month),
     topDownloadFormat: data.top_download_format ?? null,
     topDownloadFormatPercent: data.top_download_format_percent ?? null,
   };

@@ -84,6 +84,9 @@ class User(SoftDeleteMixin, BaseModel):
     reset_token: Mapped[str | None] = mapped_column(
         String(255), nullable=True, unique=True
     )
+    reset_token_hash: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, unique=True
+    )
     reset_expires_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )

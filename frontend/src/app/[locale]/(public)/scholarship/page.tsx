@@ -1,13 +1,34 @@
-import { getTranslations } from "next-intl/server";
+"use client";
 
-type ScholarshipPageProps = {
-  params: { locale: string };
-};
+import { Suspense } from "react";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import Pagination from "@/components/search/Pagination";
+import ScholarshipCard from "@/components/scholarship/ScholarshipCard";
+import ScholarshipFilter, {
+  parseScholarshipFilterParams,
+} from "@/components/scholarship/ScholarshipFilter";
+import { useScholarships } from "@/hooks/useScholarships";
 
-export default async function ScholarshipPage(_props: ScholarshipPageProps) {
-  const t = await getTranslations("scholarship");
+function ScholarshipListContent() {
+  const t = useTranslations("scholarship");
+  const tList = useTranslations("scholarship.list");
+  const searchParams = useSearchParams();
+  const { page, q, scholarship_type, target_level } =
+    parseScholarshipFilterParams(searchParams);
 
-  const placeholderKeys = ["gsl", "eef", "government", "university"] as const;
+  const { data, isLoading, isError } = useScholarships({
+    q: q || undefined,
+    scholarship_type: scholarship_type || undefined,
+    target_level: target_level || undefined,
+    page,
+    page_size: 20,
+  });
+
+  const items = data?.items ?? [];
+  const pagination = data?.pagination;
+  const totalPages = pagination?.total_pages ?? 0;
+  const currentPage = pagination?.page ?? page;
 
   return (
     <>
@@ -24,27 +45,61 @@ export default async function ScholarshipPage(_props: ScholarshipPageProps) {
 
       <section className="bg-surface-page px-4 py-spacing-6 md:px-spacing-10">
         <div className="mx-auto max-w-container-max space-y-spacing-6">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {placeholderKeys.map((key) => (
-              <div
-                key={key}
-                className="rounded-radius-lg border border-border-default/80 bg-surface-card p-6 shadow-level-1"
-              >
-                <h2 className="font-kanit text-heading-3 font-semibold text-text-primary">
-                  {t(`categories.${key}`)}
-                </h2>
-                <p className="mt-2 font-sarabun text-body-sm text-text-muted">
-                  {t("comingSoon")}
-                </p>
-              </div>
-            ))}
-          </div>
+          <ScholarshipFilter />
 
-          <p className="text-center font-sarabun text-caption text-text-muted">
-            {t("underConstruction")}
-          </p>
+          {isLoading && (
+            <p className="py-12 text-center font-sarabun text-body-md text-text-muted">
+              {t("common.loading")}
+            </p>
+          )}
+
+          {isError && (
+            <p className="py-12 text-center font-sarabun text-body-md text-status-error">
+              {tList("loadError")}
+            </p>
+          )}
+
+          {!isLoading && !isError && items.length === 0 && (
+            <p className="py-12 text-center font-sarabun text-body-md text-text-muted">
+              {tList("empty")}
+            </p>
+          )}
+
+          {!isLoading && !isError && items.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {items.map((scholarship) => (
+                  <ScholarshipCard
+                    key={scholarship.id}
+                    scholarship={scholarship}
+                  />
+                ))}
+              </div>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.max(1, totalPages)}
+              />
+            </>
+          )}
         </div>
       </section>
     </>
+  );
+}
+
+export default function ScholarshipPage() {
+  const t = useTranslations("scholarship");
+
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-container-max px-4 py-12 text-center font-sarabun text-body-md text-text-muted">
+          {t("common.loading")}
+        </div>
+      }
+    >
+      <ScholarshipListContent />
+    </Suspense>
   );
 }

@@ -68,6 +68,12 @@ function NavIcon({ name }: { name: string }) {
           <path d="M13 3a9 9 0 1 0 8.95 10h-2.02A7 7 0 1 1 17 6.1V9h2V3h-6v2h3.27A8.96 8.96 0 0 0 13 3Zm-1 5h2v5l4.25 2.52-1 1.73L12 14V8Z" />
         </svg>
       );
+    case "scholarship":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 3 1 9l4 2.18v6L12 21l7-3.82v-6L23 9 12 3zm0 2.18 6.5 3.5L12 12.18 5.5 8.68 12 5.18zM7 11.09v4.36L12 18.5l5-3.05v-4.36L12 14.82 7 11.09z" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -227,6 +233,12 @@ export default function AgencySidebar() {
       labelKey: "categories",
       icon: "categories",
       match: (p) => p.startsWith(`${base}/manage/categories`),
+    },
+    {
+      href: `${base}/manage/scholarships`,
+      labelKey: "scholarships",
+      icon: "scholarship",
+      match: (p) => p.startsWith(`${base}/manage/scholarships`),
     },
     {
       href: `${base}/saved`,

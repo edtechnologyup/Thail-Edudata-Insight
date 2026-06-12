@@ -98,6 +98,14 @@
       "loadError": "โหลด Dataset ใหม่ล่าสุดไม่สำเร็จ",
       "empty": "ยังไม่มี Dataset ใหม่"
     },
+    "scholarships": {
+      "title": "ทุนอัปเดตล่าสุด",
+      "subtitle": "ทุนที่มีการอัปเดตในเดือนนี้ภายใน 7 วันที่ผ่านมา",
+      "viewAll": "ดูทุนทั้งหมด",
+      "viewDetail": "ดูรายละเอียด",
+      "loadError": "โหลดทุนการศึกษาไม่สำเร็จ",
+      "empty": "ยังไม่มีทุนที่อัปเดตล่าสุด"
+    },
     "cta": {
       "title": "มีชุดข้อมูลที่ต้องการนำเสนอ?",
       "subtitle": "หากหน่วยงานของท่านมีข้อมูลด้านการศึกษาที่ต้องการเปิดเผยสู่สาธารณะ สามารถแจ้งความประสงค์เพื่อนำข้อมูลเข้าสู่ระบบได้ทันที",
@@ -136,8 +144,153 @@
   "scholarship": {
     "title": "ทุนการศึกษา",
     "subtitle": "รวมทุนการศึกษาสำคัญของการศึกษาไทย",
-    "comingSoon": "ข้อมูลจะเปิดให้ใช้งานเร็วๆ นี้",
-    "underConstruction": "หน้านี้อยู่ระหว่างจัดทำ — ข้อมูลทุนการศึกษาจะทยอยเพิ่มเข้ามา",
+    "common": {
+      "all": "ทั้งหมด",
+      "loading": "กำลังโหลด...",
+      "noAgency": "—",
+      "currency": "บาท",
+      "statusPublished": "เผยแพร่",
+      "statusDraft": "ร่าง",
+      "closedBadge": "ปิดรับแล้ว"
+    },
+    "types": {
+      "government": "ทุนรัฐบาล",
+      "university": "ทุนมหาวิทยาลัย",
+      "private": "ทุนเอกชน",
+      "foundation": "ทุนมูลนิธิ",
+      "exchange": "ทุนแลกเปลี่ยน",
+      "other": "อื่นๆ"
+    },
+    "levels": {
+      "high_school": "มัธยมศึกษา",
+      "bachelor": "ปริญญาตรี",
+      "master": "ปริญญาโท",
+      "doctoral": "ปริญญาเอก",
+      "any": "ทุกระดับ"
+    },
+    "sources": {
+      "agency": "Agency",
+      "data_go_th": "data.go.th",
+      "api": "API"
+    },
+    "filter": {
+      "search": "ค้นหาทุน",
+      "searchPlaceholder": "ค้นหาชื่อทุน รายละเอียด หรือคุณสมบัติ...",
+      "searchButton": "ค้นหา",
+      "type": "ประเภททุน",
+      "level": "ระดับการศึกษา"
+    },
+    "list": {
+      "empty": "ไม่พบทุนการศึกษาที่ตรงกับเงื่อนไข",
+      "loadError": "โหลดรายการทุนไม่สำเร็จ กรุณาลองใหม่"
+    },
+    "card": {
+      "agency": "หน่วยงาน",
+      "closeDate": "ปิดรับ",
+      "viewDetail": "ดูรายละเอียด",
+      "bookmark": "บันทึกทุน",
+      "bookmarked": "บันทึกแล้ว",
+      "bookmarkSuccess": "บันทึกทุนแล้ว"
+    },
+    "detail": {
+      "back": "กลับรายการทุน",
+      "description": "รายละเอียด",
+      "eligibility": "คุณสมบัติผู้สมัคร",
+      "type": "ประเภททุน",
+      "level": "ระดับการศึกษา",
+      "amount": "วงเงิน",
+      "openDate": "วันเปิดรับ",
+      "closeDate": "วันปิดรับ",
+      "phone": "เบอร์ติดต่อ",
+      "email": "อีเมลติดต่อ",
+      "apply": "สมัครทุนนี้",
+      "notFound": "ไม่พบทุนการศึกษา"
+    },
+    "manage": {
+      "title": "จัดการทุนการศึกษา",
+      "subtitle": "สร้าง แก้ไข และลบทุนของหน่วยงานคุณ",
+      "createNew": "สร้างทุนใหม่",
+      "colTitle": "ชื่อทุน",
+      "colType": "ประเภท",
+      "colLevel": "ระดับ",
+      "colStatus": "สถานะ",
+      "colCloseDate": "ปิดรับ",
+      "colActions": "จัดการ",
+      "edit": "แก้ไข",
+      "delete": "ลบ",
+      "empty": "ยังไม่มีทุนในระบบ",
+      "loadError": "โหลดรายการทุนไม่สำเร็จ",
+      "deleteSuccess": "ลบทุนแล้ว",
+      "deleteError": "ลบทุนไม่สำเร็จ",
+      "confirmTitle": "ยืนยันการลบทุน",
+      "confirmMsg": "ต้องการลบทุน \"{title}\" ใช่หรือไม่?",
+      "cancel": "ยกเลิก",
+      "confirm": "ลบ",
+      "editLoading": "กำลังโหลด...",
+      "editNotFound": "ไม่พบทุนการศึกษา",
+      "editBack": "กลับรายการทุน"
+    },
+    "admin": {
+      "title": "จัดการทุนการศึกษา",
+      "subtitle": "ดูและซ่อนทุนจากทุกหน่วยงาน",
+      "filterStatus": "สถานะ",
+      "filterType": "ประเภททุน",
+      "filterAgency": "หน่วยงาน",
+      "colTitle": "ชื่อทุน",
+      "colAgency": "หน่วยงาน",
+      "colType": "ประเภท",
+      "colLevel": "ระดับ",
+      "colStatus": "สถานะ",
+      "colSource": "แหล่งข้อมูล",
+      "colCloseDate": "ปิดรับ",
+      "colActions": "จัดการ",
+      "hide": "ซ่อน",
+      "empty": "ไม่มีทุนในระบบ",
+      "loadError": "โหลดรายการทุนไม่สำเร็จ",
+      "hideSuccess": "ซ่อนทุนแล้ว",
+      "hideError": "ซ่อนทุนไม่สำเร็จ"
+    },
+    "saved": {
+      "tab": "ทุนที่บันทึก ({count})",
+      "empty": "ยังไม่มีทุนที่บันทึก",
+      "removeBookmark": "ยกเลิก bookmark",
+      "removeSuccess": "ยกเลิก bookmark แล้ว",
+      "removeError": "ยกเลิก bookmark ไม่สำเร็จ",
+      "loadError": "โหลดทุนที่บันทึกไม่สำเร็จ"
+    },
+    "form": {
+      "title": "ชื่อทุน",
+      "description": "รายละเอียด",
+      "type": "ประเภททุน",
+      "level": "ระดับการศึกษา",
+      "eligibility": "คุณสมบัติผู้สมัคร",
+      "openDate": "วันเปิดรับ",
+      "closeDate": "วันปิดรับ",
+      "amount": "วงเงิน (ไม่บังคับ)",
+      "amountNote": "หมายเหตุวงเงิน",
+      "applicationUrl": "ลิงก์สมัคร",
+      "contactPhone": "เบอร์ติดต่อ",
+      "contactEmail": "อีเมลติดต่อ",
+      "status": "สถานะ",
+      "draft": "บันทึกร่าง",
+      "published": "เผยแพร่",
+      "save": "บันทึก",
+      "cancel": "ยกเลิก",
+      "createTitle": "สร้างทุนใหม่",
+      "editTitle": "แก้ไขทุน",
+      "createSuccess": "สร้างทุนสำเร็จ",
+      "updateSuccess": "บันทึกสำเร็จ",
+      "saveError": "บันทึกไม่สำเร็จ กรุณาลองใหม่",
+      "validation": {
+        "titleMin": "ชื่อทุนต้องมีอย่างน้อย 5 ตัวอักษร",
+        "descriptionRequired": "กรุณากรอกรายละเอียด",
+        "eligibilityRequired": "กรุณากรอกคุณสมบัติผู้สมัคร",
+        "openDateRequired": "กรุณาเลือกวันเปิดรับ",
+        "closeDateRequired": "กรุณาเลือกวันปิดรับ",
+        "closeDateAfterOpen": "วันปิดรับต้องไม่ก่อนวันเปิดรับ",
+        "emailInvalid": "รูปแบบอีเมลไม่ถูกต้อง"
+      }
+    },
     "categories": {
       "gsl": "กองทุนเงินให้กู้ยืมเพื่อการศึกษา (กยศ.)",
       "eef": "กองทุนเพื่อความเสมอภาคทางการศึกษา (กสศ.)",
@@ -688,6 +841,7 @@
       "upload": "อัปโหลด Dataset",
       "bulkUpload": "Bulk Upload",
       "categories": "จัดการหมวดหมู่",
+      "scholarships": "จัดการทุนการศึกษา",
       "saved": "บันทึกของฉัน",
       "customDashboard": "Custom Dashboard",
       "activityLog": "ประวัติการทำงาน",

@@ -98,6 +98,14 @@
       "loadError": "Could not load new releases",
       "empty": "No new datasets yet"
     },
+    "scholarships": {
+      "title": "Recently updated scholarships",
+      "subtitle": "Scholarships updated this month within the last 7 days",
+      "viewAll": "View all scholarships",
+      "viewDetail": "View details",
+      "loadError": "Failed to load scholarships",
+      "empty": "No recently updated scholarships"
+    },
     "cta": {
       "title": "Have a dataset to share?",
       "subtitle": "Government agencies can request to publish education data for public access.",
@@ -136,8 +144,153 @@
   "scholarship": {
     "title": "Scholarships",
     "subtitle": "Major scholarships in Thai education",
-    "comingSoon": "Information coming soon",
-    "underConstruction": "This page is under construction — scholarship information will be added gradually",
+    "common": {
+      "all": "All",
+      "loading": "Loading...",
+      "noAgency": "—",
+      "currency": "THB",
+      "statusPublished": "Published",
+      "statusDraft": "Draft",
+      "closedBadge": "Closed"
+    },
+    "types": {
+      "government": "Government",
+      "university": "University",
+      "private": "Private",
+      "foundation": "Foundation",
+      "exchange": "Exchange",
+      "other": "Other"
+    },
+    "levels": {
+      "high_school": "High school",
+      "bachelor": "Bachelor",
+      "master": "Master",
+      "doctoral": "Doctoral",
+      "any": "All levels"
+    },
+    "sources": {
+      "agency": "Agency",
+      "data_go_th": "data.go.th",
+      "api": "API"
+    },
+    "filter": {
+      "search": "Search scholarships",
+      "searchPlaceholder": "Search by title, description, or eligibility...",
+      "searchButton": "Search",
+      "type": "Scholarship type",
+      "level": "Education level"
+    },
+    "list": {
+      "empty": "No scholarships match your criteria",
+      "loadError": "Failed to load scholarships. Please try again."
+    },
+    "card": {
+      "agency": "Agency",
+      "closeDate": "Closes",
+      "viewDetail": "View details",
+      "bookmark": "Save scholarship",
+      "bookmarked": "Saved",
+      "bookmarkSuccess": "Scholarship saved"
+    },
+    "detail": {
+      "back": "Back to list",
+      "description": "Description",
+      "eligibility": "Eligibility",
+      "type": "Scholarship type",
+      "level": "Education level",
+      "amount": "Amount",
+      "openDate": "Open date",
+      "closeDate": "Close date",
+      "phone": "Contact phone",
+      "email": "Contact email",
+      "apply": "Apply for this scholarship",
+      "notFound": "Scholarship not found"
+    },
+    "manage": {
+      "title": "Manage scholarships",
+      "subtitle": "Create, edit, and delete your agency scholarships",
+      "createNew": "Create scholarship",
+      "colTitle": "Title",
+      "colType": "Type",
+      "colLevel": "Level",
+      "colStatus": "Status",
+      "colCloseDate": "Close date",
+      "colActions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "empty": "No scholarships yet",
+      "loadError": "Failed to load scholarships",
+      "deleteSuccess": "Scholarship deleted",
+      "deleteError": "Failed to delete scholarship",
+      "confirmTitle": "Delete scholarship?",
+      "confirmMsg": "Delete scholarship \"{title}\"?",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "editLoading": "Loading...",
+      "editNotFound": "Scholarship not found",
+      "editBack": "Back to list"
+    },
+    "admin": {
+      "title": "Manage scholarships",
+      "subtitle": "View and hide scholarships from all agencies",
+      "filterStatus": "Status",
+      "filterType": "Scholarship type",
+      "filterAgency": "Agency",
+      "colTitle": "Title",
+      "colAgency": "Agency",
+      "colType": "Type",
+      "colLevel": "Level",
+      "colStatus": "Status",
+      "colSource": "Source",
+      "colCloseDate": "Close date",
+      "colActions": "Actions",
+      "hide": "Hide",
+      "empty": "No scholarships found",
+      "loadError": "Failed to load scholarships",
+      "hideSuccess": "Scholarship hidden",
+      "hideError": "Failed to hide scholarship"
+    },
+    "saved": {
+      "tab": "Saved scholarships ({count})",
+      "empty": "No saved scholarships yet",
+      "removeBookmark": "Remove bookmark",
+      "removeSuccess": "Bookmark removed",
+      "removeError": "Failed to remove bookmark",
+      "loadError": "Failed to load saved scholarships"
+    },
+    "form": {
+      "title": "Title",
+      "description": "Description",
+      "type": "Scholarship type",
+      "level": "Education level",
+      "eligibility": "Eligibility",
+      "openDate": "Open date",
+      "closeDate": "Close date",
+      "amount": "Amount (optional)",
+      "amountNote": "Amount note",
+      "applicationUrl": "Application URL",
+      "contactPhone": "Contact phone",
+      "contactEmail": "Contact email",
+      "status": "Status",
+      "draft": "Save as draft",
+      "published": "Publish",
+      "save": "Save",
+      "cancel": "Cancel",
+      "createTitle": "Create scholarship",
+      "editTitle": "Edit scholarship",
+      "createSuccess": "Scholarship created",
+      "updateSuccess": "Saved successfully",
+      "saveError": "Save failed. Please try again.",
+      "validation": {
+        "titleMin": "Title must be at least 5 characters",
+        "descriptionRequired": "Description is required",
+        "eligibilityRequired": "Eligibility is required",
+        "openDateRequired": "Open date is required",
+        "closeDateRequired": "Close date is required",
+        "closeDateAfterOpen": "Close date must not be before open date",
+        "emailInvalid": "Invalid email format"
+      }
+    },
     "categories": {
       "gsl": "Student Loan Fund (GSL)",
       "eef": "Equitable Education Fund (EEF)",
@@ -685,6 +838,7 @@
       "upload": "Upload dataset",
       "bulkUpload": "Bulk upload",
       "categories": "Manage categories",
+      "scholarships": "Manage scholarships",
       "saved": "My saves",
       "customDashboard": "Custom dashboard",
       "activityLog": "Activity log",

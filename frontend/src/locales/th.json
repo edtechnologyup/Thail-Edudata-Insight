@@ -709,6 +709,9 @@
     "bulkResult": "ผลการอัปโหลด",
     "bulkSuccess": "สำเร็จ",
     "bulkFailed": "ล้มเหลว",
+    "noRating": "ยังไม่มีคะแนน",
+    "ratingSaving": "กำลังบันทึก...",
+    "ratingVoters": "{count} คนโหวต",
     "detail": {
       "breadcrumbHome": "หน้าหลัก",
       "breadcrumbCategory": "หมวดหมู่",

@@ -19,6 +19,10 @@ export type ApiDataset = {
   category_name_th?: string | null;
   category_name_en?: string | null;
   file_format?: string | null;
+  user_id?: string;
+  rating_avg?: number;
+  rating_count?: number;
+  user_rating?: number | null;
 };
 
 export type DatasetPreviewData = {

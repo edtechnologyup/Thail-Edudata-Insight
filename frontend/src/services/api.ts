@@ -15,6 +15,7 @@ type JSendResponse<T = unknown> = {
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 10000,
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use((config) => {

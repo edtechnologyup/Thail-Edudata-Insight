@@ -11,6 +11,7 @@ import { useDatasetPreview } from "@/hooks/useDatasetPreview";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { mapPreviewToTable } from "@/utils/datasetDetailMappers";
 import CitationBox from "./CitationBox";
+import DatasetRating from "./DatasetRating";
 import DatasetTags from "./DatasetTags";
 import DownloadModal from "./DownloadModal";
 import PreviewTable from "./PreviewTable";
@@ -22,6 +23,12 @@ type DatasetDetailProps = {
   isUpdated: boolean;
   downloadCountLabel: string;
   sourceFileFormat?: string | null;
+  viewCount?: number;
+  ratingAvg?: number;
+  ratingCount?: number;
+  userRating?: number | null;
+  datasetOwnerId?: string;
+  isPublished?: boolean;
 };
 
 type DetailTab = "preview" | "citation";
@@ -50,6 +57,12 @@ export default function DatasetDetail({
   isUpdated,
   downloadCountLabel,
   sourceFileFormat,
+  viewCount,
+  ratingAvg,
+  ratingCount,
+  userRating,
+  datasetOwnerId,
+  isPublished,
 }: DatasetDetailProps) {
   const t = useTranslations("dataset");
   const tDetail = useTranslations("dataset.detail");
@@ -154,23 +167,9 @@ export default function DatasetDetail({
                 </div>
               </div>
 
-              <div className="flex max-w-sm flex-col gap-2">
-                <div className="flex justify-between font-sarabun text-label font-medium">
-                  <span className="text-text-muted">{tDetail("qualityScore")}</span>
-                  <span className="text-primary">
-                    {detail.qualityScore}/100
-                  </span>
-                </div>
-                <div className="h-1.5 w-full rounded-radius-full bg-surface-container">
-                  <div
-                    className="h-1.5 rounded-radius-full bg-primary transition-all"
-                    style={{ width: `${detail.qualityScore}%` }}
-                  />
-                </div>
-              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center justify-end gap-3 md:self-start">
               <button
                 type="button"
                 onClick={() => setDownloadOpen(true)}
@@ -204,6 +203,33 @@ export default function DatasetDetail({
                 </svg>
               </Link>
             </div>
+          </div>
+
+          <div className="mt-6 flex w-full flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="flex w-full max-w-md flex-col gap-2">
+              <div className="flex justify-between font-sarabun text-label font-medium">
+                <span className="text-text-muted">{tDetail("qualityScore")}</span>
+                <span className="text-primary">
+                  {detail.qualityScore}/100
+                </span>
+              </div>
+              <div className="h-1.5 w-full rounded-radius-full bg-surface-container">
+                <div
+                  className="h-1.5 rounded-radius-full bg-primary transition-all"
+                  style={{ width: `${detail.qualityScore}%` }}
+                />
+              </div>
+            </div>
+
+            <DatasetRating
+              datasetId={datasetId}
+              datasetOwnerId={datasetOwnerId ?? ""}
+              isPublished={isPublished ?? false}
+              initialAvg={ratingAvg ?? 0}
+              initialCount={ratingCount ?? 0}
+              initialUserRating={userRating ?? null}
+              viewCount={viewCount ?? 0}
+            />
           </div>
         </div>
       </section>

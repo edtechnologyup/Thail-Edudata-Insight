@@ -706,6 +706,9 @@
     "bulkResult": "Upload results",
     "bulkSuccess": "Success",
     "bulkFailed": "Failed",
+    "noRating": "No ratings yet",
+    "ratingSaving": "Saving...",
+    "ratingVoters": "{count} voters",
     "detail": {
       "breadcrumbHome": "Home",
       "breadcrumbCategory": "Category",

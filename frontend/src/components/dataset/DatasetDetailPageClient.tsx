@@ -108,6 +108,12 @@ export default function DatasetDetailPageClient({
       isUpdated={isUpdated}
       downloadCountLabel={formatDownloadCount(detail.downloadCount, locale)}
       sourceFileFormat={apiDataset.file_format}
+      viewCount={apiDataset.view_count ?? 0}
+      ratingAvg={apiDataset.rating_avg ?? 0}
+      ratingCount={apiDataset.rating_count ?? 0}
+      userRating={apiDataset.user_rating ?? null}
+      datasetOwnerId={apiDataset.user_id ? String(apiDataset.user_id) : ""}
+      isPublished={apiDataset.status === "published"}
     />
   );
 }

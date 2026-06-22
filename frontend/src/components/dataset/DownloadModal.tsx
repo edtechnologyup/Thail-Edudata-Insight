@@ -117,23 +117,31 @@ function DownloadModalForm({
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
-            {availableFormats.map((format) => (
-              <label
-                key={format}
-                className="flex cursor-pointer items-center gap-2 rounded-radius-md border border-border-input p-3 transition-colors hover:bg-surface-container"
-              >
-                <input
-                  type="radio"
-                  value={format}
-                  className="accent-primary-dark"
-                  disabled={isSubmitting}
-                  {...register("format")}
-                />
-                <span className="font-sarabun text-label">
-                  {DOWNLOAD_FORMAT_LABELS[format]}
-                </span>
-              </label>
-            ))}
+            {availableFormats.map((format) => {
+              const fmtColors: Record<string, string> = {
+                csv: "#1565c0", excel: "#2e7d32", xlsx: "#2e7d32",
+                json: "#e65100", xml: "#4527a0", pdf: "#c62828", sql: "#00695c",
+              };
+              const borderColor = fmtColors[format] ?? "#9e9e9e";
+              return (
+                <label
+                  key={format}
+                  className="flex cursor-pointer items-center gap-2 rounded-2xl p-3 transition-colors hover:opacity-80"
+                  style={{ border: `2px solid ${borderColor}` }}
+                >
+                  <input
+                    type="radio"
+                    value={format}
+                    className="accent-primary-dark"
+                    disabled={isSubmitting}
+                    {...register("format")}
+                  />
+                  <span className="font-sarabun text-label font-semibold" style={{ color: borderColor }}>
+                    {DOWNLOAD_FORMAT_LABELS[format]}
+                  </span>
+                </label>
+              );
+            })}
           </div>
         )}
       </div>
@@ -170,7 +178,8 @@ function DownloadModalForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 rounded-radius-md bg-primary py-3 font-sarabun text-label font-medium text-white transition-all hover:bg-primary-hover disabled:opacity-70"
+          className="flex-1 rounded-2xl py-3 font-sarabun text-label font-bold text-white transition-all hover:opacity-90 disabled:opacity-70"
+          style={{ backgroundColor: "#0d5302" }}
         >
           {isSubmitting ? t("processing") : t("submit")}
         </button>
@@ -178,7 +187,8 @@ function DownloadModalForm({
           type="button"
           onClick={onClose}
           disabled={isSubmitting}
-          className="rounded-radius-md border border-border-input px-6 py-3 font-sarabun text-label text-text-secondary transition-colors hover:bg-surface-container disabled:opacity-70"
+          className="rounded-2xl border-2 px-6 py-3 font-sarabun text-label font-bold transition-colors hover:opacity-90 disabled:opacity-70"
+          style={{ borderColor: "#c41411", color: "#c41411" }}
         >
           {tCommon("cancel")}
         </button>

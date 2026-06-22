@@ -51,20 +51,6 @@ export default function DatasetDetailPage({ params }: DatasetDetailPageProps) {
 
   return (
     <div className="relative">
-      <div className="mx-auto flex max-w-container-max justify-end px-4 pt-6 md:px-spacing-10">
-        <button
-          type="button"
-          onClick={handleExportPdf}
-          disabled={isExporting}
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-radius-md bg-primary px-5 font-sarabun text-label font-semibold text-white shadow-level-1 transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isExporting && (
-            <span className="h-4 w-4 animate-spin rounded-radius-full border-2 border-white/40 border-t-white" />
-          )}
-          Export PDF
-        </button>
-      </div>
-
       <DatasetDetailPageClient id={params.id} locale={params.locale} />
 
       {toast && (

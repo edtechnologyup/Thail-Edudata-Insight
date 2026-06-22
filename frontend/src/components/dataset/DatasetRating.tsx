@@ -49,18 +49,18 @@ export default function DatasetRating({
   return (
     <div className="flex w-full flex-col items-end gap-2 md:ml-auto md:w-auto">
       {/* ── แถบหลัก: คะแนน | ดาว | ผู้เข้าชม | ปุ่มโหวต ── */}
-      <div className="inline-flex items-center gap-4 rounded-radius-full border border-primary/30 bg-primary-light/40 px-6 py-3">
-        <span className="font-kanit text-heading-3-mobile font-bold text-primary-dark">
+      <div className="inline-flex items-center gap-5 rounded-radius-full border border-primary/30 bg-primary-light/40 px-8 py-4">
+        <span className="font-kanit text-heading-2 font-bold text-primary-dark">
           {ratingAvg.toFixed(2)}
         </span>
 
-        <StarDisplay count={filledStars} size="text-2xl" />
+        <StarDisplay count={filledStars} size="text-3xl" />
 
-        <span className="text-lg text-primary/30">|</span>
+        <span className="text-xl text-primary/30">|</span>
 
-        <span className="flex items-center gap-1.5 font-sarabun text-label font-medium text-primary-dark">
+        <span className="flex items-center gap-2 font-sarabun text-body-md font-medium text-primary-dark">
           {viewCount.toLocaleString(numberLocale)}
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
@@ -70,14 +70,14 @@ export default function DatasetRating({
           <button
             type="button"
             onClick={() => setShowVoteStars((v) => !v)}
-            className="rounded-radius-full bg-primary px-5 py-1.5 font-sarabun text-label font-bold text-white transition-colors hover:bg-primary-dark"
+            className="rounded-radius-full bg-primary px-6 py-2 font-sarabun text-body-md font-bold text-white transition-colors hover:bg-primary-dark"
           >
             {t("rateButton")}
           </button>
         )}
 
         {votedToday && (
-          <span className="rounded-radius-full bg-primary/20 px-4 py-1.5 font-sarabun text-label font-medium text-primary-dark">
+          <span className="rounded-radius-full bg-primary/20 px-5 py-2 font-sarabun text-body-md font-medium text-primary-dark">
             ✓ {t("ratedToday")}
           </span>
         )}

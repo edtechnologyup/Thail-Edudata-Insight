@@ -25,17 +25,39 @@ function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="shrink-0 rounded-radius-md border border-border-input px-3 py-1.5 font-sarabun text-caption text-text-secondary transition-colors hover:bg-surface-container"
+      className="shrink-0 rounded-xl px-4 py-2 font-sarabun text-caption font-bold transition-all hover:opacity-80"
+      style={
+        copied
+          ? { backgroundColor: "#e8f5e9", color: "#2e7d32", border: "1.5px solid #2e7d32" }
+          : { backgroundColor: "#f9a825", color: "#33691e", border: "1.5px solid #f9a825" }
+      }
     >
-      {copied ? t("copied") : t("copy")}
+      {copied ? (
+        <span className="inline-flex items-center gap-1">
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+          {t("copied")}
+        </span>
+      ) : (
+        <span className="inline-flex items-center gap-1">
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          {t("copy")}
+        </span>
+      )}
     </button>
   );
 }
 
 function CodeBlock({ code }: { code: string }) {
   return (
-    <div className="flex items-start gap-2">
-      <pre className="flex-1 overflow-x-auto rounded-radius-md bg-surface-navy p-4 font-mono text-caption leading-relaxed text-white">
+    <div className="flex items-start gap-3">
+      <pre
+        className="flex-1 overflow-x-auto rounded-2xl p-4 font-mono text-caption leading-relaxed text-white"
+        style={{ backgroundColor: "#1a3a2a" }}
+      >
         {code}
       </pre>
       <CopyButton text={code} />
@@ -99,21 +121,33 @@ export default function ApiAccessModal({
         onClick={onClose}
         aria-label={tCommon("close")}
       />
-      <div className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-radius-lg border border-border-default/80 bg-surface-card p-spacing-6 shadow-level-3">
+      <div className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border-default/60 bg-white p-8 shadow-level-3">
+        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
-          <h3
-            id="api-access-modal-title"
-            className="font-kanit text-heading-3 text-text-primary"
-          >
-            {t("title")}
-          </h3>
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ backgroundColor: "#e0f2f1" }}
+            >
+              <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <h3
+              id="api-access-modal-title"
+              className="font-kanit text-heading-3 font-bold"
+              style={{ color: "#1a3a2a" }}
+            >
+              {t("title")}
+            </h3>
+          </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-radius-full p-1 text-text-muted transition-colors hover:bg-surface-container"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border-default/60 text-text-muted transition-colors hover:bg-surface-container"
             aria-label={tCommon("close")}
           >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -122,34 +156,44 @@ export default function ApiAccessModal({
         <p className="mb-2 font-sarabun text-body-md text-text-secondary">
           {t("intro")}
         </p>
-        <p className="mb-6 font-sarabun text-caption text-text-muted">
+        <p
+          className="mb-6 inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-sarabun text-caption font-semibold"
+          style={{ backgroundColor: "#fff3e0", color: "#e65100" }}
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           {t("rateLimit")}
         </p>
 
         {/* ── Preview ── */}
-        <section className="mb-8">
-          <h4 className="mb-3 font-kanit text-label font-bold text-text-primary">
+        <section className="mb-8 rounded-2xl border border-border-default/60 bg-gray-50/50 p-6">
+          <h4 className="mb-4 font-kanit text-body-md font-bold" style={{ color: "#00695c" }}>
             {t("previewHeading")}
           </h4>
 
-          <p className="mb-2 font-sarabun text-caption font-medium text-text-muted">
+          <p className="mb-2 font-sarabun text-caption font-bold" style={{ color: "#1a3a2a" }}>
             Endpoint
           </p>
-          <div className="mb-4 flex items-center gap-2">
-            <code className="flex-1 overflow-x-auto rounded-radius-md bg-surface-container px-3 py-2 font-mono text-caption text-text-primary">
-              GET {previewUrl}
+          <div className="mb-4 flex items-center gap-3">
+            <code
+              className="flex-1 overflow-x-auto rounded-xl border border-border-default/60 bg-white px-4 py-3 font-mono text-caption"
+              style={{ color: "#00695c" }}
+            >
+              <span className="mr-2 rounded-md px-2 py-0.5 font-bold text-white" style={{ backgroundColor: "#00897b" }}>GET</span>
+              {previewUrl}
             </code>
             <CopyButton text={previewUrl} />
           </div>
 
-          <p className="mb-2 font-sarabun text-caption font-medium text-text-muted">
+          <p className="mb-2 font-sarabun text-caption font-bold" style={{ color: "#1a3a2a" }}>
             curl
           </p>
           <CodeBlock code={`curl "${previewUrl}"`} />
 
           {previewData && (
             <>
-              <p className="mb-2 mt-4 font-sarabun text-caption font-medium text-text-muted">
+              <p className="mb-2 mt-5 font-sarabun text-caption font-bold" style={{ color: "#1a3a2a" }}>
                 {t("exampleResponse")}
               </p>
               <CodeBlock code={buildExampleResponse(previewData)} />
@@ -158,56 +202,63 @@ export default function ApiAccessModal({
         </section>
 
         {/* ── Download ── */}
-        <section>
-          <h4 className="mb-3 font-kanit text-label font-bold text-text-primary">
+        <section className="rounded-2xl border border-border-default/60 bg-gray-50/50 p-6">
+          <h4 className="mb-4 font-kanit text-body-md font-bold" style={{ color: "#00695c" }}>
             {t("downloadHeading")}
           </h4>
 
-          <p className="mb-2 font-sarabun text-caption font-medium text-text-muted">
+          <p className="mb-2 font-sarabun text-caption font-bold" style={{ color: "#1a3a2a" }}>
             Endpoint
           </p>
-          <div className="mb-4 flex items-center gap-2">
-            <code className="flex-1 overflow-x-auto rounded-radius-md bg-surface-container px-3 py-2 font-mono text-caption text-text-primary">
-              GET {downloadUrl}?purpose=...&format=csv
+          <div className="mb-4 flex items-center gap-3">
+            <code
+              className="flex-1 overflow-x-auto rounded-xl border border-border-default/60 bg-white px-4 py-3 font-mono text-caption"
+              style={{ color: "#00695c" }}
+            >
+              <span className="mr-2 rounded-md px-2 py-0.5 font-bold text-white" style={{ backgroundColor: "#00897b" }}>GET</span>
+              {downloadUrl}?purpose=...&format=csv
             </code>
             <CopyButton text={`${downloadUrl}?purpose=YOUR_PURPOSE&format=csv`} />
           </div>
 
-          <p className="mb-2 font-sarabun text-caption font-medium text-text-muted">
+          <p className="mb-2 font-sarabun text-caption font-bold" style={{ color: "#1a3a2a" }}>
             {t("queryParams")}
           </p>
-          <div className="mb-4 overflow-hidden rounded-radius-md border border-border-default">
+          <div className="mb-5 overflow-hidden rounded-xl border border-border-default/60">
             <table className="w-full text-left font-sarabun text-caption">
-              <thead className="bg-surface-container">
-                <tr>
-                  <th className="px-3 py-2 font-medium text-text-muted">{t("paramName")}</th>
-                  <th className="px-3 py-2 font-medium text-text-muted">{t("paramType")}</th>
-                  <th className="px-3 py-2 font-medium text-text-muted">{t("paramDesc")}</th>
+              <thead>
+                <tr style={{ backgroundColor: "#1a3a2a" }}>
+                  <th className="px-4 py-3 font-semibold text-white">{t("paramName")}</th>
+                  <th className="px-4 py-3 font-semibold text-white">{t("paramType")}</th>
+                  <th className="px-4 py-3 font-semibold text-white">{t("paramDesc")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border-default">
-                <tr>
-                  <td className="px-3 py-2 font-mono">purpose</td>
-                  <td className="px-3 py-2">string</td>
-                  <td className="px-3 py-2">{t("purposeDesc")}</td>
+              <tbody className="divide-y divide-border-default/40">
+                <tr className="bg-white">
+                  <td className="px-4 py-3 font-mono font-semibold" style={{ color: "#00695c" }}>purpose</td>
+                  <td className="px-4 py-3 text-text-secondary">string</td>
+                  <td className="px-4 py-3 text-text-secondary">{t("purposeDesc")}</td>
                 </tr>
-                <tr>
-                  <td className="px-3 py-2 font-mono">format</td>
-                  <td className="px-3 py-2">string</td>
-                  <td className="px-3 py-2">csv | excel | json | xml</td>
+                <tr className="bg-gray-50">
+                  <td className="px-4 py-3 font-mono font-semibold" style={{ color: "#00695c" }}>format</td>
+                  <td className="px-4 py-3 text-text-secondary">string</td>
+                  <td className="px-4 py-3 text-text-secondary">csv | excel | json | xml</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <p className="mb-2 font-sarabun text-caption font-medium text-text-muted">
+          <p className="mb-2 font-sarabun text-caption font-bold" style={{ color: "#1a3a2a" }}>
             curl
           </p>
           <CodeBlock
             code={`curl -o data.csv \\\n  "${downloadUrl}?purpose=research%20and%20analysis&format=csv"`}
           />
 
-          <p className="mt-4 font-sarabun text-caption text-text-muted">
+          <p
+            className="mt-5 rounded-xl px-4 py-2.5 font-sarabun text-caption"
+            style={{ backgroundColor: "#e8f5e9", color: "#2e7d32" }}
+          >
             {t("downloadNote")}
           </p>
         </section>

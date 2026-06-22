@@ -260,6 +260,36 @@ def get_stats_by_category(
             continue
         level1_counts[root.id] = level1_counts.get(root.id, 0) + count
 
+    level1_downloads: dict[uuid.UUID, int] = {}
+    level1_views: dict[uuid.UUID, int] = {}
+    uncategorized_downloads = 0
+    uncategorized_views = 0
+
+    dl_vw_query = db.query(
+        Dataset.category_id,
+        func.coalesce(func.sum(Dataset.download_count), 0),
+        func.coalesce(func.sum(Dataset.view_count), 0),
+    ).filter(*published_filter)
+    if category_id is not None:
+        cat_ids = _category_ids_under_level1(db, category_id)
+        dl_vw_query = dl_vw_query.filter(Dataset.category_id.in_(cat_ids))
+    dl_vw_rows = dl_vw_query.group_by(Dataset.category_id).all()
+
+    for row_cat_id, row_dl, row_vw in dl_vw_rows:
+        dl = int(row_dl or 0)
+        vw = int(row_vw or 0)
+        if row_cat_id is None:
+            uncategorized_downloads += dl
+            uncategorized_views += vw
+            continue
+        root = _resolve_level1_category(db, row_cat_id)
+        if root is None:
+            uncategorized_downloads += dl
+            uncategorized_views += vw
+            continue
+        level1_downloads[root.id] = level1_downloads.get(root.id, 0) + dl
+        level1_views[root.id] = level1_views.get(root.id, 0) + vw
+
     categories_breakdown: list[dict[str, Any]] = []
     if level1_counts:
         root_ids = list(level1_counts.keys())
@@ -282,6 +312,8 @@ def get_stats_by_category(
                     "name_en": cat.name_en,
                     "slug": cat.slug,
                     "count": count,
+                    "download_count": level1_downloads.get(root_id, 0),
+                    "view_count": level1_views.get(root_id, 0),
                 }
             )
 
@@ -293,6 +325,8 @@ def get_stats_by_category(
                 "name_en": "Uncategorized",
                 "slug": "uncategorized",
                 "count": uncategorized_count,
+                "download_count": uncategorized_downloads,
+                "view_count": uncategorized_views,
             }
         )
 
@@ -317,9 +351,37 @@ def get_stats_by_category(
         if row.year is not None
     ]
 
+    metrics_query = db.query(
+        extract("year", Dataset.published_at).label("year"),
+        func.count(Dataset.id).label("datasets"),
+        func.coalesce(func.sum(Dataset.download_count), 0).label("downloads"),
+        func.coalesce(func.sum(Dataset.view_count), 0).label("views"),
+    ).filter(*published_filter, Dataset.published_at.isnot(None))
+
+    if category_id is not None:
+        cat_ids = _category_ids_under_level1(db, category_id)
+        metrics_query = metrics_query.filter(Dataset.category_id.in_(cat_ids))
+
+    metrics_rows = (
+        metrics_query.group_by(extract("year", Dataset.published_at))
+        .order_by(extract("year", Dataset.published_at))
+        .all()
+    )
+    metrics_by_year = [
+        {
+            "year": int(row.year),
+            "datasets": int(row.datasets),
+            "downloads": int(row.downloads),
+            "views": int(row.views),
+        }
+        for row in metrics_rows
+        if row.year is not None
+    ]
+
     return {
         "categories": categories_breakdown,
         "datasets_by_year": datasets_by_year,
+        "metrics_by_year": metrics_by_year,
         "selected_category_id": str(category_id) if category_id else None,
     }
 
@@ -331,7 +393,7 @@ def get_trending_datasets(db: Session, limit: int) -> list[Dataset]:
             Dataset.is_deleted.is_(False),
             Dataset.status == "published",
         )
-        .order_by(Dataset.view_count.desc(), Dataset.download_count.desc())
+        .order_by(Dataset.download_count.desc(), Dataset.view_count.desc())
         .limit(limit)
         .all()
     )

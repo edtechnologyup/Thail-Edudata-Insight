@@ -1,67 +1,151 @@
 "use client";
 
+import { useState, useCallback } from "react";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 import { CHART_COLORS } from "@/constants/chartColors";
 import type { CategoryStatItem } from "@/hooks/useStatsByCategory";
 
 type CategoryPieChartProps = {
   data: CategoryStatItem[];
-  selectedCategoryId?: string | null;
 };
 
-function ChartTooltip({
-  active,
-  payload,
-}: {
-  active?: boolean;
-  payload?: { name: string; value: number }[];
-}) {
-  if (!active || !payload?.length) return null;
-  const item = payload[0];
+type ChartItem = {
+  id: string | null;
+  name: string;
+  value: number;
+  download_count: number;
+  view_count: number;
+};
+
+function ActiveShape(props: any) {
+  const {
+    cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill,
+  } = props;
   return (
-    <div className="rounded-radius-md border border-border-default bg-surface-card px-3 py-2 shadow-level-2">
-      <p className="font-sarabun text-label font-medium text-text-primary">
-        {item.name}
-      </p>
-      <p className="font-kanit text-label font-semibold text-primary-dark">
-        {item.value}
-      </p>
+    <g>
+      <Sector
+        cx={cx}
+        cy={cy}
+        innerRadius={innerRadius - 4}
+        outerRadius={outerRadius + 8}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        fill={fill}
+        stroke="#111827"
+        strokeWidth={2}
+      />
+    </g>
+  );
+}
+
+function CategoryDetail({
+  item,
+  color,
+  total,
+  locale,
+}: {
+  item: ChartItem;
+  color: string;
+  total: number;
+  locale: string;
+}) {
+  const t = useTranslations("stats");
+  const base = `/${locale}`;
+  const percent = Math.round((item.value / total) * 100);
+  const numLocale = locale === "th" ? "th-TH" : "en-US";
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-2.5">
+        <span
+          className="h-4 w-4 shrink-0 rounded-radius-full"
+          style={{ backgroundColor: color }}
+          aria-hidden
+        />
+        <h3 className="font-kanit text-label font-bold text-text-primary">
+          {item.name}
+        </h3>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        <div className="rounded-radius-md bg-primary-light/50 px-3 py-2">
+          <p className="font-sarabun text-caption font-medium text-text-muted">{t("datasetCount")}</p>
+          <p className="font-kanit text-label font-bold text-primary-dark">
+            {item.value.toLocaleString(numLocale)} <span className="text-caption font-medium text-text-muted">({percent}%)</span>
+          </p>
+        </div>
+        <div className="rounded-radius-md bg-surface-container/60 px-3 py-2">
+          <p className="font-sarabun text-caption font-medium text-text-muted">{t("downloads")}</p>
+          <p className="font-kanit text-label font-bold text-text-primary">
+            {item.download_count.toLocaleString(numLocale)}
+          </p>
+        </div>
+        <div className="rounded-radius-md bg-surface-container/60 px-3 py-2">
+          <p className="font-sarabun text-caption font-medium text-text-muted">{t("views")}</p>
+          <p className="font-kanit text-label font-bold text-text-primary">
+            {item.view_count.toLocaleString(numLocale)}
+          </p>
+        </div>
+      </div>
+
+      {item.id && (
+        <Link
+          href={`${base}/search?category_id=${item.id}`}
+          className="inline-flex items-center justify-center gap-2 rounded-radius-md bg-primary px-4 py-2 font-sarabun text-caption font-medium text-white transition-colors hover:bg-primary-hover"
+        >
+          {t("viewAllDatasets")}
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
+      )}
     </div>
   );
 }
 
-export default function CategoryPieChart({
-  data,
-  selectedCategoryId = null,
-}: CategoryPieChartProps) {
+export default function CategoryPieChart({ data }: CategoryPieChartProps) {
   const t = useTranslations("stats");
   const locale = useLocale();
   const isTh = locale === "th";
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  const chartData = data
+  const chartData: ChartItem[] = data
     .filter((item) => item.count > 0)
     .map((item) => ({
       id: item.id,
       name: isTh ? item.name_th : item.name_en,
       value: item.count,
+      download_count: item.download_count ?? 0,
+      view_count: item.view_count ?? 0,
     }))
     .sort((a, b) => b.value - a.value);
 
   const total = chartData.reduce((sum, item) => sum + item.value, 0);
 
+  const toggleDetail = useCallback((_: any, index: number) => {
+    setActiveIndex((prev) => (prev === index ? null : index));
+  }, []);
+
+  const selectedItem = activeIndex !== null ? chartData[activeIndex] : null;
+  const selectedColor = activeIndex !== null
+    ? CHART_COLORS.pie[activeIndex % CHART_COLORS.pie.length]
+    : "";
+
   return (
-    <div className="flex h-full flex-col rounded-radius-lg border border-border-default bg-surface-card p-5 shadow-level-1 md:p-6">
-      <h2 className="mb-4 font-kanit text-heading-3-mobile font-semibold text-text-primary md:mb-5 md:text-heading-3">
+    <div className="rounded-radius-lg border border-border-default bg-surface-card p-5 shadow-level-1 md:p-6">
+      <h2 className="mb-4 font-kanit text-heading-3-mobile font-semibold text-text-primary md:text-heading-3">
         {t("datasetByCategory")}
       </h2>
       {total === 0 ? (
-        <p className="flex flex-1 items-center justify-center py-12 font-sarabun text-body-md text-text-muted">
+        <p className="py-8 text-center font-sarabun text-body-md text-text-muted">
           {t("noChartData")}
         </p>
       ) : (
-        <div className="flex flex-1 flex-col items-center gap-6 md:flex-row md:items-center md:gap-8">
-          <div className="relative mx-auto h-56 w-56 shrink-0 sm:h-64 sm:w-64 md:mx-0 md:h-72 md:w-72 lg:h-80 lg:w-80">
+        <div className="flex flex-col items-center gap-5 md:flex-row md:items-start md:gap-6">
+          {/* กราฟวงกลม */}
+          <div className="relative h-56 w-56 shrink-0 sm:h-64 sm:w-64 md:h-72 md:w-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -70,67 +154,80 @@ export default function CategoryPieChart({
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius="58%"
+                  innerRadius="55%"
                   outerRadius="82%"
                   paddingAngle={2}
+                  activeIndex={activeIndex ?? undefined}
+                  activeShape={ActiveShape}
+                  onClick={toggleDetail}
                 >
                   {chartData.map((item, index) => {
-                    const color =
-                      CHART_COLORS.pie[index % CHART_COLORS.pie.length];
-                    const isSelected =
-                      selectedCategoryId && item.id === selectedCategoryId;
+                    const color = CHART_COLORS.pie[index % CHART_COLORS.pie.length];
+                    const dimmed = activeIndex !== null && activeIndex !== index;
                     return (
                       <Cell
                         key={item.name}
                         fill={color}
-                        stroke={isSelected ? "#111827" : undefined}
-                        strokeWidth={isSelected ? 2 : 0}
+                        opacity={dimmed ? 0.35 : 1}
+                        className="cursor-pointer transition-opacity duration-200"
                       />
                     );
                   })}
                 </Pie>
-                <Tooltip content={<ChartTooltip />} />
               </PieChart>
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <span className="font-kanit text-heading-2 font-bold text-text-primary md:text-heading-1">
-                {total}
+              <span className="font-kanit text-heading-3-mobile font-bold text-text-primary md:text-heading-2">
+                {selectedItem ? selectedItem.value : total}
               </span>
-              <span className="font-sarabun text-caption text-text-muted">
-                {t("totalDatasets")}
+              <span className="max-w-[80%] truncate text-center font-sarabun text-caption text-text-muted">
+                {selectedItem ? selectedItem.name : t("totalDatasets")}
               </span>
             </div>
           </div>
-          <ul className="flex w-full flex-1 flex-col justify-center gap-2.5 md:max-h-80 md:gap-3 md:overflow-y-auto md:pr-1">
-            {chartData.map((item, index) => {
-              const percent = Math.round((item.value / total) * 100);
-              const color =
-                CHART_COLORS.pie[index % CHART_COLORS.pie.length];
-              return (
-                <li
-                  key={item.name}
-                  className="flex items-center justify-between gap-3 rounded-radius-sm px-1 py-0.5 font-sarabun text-label"
-                >
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span
-                      className="h-3 w-3 shrink-0 rounded-radius-full"
-                      style={{ backgroundColor: color }}
-                      aria-hidden
-                    />
-                    <span className="truncate text-text-secondary">
-                      {item.name}
-                    </span>
-                  </div>
-                  <span className="shrink-0 text-right font-semibold tabular-nums text-text-primary">
-                    <span className="block">{item.value.toLocaleString(locale)}</span>
-                    <span className="font-sarabun text-caption font-medium text-text-muted">
-                      {percent}%
-                    </span>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+
+          {/* รายชื่อหมวดหมู่ หรือ ข้อมูลรายละเอียด — สลับกัน */}
+          <div className="w-full min-w-0 flex-1">
+            {selectedItem ? (
+              <CategoryDetail
+                item={selectedItem}
+                color={selectedColor}
+                total={total}
+                locale={locale}
+              />
+            ) : (
+              <ul className="flex flex-col gap-0.5 md:max-h-72 md:overflow-y-auto md:pr-1">
+                {chartData.map((item, index) => {
+                  const percent = Math.round((item.value / total) * 100);
+                  const color = CHART_COLORS.pie[index % CHART_COLORS.pie.length];
+                  return (
+                    <li key={item.name}>
+                      <button
+                        type="button"
+                        onClick={() => toggleDetail(null, index)}
+                        className="flex w-full items-center justify-between gap-2 rounded-radius-md px-2.5 py-1.5 font-sarabun text-label transition-colors hover:bg-surface-container"
+                      >
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span
+                            className="h-3 w-3 shrink-0 rounded-radius-full"
+                            style={{ backgroundColor: color }}
+                            aria-hidden
+                          />
+                          <span className="truncate font-medium text-text-secondary">
+                            {item.name}
+                          </span>
+                        </div>
+                        <span className="shrink-0 font-semibold tabular-nums text-text-primary">
+                          {item.value.toLocaleString(locale)}{" "}
+                          <span className="font-medium text-text-muted">({percent}%)</span>
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </div>
       )}
     </div>

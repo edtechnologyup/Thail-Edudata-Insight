@@ -20,6 +20,7 @@ from app.schemas.visualization_schema import (
     StatsByCategoryResponse,
     StatsOverviewResponse,
     TrendingResponse,
+    YearMetricStat,
 )
 
 
@@ -68,6 +69,9 @@ def get_stats_by_category(
         categories=[CategoryStatItem(**row) for row in data["categories"]],
         datasets_by_year=[
             DatasetYearStat(**row) for row in data["datasets_by_year"]
+        ],
+        metrics_by_year=[
+            YearMetricStat(**row) for row in data.get("metrics_by_year", [])
         ],
         selected_category_id=data["selected_category_id"],
     )

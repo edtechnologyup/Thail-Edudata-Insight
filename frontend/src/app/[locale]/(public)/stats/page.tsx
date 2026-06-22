@@ -1,10 +1,8 @@
 import { getTranslations } from "next-intl/server";
+import StatsAnalysisChart from "@/components/dashboard/StatsAnalysisChart";
 import StatsChartsSection from "@/components/dashboard/StatsChartsSection";
 import StatsPageOverview from "@/components/dashboard/StatsPageOverview";
-import StudentChart from "@/components/dashboard/StudentChart";
-import TeacherChart from "@/components/dashboard/TeacherChart";
 import TopDatasetList from "@/components/dashboard/TopDatasetList";
-import { MOCK_STATS_DATA } from "@/data/mockData";
 
 type StatsPageProps = {
   params: { locale: string };
@@ -28,14 +26,10 @@ export default async function StatsPage(_props: StatsPageProps) {
         <div className="mx-auto max-w-container-max space-y-spacing-6">
           <StatsPageOverview />
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <StudentChart data={MOCK_STATS_DATA.studentsByYear} />
-            <TeacherChart data={MOCK_STATS_DATA.teachersByYear} />
-          </div>
-
-          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
-            <div className="flex lg:col-span-2">
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+            <div className="flex flex-col gap-6 lg:col-span-2">
               <StatsChartsSection />
+              <StatsAnalysisChart />
             </div>
             <div className="flex lg:col-span-1">
               <TopDatasetList />

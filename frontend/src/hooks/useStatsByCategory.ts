@@ -9,11 +9,21 @@ export type CategoryStatItem = {
   name_en: string;
   slug: string;
   count: number;
+  download_count: number;
+  view_count: number;
+};
+
+export type YearMetricStat = {
+  year: number;
+  datasets: number;
+  downloads: number;
+  views: number;
 };
 
 export type StatsByCategoryData = {
   categories: CategoryStatItem[];
   datasets_by_year: { year: number; count: number }[];
+  metrics_by_year: YearMetricStat[];
   selected_category_id: string | null;
 };
 

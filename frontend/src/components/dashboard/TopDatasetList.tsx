@@ -32,7 +32,7 @@ export default function TopDatasetList() {
 
   const items = (data?.datasets ?? [])
     .slice()
-    .sort((a, b) => (b.view_count ?? 0) - (a.view_count ?? 0));
+    .sort((a, b) => (b.download_count ?? 0) - (a.download_count ?? 0) || (b.view_count ?? 0) - (a.view_count ?? 0));
 
   if (isLoading && !data) {
     return <ListSkeleton />;
@@ -85,10 +85,10 @@ export default function TopDatasetList() {
                   </div>
                   <div className="shrink-0 text-right">
                     <span className="block font-kanit text-label font-bold text-primary-dark">
-                      {formatCompactCount(item.view_count ?? 0, locale)}
+                      {formatCompactCount(item.download_count ?? 0, locale)}
                     </span>
                     <span className="font-sarabun text-caption uppercase text-text-muted">
-                      {t("views")}
+                      {t("downloads")}
                     </span>
                   </div>
                 </Link>

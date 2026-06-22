@@ -21,11 +21,21 @@ class CategoryStatItem(BaseModel):
     name_en: str
     slug: str
     count: int
+    download_count: int = 0
+    view_count: int = 0
+
+
+class YearMetricStat(BaseModel):
+    year: int
+    datasets: int = 0
+    downloads: int = 0
+    views: int = 0
 
 
 class StatsByCategoryResponse(BaseModel):
     categories: list[CategoryStatItem]
     datasets_by_year: list[DatasetYearStat]
+    metrics_by_year: list[YearMetricStat] = []
     selected_category_id: str | None = None
 
 

@@ -47,6 +47,10 @@ export function mapApiDatasetToHomeCard(
       ? "published"
       : "draft") as DatasetStatus,
     downloadCount: dataset.download_count ?? 0,
+    apiDownloadCount: dataset.api_download_count ?? 0,
+    viewCount: dataset.view_count ?? 0,
+    qualityScore: dataset.quality_score ?? null,
+    fileFormat: dataset.file_format ?? null,
     updatedAt:
       dataset.updated_at ?? dataset.published_at ?? dataset.created_at,
     createdAt: dataset.created_at,

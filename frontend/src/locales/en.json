@@ -112,7 +112,9 @@
       "title": "Have a dataset to share?",
       "subtitle": "Government agencies can request to publish education data for public access.",
       "register": "Register agency",
-      "manual": "User guide"
+      "manual": "User guide",
+      "manualTitle": "User Guide & SDK",
+      "manualSubtitle": "Learn how to access education data through our API and developer tools."
     }
   },
   "megamenu": {
@@ -178,12 +180,18 @@
     "filter": {
       "search": "Search scholarships",
       "searchPlaceholder": "Search by title, description, or eligibility...",
-      "searchButton": "Search",
+      "searchButton": "Search now",
+      "title": "Filter",
       "type": "Scholarship type",
+      "allTypes": "All types",
       "level": "Education level",
-      "applicationStatus": "Application status",
-      "applicationStatus_open": "Open for applications",
-      "applicationStatus_closed": "Closed"
+      "applicationStatus": "Status",
+      "applicationStatus_open": "Open",
+      "applicationStatus_closed": "Closed",
+      "clearAll": "Clear all filters",
+      "foundTotal": "Found {count} scholarships",
+      "sortBy": "Sort by:",
+      "sortLatest": "Latest"
     },
     "list": {
       "empty": "No scholarships match your criteria",
@@ -790,6 +798,8 @@
     }
   },
   "search": {
+    "pageTitle": "Search Thai Education Data",
+    "loading": "Loading...",
     "placeholder": "Search datasets...",
     "keyword": "Keyword",
     "filter": "Filter",
@@ -833,6 +843,7 @@
     "viewDetail": "View Details",
     "downloads": "Downloads",
     "published": "Published",
+    "updated": "Updated",
     "resultCount": "{count} results"
   },
   "agency": {

@@ -9,6 +9,10 @@ export type HomeDatasetMock = {
   agency: string;
   status: DatasetStatus;
   downloadCount: number;
+  apiDownloadCount?: number;
+  viewCount?: number;
+  qualityScore?: number | null;
+  fileFormat?: string | null;
   updatedAt: string;
   createdAt?: string;
   publishedAt?: string | null;

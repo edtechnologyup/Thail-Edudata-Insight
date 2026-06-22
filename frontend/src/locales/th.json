@@ -18,6 +18,8 @@
     "view": "ดู",
     "download": "ดาวน์โหลด",
     "upload": "อัปโหลด",
+    "visitorsToday": "ผู้เข้าชมวันนี้",
+    "visitorsTotal": "ผู้เข้าชมทั้งหมด",
     "submit": "ส่ง",
     "reset": "รีเซ็ต",
     "filter": "กรอง",
@@ -348,6 +350,17 @@
     "regionChart": "สัดส่วนนักเรียนตามภูมิภาค",
     "year": "ปี พ.ศ.",
     "loadError": "โหลดสถิติภาพรวมไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
+    "datasetCount": "จำนวน Dataset",
+    "viewAllDatasets": "ดู Dataset ทั้งหมด",
+    "analysisTitle": "วิเคราะห์ข้อมูล",
+    "filterMetric": "ข้อมูลที่แสดง",
+    "filterCategory": "หมวดหมู่",
+    "filterChartType": "แบบกราฟ",
+    "metricDatasets": "จำนวน Dataset",
+    "metricDownloads": "ยอดดาวน์โหลด",
+    "metricViews": "ยอดเข้าชม",
+    "chartBar": "กราฟแท่ง",
+    "chartLine": "กราฟเส้น",
     "mockNote": "ข้อมูลตัวอย่าง — จะเชื่อม API เมื่อ backend พร้อม"
   },
   "compare": {
@@ -711,6 +724,9 @@
     "bulkFailed": "ล้มเหลว",
     "noRating": "ยังไม่มีคะแนน",
     "ratingSaving": "กำลังบันทึก...",
+    "rateButton": "โหวต",
+    "ratedToday": "โหวต",
+    "ratePrompt": "ให้คะแนน:",
     "ratingVoters": "{count} คนโหวต",
     "detail": {
       "breadcrumbHome": "หน้าหลัก",
@@ -736,6 +752,7 @@
       "download": "ดาวน์โหลด",
       "bookmark": "บุ๊กมาร์ก",
       "compare": "เปรียบเทียบ",
+      "apiAccess": "API Access",
       "quote": "อ้างอิง",
       "openDataCommon": "Open Data Common",
       "loadError": "โหลดข้อมูล Dataset ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"
@@ -755,6 +772,22 @@
     "citationStyles": {
       "apa": "APA Style",
       "vancouver": "Vancouver Style",
+      "copy": "คัดลอก",
+      "copied": "คัดลอกแล้ว"
+    },
+    "apiAccess": {
+      "title": "API Access",
+      "intro": "ใช้ endpoint ด้านล่างเพื่อดึงข้อมูล Dataset นี้ผ่าน HTTP GET ได้โดยไม่ต้อง Login",
+      "rateLimit": "Rate Limit: 100 requests/นาที/IP",
+      "previewHeading": "Preview (ดูตัวอย่างข้อมูล)",
+      "downloadHeading": "Download (ดาวน์โหลดไฟล์)",
+      "queryParams": "Query Parameters",
+      "paramName": "ชื่อ",
+      "paramType": "ประเภท",
+      "paramDesc": "คำอธิบาย",
+      "purposeDesc": "วัตถุประสงค์การใช้ข้อมูล (ต้องมีอย่างน้อย 10 ตัวอักษร)",
+      "exampleResponse": "ตัวอย่าง Response",
+      "downloadNote": "Response เป็นไฟล์ในรูปแบบที่เลือก (csv/excel/json/xml)",
       "copy": "คัดลอก",
       "copied": "คัดลอกแล้ว"
     }

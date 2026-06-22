@@ -18,6 +18,8 @@
     "view": "View",
     "download": "Download",
     "upload": "Upload",
+    "visitorsToday": "Visitors today",
+    "visitorsTotal": "Total visitors",
     "submit": "Submit",
     "reset": "Reset",
     "filter": "Filter",
@@ -348,6 +350,17 @@
     "regionChart": "Students by region",
     "year": "Year (B.E.)",
     "loadError": "Could not load overview statistics. Please try again.",
+    "datasetCount": "Dataset count",
+    "viewAllDatasets": "View all datasets",
+    "analysisTitle": "Data Analysis",
+    "filterMetric": "Metric",
+    "filterCategory": "Category",
+    "filterChartType": "Chart type",
+    "metricDatasets": "Datasets",
+    "metricDownloads": "Downloads",
+    "metricViews": "Views",
+    "chartBar": "Bar chart",
+    "chartLine": "Line chart",
     "mockNote": "Sample data — will connect to API when backend is ready"
   },
   "compare": {
@@ -708,6 +721,9 @@
     "bulkFailed": "Failed",
     "noRating": "No ratings yet",
     "ratingSaving": "Saving...",
+    "rateButton": "Vote",
+    "ratedToday": "Voted",
+    "ratePrompt": "Rate:",
     "ratingVoters": "{count} voters",
     "detail": {
       "breadcrumbHome": "Home",
@@ -733,6 +749,7 @@
       "download": "Download",
       "bookmark": "Bookmark",
       "compare": "Compare",
+      "apiAccess": "API Access",
       "quote": "Citation",
       "openDataCommon": "Open Data Common",
       "loadError": "Could not load dataset details. Please try again."
@@ -752,6 +769,22 @@
     "citationStyles": {
       "apa": "APA Style",
       "vancouver": "Vancouver Style",
+      "copy": "Copy",
+      "copied": "Copied"
+    },
+    "apiAccess": {
+      "title": "API Access",
+      "intro": "Use the endpoints below to access this dataset via HTTP GET — no authentication required",
+      "rateLimit": "Rate Limit: 100 requests/min/IP",
+      "previewHeading": "Preview (sample data)",
+      "downloadHeading": "Download (get file)",
+      "queryParams": "Query Parameters",
+      "paramName": "Name",
+      "paramType": "Type",
+      "paramDesc": "Description",
+      "purposeDesc": "Purpose of data usage (at least 10 characters)",
+      "exampleResponse": "Example Response",
+      "downloadNote": "Response is a file in the selected format (csv/excel/json/xml)",
       "copy": "Copy",
       "copied": "Copied"
     }

@@ -202,7 +202,7 @@ export default function SearchFilter({
       {showAgencyFilter ? (
         <>
           <div className="flex flex-col gap-3">
-            <span className="font-sarabun text-label font-medium text-text-secondary">
+            <span className="font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
               {t("agency")}
             </span>
             {agencyOptions.map((agency) => {
@@ -234,43 +234,14 @@ export default function SearchFilter({
         </>
       ) : null}
 
-      {showTagFilter ? (
-        <>
-          <hr className="border-border-default/60" />
-
-          <div className="flex flex-col gap-3">
-            <span className="font-sarabun text-label font-medium text-text-secondary">
-              {t("tag")}
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {tagOptions.map((tag) => {
-                const active = selectedTags.includes(tag);
-                return (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => toggleTag(tag)}
-                    className={`rounded-radius-full border px-3 py-1 font-sarabun text-caption font-medium transition-colors ${
-                      active
-                        ? "border-primary/30 bg-primary text-white"
-                        : "border-border-default/80 bg-surface-container text-text-secondary hover:bg-primary-light"
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </>
-      ) : null}
+      {/* Tag filter hidden from UI but tag search still works via URL params */}
 
       {showYearFilter ? (
         <>
           <hr className="border-border-default/60" />
 
           <div className="flex flex-col gap-3">
-            <span className="font-sarabun text-label font-medium text-text-secondary">
+            <span className="font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
               {t("academicYear")}
             </span>
             {yearOptions.map((year) => {
@@ -302,7 +273,7 @@ export default function SearchFilter({
           <hr className="border-border-default/60" />
 
           <div className="flex flex-col gap-3">
-            <span className="font-sarabun text-label font-medium text-text-secondary">
+            <span className="font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
               {t("fileFormat")}
             </span>
             <div className="flex flex-wrap gap-2">
@@ -333,7 +304,7 @@ export default function SearchFilter({
           <hr className="border-border-default/60" />
 
           <div className="flex flex-col gap-3">
-            <span className="font-sarabun text-label font-medium text-text-secondary">
+            <span className="font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
               {t("province")}
             </span>
             {selectedProvince ? (
@@ -392,7 +363,16 @@ export default function SearchFilter({
       <div className="mt-2 flex flex-col gap-3">
         <button
           type="button"
-          className="flex w-full items-center justify-center gap-2 rounded-radius-md border-2 border-primary-dark py-2.5 font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-primary-light"
+          onClick={clearAll}
+          className="w-full py-2.5 font-sarabun text-label font-semibold transition-colors hover:underline"
+          style={{ color: "#0d5302" }}
+        >
+          {t("clearFilter")}
+        </button>
+        <button
+          type="button"
+          className="flex w-full items-center justify-center gap-2 rounded-lg py-2.5 font-sarabun text-label font-bold transition-colors hover:opacity-90"
+          style={{ backgroundColor: "#f9a825", color: "#0d5302" }}
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
             <path
@@ -403,13 +383,6 @@ export default function SearchFilter({
             />
           </svg>
           {t("saveSearch")}
-        </button>
-        <button
-          type="button"
-          onClick={clearAll}
-          className="w-full py-2 font-sarabun text-label text-status-error transition-colors hover:underline"
-        >
-          {t("clearFilter")}
         </button>
       </div>
     </div>

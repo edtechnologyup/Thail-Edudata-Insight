@@ -34,6 +34,7 @@ type ApiSearchItem = {
   download_count: number;
   published_at: string | null;
   agency_name: string | null;
+  file_format: string | null;
 };
 
 function formatDownloadCount(count: number, locale: string): string {
@@ -70,9 +71,35 @@ function formatDate(iso: string, locale: string): string {
 }
 
 function licenseBadge(license: ApiSearchItem["license"], locale: string): string {
-  if (license === "open") return locale === "th" ? "เปิดข้อมูล" : "Open Data";
+  if (license === "open") return locale === "th" ? "PUBLIC DATA" : "PUBLIC DATA";
   if (license === "cc") return "CC-BY-4.0";
   return locale === "th" ? "มีเงื่อนไข" : "Restricted";
+}
+
+const FORMAT_ICON_COLORS: Record<string, { bg: string; text: string }> = {
+  csv: { bg: "#e3f2fd", text: "#1565c0" },
+  excel: { bg: "#e8f5e9", text: "#2e7d32" },
+  xlsx: { bg: "#e8f5e9", text: "#2e7d32" },
+  pdf: { bg: "#ffebee", text: "#c62828" },
+  json: { bg: "#fff3e0", text: "#e65100" },
+  xml: { bg: "#ede7f6", text: "#4527a0" },
+  sql: { bg: "#e0f2f1", text: "#00695c" },
+};
+
+function FileFormatIcon({ format }: { format: string }) {
+  const lower = format.toLowerCase();
+  const colors = FORMAT_ICON_COLORS[lower] ?? { bg: "#f5f5f5", text: "#616161" };
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-radius-sm px-1.5 py-0.5 text-[11px] font-bold uppercase"
+      style={{ backgroundColor: colors.bg, color: colors.text }}
+    >
+      <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z" />
+      </svg>
+      {format}
+    </span>
+  );
 }
 
 function mapSortToApi(sort: SortOption): string {
@@ -94,66 +121,77 @@ function SearchResultCard({
   const title = item.title;
   const description = item.description ?? "";
   const agency = item.agency_name ?? "-";
+  const format = item.file_format;
 
   return (
-    <article className="group flex flex-col justify-between gap-4 rounded-radius-lg border border-border-default/80 bg-surface-card p-5 shadow-level-1 transition-all hover:border-primary/50 hover:shadow-level-2 sm:flex-row sm:items-start">
-      <div className="flex max-w-full flex-col gap-3 sm:max-w-[70%]">
-        <div className="flex flex-wrap gap-2">
-          <span className="rounded-radius-sm bg-primary-light px-2 py-0.5 font-sarabun text-caption font-bold uppercase tracking-wider text-primary-dark">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border-default/80 bg-white shadow-level-1 transition-all hover:shadow-level-2 sm:flex-row"
+      style={{ borderLeft: "4px solid #33691e" }}
+    >
+      <div className="flex flex-1 flex-col gap-3 p-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-md px-2.5 py-0.5 font-sarabun text-caption font-bold uppercase tracking-wider"
+            style={{ backgroundColor: "#e0f2f1", color: "#00695c" }}>
             {categoryName}
           </span>
-          <span className="rounded-radius-sm bg-surface-container px-2 py-0.5 font-sarabun text-caption font-bold uppercase tracking-wider text-text-secondary">
+          <span className="rounded-md px-2.5 py-0.5 font-sarabun text-caption font-bold uppercase tracking-wider"
+            style={{ backgroundColor: "#e8f5e9", color: "#2e7d32" }}>
             {licenseBadge(item.license, locale)}
           </span>
+          <span className="flex items-center gap-1 rounded-md px-2 py-0.5 font-sarabun text-caption font-semibold"
+            style={{ backgroundColor: "#e8f5e9", color: "#388e3c" }}>
+            <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+            </svg>
+            {t("published")}
+          </span>
         </div>
+
         <Link
           href={`/${locale}/datasets/${item.id}`}
-          className="font-kanit text-heading-3-mobile leading-snug text-primary-dark transition-colors hover:text-primary"
+          className="font-kanit text-heading-3-mobile font-bold leading-snug transition-colors hover:underline"
+          style={{ color: "#00695c" }}
         >
           {title}
         </Link>
-        <p className="line-clamp-2 font-sarabun text-label text-text-muted">
-          {description}
-        </p>
+
         <div className="flex flex-wrap items-center gap-4 font-sarabun text-caption text-text-muted">
           <span className="flex items-center gap-1">
             <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
             {agency}
           </span>
           <span className="flex items-center gap-1">
             <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            {formatDate(item.published_at ?? new Date().toISOString(), locale)}
+            {t("updated")} {formatDate(item.published_at ?? new Date().toISOString(), locale)}
+          </span>
+        </div>
+
+        <p className="line-clamp-2 font-sarabun text-label text-text-muted">
+          {description}
+        </p>
+
+        <div className="flex flex-wrap items-center gap-3 pt-1">
+          {format && <FileFormatIcon format={format} />}
+          <span className="flex items-center gap-1 font-sarabun text-caption text-text-muted">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            {formatDownloadCount(item.download_count, locale)} {t("downloads")}
           </span>
         </div>
       </div>
 
-      <div className="flex min-w-[140px] flex-col items-stretch gap-4 sm:items-end">
-        <span className="self-start rounded-radius-full bg-status-published-bg px-3 py-1 font-sarabun text-caption font-bold text-status-published sm:self-auto">
-          {t("published")}
-        </span>
-        <div className="text-left sm:text-right">
-          <p className="font-sarabun text-caption text-text-muted">{t("downloads")}</p>
-          <p className="font-sarabun text-label font-bold text-text-primary">
-            {formatDownloadCount(item.download_count, locale)}
-          </p>
-        </div>
+      <div className="flex shrink-0 flex-col items-end justify-center gap-3 p-5 sm:w-[180px]">
         <Link
           href={`/${locale}/datasets/${item.id}`}
-          className="w-full rounded-radius-md border border-primary-dark px-4 py-2 text-center font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-primary-light sm:w-full"
+          className="rounded-lg border-2 px-5 py-2 text-center font-sarabun text-label font-bold transition-colors hover:bg-[#e0f2f1]"
+          style={{ borderColor: "#00897b", color: "#00897b" }}
         >
           {t("viewDetail")}
         </Link>
@@ -259,10 +297,10 @@ export default function SearchResult(props: SearchResultProps) {
 
   return (
     <section className="flex-1 py-spacing-2">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="font-sarabun text-body-md text-text-muted">
+      <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white/80 px-5 py-4 shadow-level-1 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+        <p className="font-sarabun text-body-md font-semibold" style={{ color: "#00695c" }}>
           {t("foundCount", { count: totalCount.toLocaleString(locale) })}{" "}
-          <strong className="text-text-primary">&quot;{displayKeyword}&quot;</strong>
+          <span className="font-bold" style={{ color: "#33691e" }}>&quot;{displayKeyword}&quot;</span>
         </p>
         <SortDropdown value={props.sort} />
       </div>

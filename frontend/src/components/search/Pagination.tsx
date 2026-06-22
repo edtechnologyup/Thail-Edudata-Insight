@@ -43,17 +43,15 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
         type="button"
         onClick={() => goToPage(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="flex h-10 w-10 items-center justify-center rounded-radius-md border border-border-input text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
+        className="flex h-10 w-10 items-center justify-center rounded-lg border border-border-default bg-white font-sarabun text-label text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
         aria-label={t("pagination.previous")}
       >
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
+        &lt;
       </button>
 
       {pages.map((page, index) =>
         page === "ellipsis" ? (
-          <span key={`ellipsis-${index}`} className="px-2 font-sarabun text-label text-text-muted">
+          <span key={`ellipsis-${index}`} className="flex h-10 w-10 items-center justify-center font-sarabun text-label text-text-muted">
             ...
           </span>
         ) : (
@@ -61,11 +59,12 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
             key={page}
             type="button"
             onClick={() => goToPage(page)}
-            className={`flex h-10 w-10 items-center justify-center rounded-radius-sm font-sarabun text-label font-bold transition-colors ${
+            className={`flex h-10 w-10 items-center justify-center rounded-lg font-sarabun text-label font-bold transition-colors ${
               page === currentPage
-                ? "bg-primary text-white shadow-level-1"
-                : "border border-border-input text-text-primary hover:bg-surface-container"
+                ? "text-white shadow-level-1"
+                : "border border-border-default bg-white text-text-primary hover:bg-surface-container"
             }`}
+            style={page === currentPage ? { backgroundColor: "#1a3a2a" } : undefined}
             aria-current={page === currentPage ? "page" : undefined}
           >
             {page}
@@ -77,12 +76,10 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
         type="button"
         onClick={() => goToPage(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="flex h-10 w-10 items-center justify-center rounded-radius-md border border-border-input text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
+        className="flex h-10 w-10 items-center justify-center rounded-lg border border-border-default bg-white font-sarabun text-label text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
         aria-label={t("pagination.next")}
       >
-        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
+        &gt;
       </button>
     </nav>
   );

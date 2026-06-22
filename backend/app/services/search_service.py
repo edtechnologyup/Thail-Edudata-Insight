@@ -138,6 +138,7 @@ def _map_to_search_response(item: dict) -> SearchResponse:
         download_count=item.get("download_count", 0),
         published_at=item.get("published_at"),
         agency_name=item.get("agency_name"),
+        file_format=item.get("file_format"),
     )
 
 

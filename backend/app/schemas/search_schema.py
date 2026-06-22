@@ -27,6 +27,7 @@ class SearchResponse(BaseModel):
     download_count: int
     published_at: datetime | None
     agency_name: str | None
+    file_format: str | None = None
 
 
 class AutocompleteResponse(BaseModel):

@@ -66,7 +66,7 @@ function FilterTreeNodeRow({
 }) {
   const label = locale === "th" ? node.name_th : node.name_en;
   const hasChildren = node.children.length > 0;
-  const isExpanded = expanded[node.id] ?? hasChildren;
+  const isExpanded = expanded[node.id] ?? false;
   const isActive = selectedCategory === node.id;
 
   return (
@@ -158,10 +158,10 @@ export default function FilterTree({ selectedCategory }: FilterTreeProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="mb-1 flex items-center justify-between font-sarabun text-label font-medium text-text-secondary">
+      <div className="mb-1 flex items-center justify-between font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
         <span>{t("categories")}</span>
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex max-h-[300px] flex-col gap-1 overflow-y-auto">
         {tree.map((node) => (
           <FilterTreeNodeRow
             key={node.id}

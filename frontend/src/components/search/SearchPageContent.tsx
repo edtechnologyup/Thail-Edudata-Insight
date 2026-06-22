@@ -40,16 +40,22 @@ export default function SearchPageContent() {
   );
 
   return (
-    <div className="mx-auto max-w-container-max px-4 py-spacing-4 md:px-spacing-10">
-      <div className="mb-6 lg:hidden">
-        <SearchBar defaultValue={resultParams.keyword} syncUrl />
+    <div className="relative min-h-screen overflow-x-hidden" style={{ background: "linear-gradient(135deg, #80cbc4 0%, #ffffff 17%, #ffecb3 33%, #80cbc4 50%, #ffffff 67%, #fff9c4 83%, #ffecb3 100%)" }}>
+    <div className="relative mx-auto max-w-container-max px-4 py-spacing-4 md:px-spacing-10">
+      <div className="mb-8">
+        <h1 className="mb-4 font-kanit text-[2rem] font-bold md:text-[2.5rem]" style={{ color: "#33691e" }}>
+          {t("pageTitle")}
+        </h1>
+        <div className="max-w-[600px]">
+          <SearchBar defaultValue={resultParams.keyword} syncUrl />
+        </div>
       </div>
 
       <div className="mb-4 flex items-center justify-between lg:hidden">
         <button
           type="button"
           onClick={() => setMobileFilterOpen(true)}
-          className="flex min-h-[44px] items-center gap-2 rounded-radius-md border border-border-input bg-surface-card px-4 font-sarabun text-label font-medium text-text-primary shadow-level-1"
+          className="flex min-h-[44px] items-center gap-2 rounded-lg border border-border-input bg-surface-card px-4 font-sarabun text-label font-medium text-text-primary shadow-level-1"
         >
           <svg className="h-5 w-5 text-primary-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
             <path
@@ -87,7 +93,7 @@ export default function SearchPageContent() {
               <button
                 type="button"
                 onClick={() => setMobileFilterOpen(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-radius-md text-text-muted hover:bg-surface-container"
+                className="flex h-10 w-10 items-center justify-center rounded-lg text-text-muted hover:bg-surface-container"
                 aria-label={t("closeFilters")}
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -99,6 +105,7 @@ export default function SearchPageContent() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

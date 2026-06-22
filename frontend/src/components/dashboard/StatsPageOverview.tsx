@@ -8,10 +8,42 @@ import { getStatsOverviewFooters } from "@/utils/statsOverviewFooters";
 
 function StatsCardSkeleton() {
   return (
-    <div className="animate-pulse rounded-radius-md border border-border-default bg-surface-card p-spacing-6 shadow-level-1">
-      <div className="mb-2 h-4 w-24 rounded-radius-sm bg-surface-container" />
-      <div className="h-10 w-20 rounded-radius-sm bg-surface-container" />
+    <div className="animate-pulse rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
+      <div className="mb-2 h-4 w-24 rounded bg-surface-container" />
+      <div className="h-12 w-20 rounded bg-surface-container" />
     </div>
+  );
+}
+
+function DatasetIcon() {
+  return (
+    <svg className="h-5 w-5" style={{ color: "#33691e" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+    </svg>
+  );
+}
+
+function AgencyIcon() {
+  return (
+    <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg className="h-5 w-5" style={{ color: "#00897b" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
+  );
+}
+
+function CategoryIcon() {
+  return (
+    <svg className="h-5 w-5" style={{ color: "#f9a825" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+    </svg>
   );
 }
 
@@ -51,26 +83,30 @@ export default function StatsPageOverview() {
       <StatsCard
         label={t("totalDatasets")}
         value={totalDatasets}
-        footer={footers.datasetsFooter}
-        valueClassName="text-text-primary"
+        valueClassName=""
+        icon={<DatasetIcon />}
+        accentColor="#33691e"
       />
       <StatsCard
         label={t("totalAgencies")}
         value={totalAgencies}
-        footer={footers.agenciesFooter}
-        valueClassName="text-primary-dark"
+        valueClassName=""
+        icon={<AgencyIcon />}
+        accentColor="#00695c"
       />
       <StatsCard
         label={t("totalDownloads")}
         value={totalDownloads}
-        footer={footers.downloadsFooter}
-        valueClassName="text-primary"
+        valueClassName="text-amber-500"
+        icon={<DownloadIcon />}
+        accentColor="#00897b"
       />
       <StatsCard
         label={t("totalCategories")}
         value={totalCategories}
-        footer={footers.categoriesFooter}
-        valueClassName="text-status-draft"
+        valueClassName=""
+        icon={<CategoryIcon />}
+        accentColor="#f9a825"
       />
     </div>
   );

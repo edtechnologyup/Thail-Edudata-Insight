@@ -33,11 +33,12 @@ function FilterButton({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-radius-full px-4 py-1.5 font-sarabun text-label font-medium transition-all ${
+      className="rounded-full px-4 py-1.5 font-sarabun text-label font-bold transition-all"
+      style={
         active
-          ? "bg-primary text-white shadow-level-1"
-          : "bg-surface-container text-text-secondary hover:bg-primary-light hover:text-primary-dark"
-      }`}
+          ? { backgroundColor: "#1a3a2a", color: "#ffffff" }
+          : { backgroundColor: "transparent", color: "#6b7280" }
+      }
     >
       {children}
     </button>
@@ -57,9 +58,9 @@ function ChartTooltipContent({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-radius-md border border-border-default bg-surface-card px-4 py-2.5 shadow-level-2">
+    <div className="rounded-xl border border-border-default/60 bg-white px-4 py-2.5 shadow-level-2">
       <p className="font-sarabun text-caption font-medium text-text-muted">{label}</p>
-      <p className="font-kanit text-label font-bold text-primary-dark">
+      <p className="font-kanit text-label font-bold" style={{ color: "#1a3a2a" }}>
         {payload[0].value.toLocaleString()} {metricLabel}
       </p>
     </div>
@@ -99,59 +100,46 @@ export default function StatsAnalysisChart() {
   const chartColor = CHART_COLORS.pie[0];
 
   return (
-    <div className="rounded-radius-lg border border-border-default bg-surface-card p-5 shadow-level-1 md:p-6">
-      <h2 className="mb-5 font-kanit text-heading-3-mobile font-semibold text-text-primary md:text-heading-3">
-        {t("analysisTitle")}
-      </h2>
+    <div className="rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1 md:p-6">
+      <div className="mb-5 flex items-center gap-2">
+        <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <h2 className="font-kanit text-heading-3-mobile font-bold md:text-heading-3" style={{ color: "#1a3a2a" }}>
+          {t("analysisTitle")}
+        </h2>
+      </div>
 
       {/* ตัวกรอง */}
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
-        {/* ข้อมูลที่แสดง */}
-        <div className="flex flex-col gap-2">
-          <span className="font-sarabun text-caption font-medium text-text-muted">
-            {t("filterMetric")}
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {(["datasets", "downloads", "views"] as Metric[]).map((m) => (
-              <FilterButton key={m} active={metric === m} onClick={() => setMetric(m)}>
-                {metricLabels[m]}
-              </FilterButton>
-            ))}
-          </div>
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-1 rounded-full border border-border-default/60 bg-gray-50 p-1">
+          {(["datasets", "downloads", "views"] as Metric[]).map((m) => (
+            <FilterButton key={m} active={metric === m} onClick={() => setMetric(m)}>
+              {metricLabels[m]}
+            </FilterButton>
+          ))}
         </div>
 
-        {/* หมวดหมู่ */}
-        <div className="flex flex-col gap-2">
-          <span className="font-sarabun text-caption font-medium text-text-muted">
-            {t("filterCategory")}
-          </span>
-          <select
-            value={selectedCategoryId ?? ""}
-            onChange={(e) => setSelectedCategoryId(e.target.value || null)}
-            className="min-w-[180px] rounded-radius-md border border-border-input bg-surface-card px-3 py-2 font-sarabun text-label text-text-primary transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="">{t("allCategories")}</option>
-            {categories.map((cat) => (
-              <option key={cat.id ?? "uncategorized"} value={cat.id ?? ""}>
-                {isTh ? cat.name_th : cat.name_en}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          value={selectedCategoryId ?? ""}
+          onChange={(e) => setSelectedCategoryId(e.target.value || null)}
+          className="rounded-full border border-border-default/60 bg-gray-50 px-4 py-2 font-sarabun text-label text-text-primary transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+        >
+          <option value="">{t("allCategories")}</option>
+          {categories.map((cat) => (
+            <option key={cat.id ?? "uncategorized"} value={cat.id ?? ""}>
+              {isTh ? cat.name_th : cat.name_en}
+            </option>
+          ))}
+        </select>
 
-        {/* แบบกราฟ */}
-        <div className="flex flex-col gap-2">
-          <span className="font-sarabun text-caption font-medium text-text-muted">
-            {t("filterChartType")}
-          </span>
-          <div className="flex gap-2">
-            <FilterButton active={chartType === "bar"} onClick={() => setChartType("bar")}>
-              {t("chartBar")}
-            </FilterButton>
-            <FilterButton active={chartType === "line"} onClick={() => setChartType("line")}>
-              {t("chartLine")}
-            </FilterButton>
-          </div>
+        <div className="flex items-center gap-1 rounded-full border border-border-default/60 bg-gray-50 p-1">
+          <FilterButton active={chartType === "bar"} onClick={() => setChartType("bar")}>
+            {t("chartBar")}
+          </FilterButton>
+          <FilterButton active={chartType === "line"} onClick={() => setChartType("line")}>
+            {t("chartLine")}
+          </FilterButton>
         </div>
       </div>
 

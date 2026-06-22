@@ -134,10 +134,16 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
     : "";
 
   return (
-    <div className="rounded-radius-lg border border-border-default bg-surface-card p-5 shadow-level-1 md:p-6">
-      <h2 className="mb-4 font-kanit text-heading-3-mobile font-semibold text-text-primary md:text-heading-3">
-        {t("datasetByCategory")}
-      </h2>
+    <div className="rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1 md:p-6">
+      <div className="mb-4 flex items-center gap-2">
+        <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+        </svg>
+        <h2 className="font-kanit text-heading-3-mobile font-bold md:text-heading-3" style={{ color: "#1a3a2a" }}>
+          {t("datasetByCategory")}
+        </h2>
+      </div>
       {total === 0 ? (
         <p className="py-8 text-center font-sarabun text-body-md text-text-muted">
           {t("noChartData")}

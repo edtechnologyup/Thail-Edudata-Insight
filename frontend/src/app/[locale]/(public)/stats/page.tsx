@@ -15,10 +15,10 @@ export default async function StatsPage(_props: StatsPageProps) {
     <>
       <section className="border-b border-border-default/60 bg-surface-card px-4 py-spacing-6 md:px-spacing-10">
         <div className="mx-auto max-w-container-max">
-          <h1 className="font-kanit text-heading-2 text-text-primary md:text-heading-1">
+          <h1 className="font-kanit text-[2rem] font-bold md:text-[2.5rem]" style={{ color: "#33691e" }}>
             {t("title")}
           </h1>
-          <p className="mt-1 font-sarabun text-label text-text-muted">{t("subtitle")}</p>
+          <p className="mt-2 max-w-2xl font-sarabun text-body-md text-text-muted">{t("subtitle")}</p>
         </div>
       </section>
 
@@ -31,14 +31,10 @@ export default async function StatsPage(_props: StatsPageProps) {
               <StatsChartsSection />
               <StatsAnalysisChart />
             </div>
-            <div className="flex lg:col-span-1">
+            <div className="lg:col-span-1">
               <TopDatasetList />
             </div>
           </div>
-
-          <p className="text-center font-sarabun text-caption text-text-muted">
-            {t("mockNote")}
-          </p>
         </div>
       </section>
     </>

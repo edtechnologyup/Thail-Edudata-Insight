@@ -31,7 +31,7 @@ type DatasetFormProps = {
 };
 
 const inputClass =
-  "w-full rounded-radius-md border border-border-input bg-surface-page px-4 py-3 font-sarabun text-label text-text-primary outline-none transition-all focus:border-border-focus focus:ring-2 focus:ring-primary-dark/20";
+  "w-full rounded-xl border border-border-input bg-surface-page px-4 py-3 font-sarabun text-label text-text-primary outline-none transition-all focus:border-primary-dark focus:ring-2 focus:ring-primary-dark/20";
 const ALL_PROVINCES_VALUE = "all";
 
 export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
@@ -184,7 +184,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
 
   if (mode === "edit" && datasetId && isLoadingInitial) {
     return (
-      <div className="rounded-radius-lg border border-border-default bg-surface-card p-8 text-center">
+      <div className="rounded-2xl border border-border-default bg-surface-card p-8 text-center">
         <p className="font-sarabun text-body-md text-text-secondary">
           {tCommon("loading")}
         </p>
@@ -194,7 +194,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
 
   if (mode === "edit" && datasetId && !initialData) {
     return (
-      <div className="rounded-radius-lg border border-border-default bg-surface-card p-8 text-center">
+      <div className="rounded-2xl border border-border-default bg-surface-card p-8 text-center">
         <p className="font-sarabun text-body-md text-text-secondary">
           {t("notFound")}
         </p>
@@ -298,30 +298,36 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
   };
 
   return (
-    <div className="mx-auto max-w-[800px] space-y-spacing-6 pb-24">
-      <header className="border-b border-border-default/30 pb-spacing-6">
-        <nav className="mb-2 flex flex-wrap items-center gap-2 font-sarabun text-label text-text-muted">
-          <Link href={`${base}/dashboard`} className="hover:text-primary-dark">
-            {t("breadcrumbDashboard")}
-          </Link>
-          <ChevronIcon />
-          <Link href={`${base}/datasets`} className="hover:text-primary-dark">
-            {t("breadcrumbDatasets")}
-          </Link>
-          <ChevronIcon />
-          <span className="font-medium text-primary-dark">
-            {mode === "create" ? t("breadcrumbCurrent") : t("breadcrumbEdit")}
-          </span>
-        </nav>
-        <h1 className="font-kanit text-[28px] font-bold text-text-primary">
-          {mode === "create" ? t("title") : t("editTitle")}
-        </h1>
-      </header>
+    <div className="mx-auto max-w-[800px] space-y-8 pb-24">
+      {/* Breadcrumb */}
+      <nav className="flex flex-wrap items-center gap-2 font-sarabun text-caption uppercase tracking-wider text-text-muted">
+        <Link href={`${base}/dashboard`} className="hover:text-primary-dark">
+          {t("breadcrumbDashboard")}
+        </Link>
+        <span>›</span>
+        <Link href={`${base}/datasets`} className="hover:text-primary-dark">
+          {t("breadcrumbDatasets")}
+        </Link>
+        <span>›</span>
+        <span className="font-semibold text-text-primary">
+          {mode === "create" ? t("breadcrumbCurrent") : t("breadcrumbEdit")}
+        </span>
+      </nav>
 
-      <section className="rounded-radius-lg border border-border-default bg-surface-card p-spacing-6 shadow-level-1">
-        <h2 className="mb-spacing-6 font-kanit text-heading-3 font-semibold text-text-primary">
-          {t("fileSection")}
-        </h2>
+      <h1 className="font-kanit text-[28px] font-bold text-text-primary">
+        {mode === "create" ? t("title") : t("editTitle")}
+      </h1>
+
+      {/* Step 1 — File Upload */}
+      <section className="rounded-2xl border border-border-default/60 bg-surface-card p-8 shadow-level-1">
+        <div className="mb-6 flex items-center gap-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-dark font-sarabun text-label font-bold text-white">
+            1
+          </span>
+          <h2 className="font-kanit text-heading-3-mobile font-semibold text-text-primary">
+            {t("fileSection")}
+          </h2>
+        </div>
         <FileUploadZone onAnalyzed={handleAnalyzed} disabled={isSubmitting} />
         {mode === "edit" && !selectedFile && (
           <button
@@ -338,12 +344,13 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
           </p>
         )}
         {analysis && hasPii && (
-          <div className="-mx-spacing-6 mt-spacing-6">
+          <div className="-mx-8 mt-6">
             <PIIWarning findings={piiFindings} />
           </div>
         )}
       </section>
 
+      {/* Step 2 — Dataset Info */}
       <form
         onSubmit={handleSubmit((values) => {
           if (!submitStatus) {
@@ -351,15 +358,20 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
           }
           void onSubmit(values, submitStatus);
         })}
-        className="space-y-spacing-6"
+        className="space-y-8"
       >
-        <section className="rounded-radius-lg border border-border-default bg-surface-card p-spacing-6 shadow-level-1">
-          <h2 className="mb-spacing-6 font-kanit text-heading-3 font-semibold text-text-primary">
-            {t("dataSection")}
-          </h2>
+        <section className="rounded-2xl border border-border-default/60 bg-surface-card p-8 shadow-level-1">
+          <div className="mb-6 flex items-center gap-3">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-dark font-sarabun text-label font-bold text-white">
+              2
+            </span>
+            <h2 className="font-kanit text-heading-3-mobile font-semibold text-text-primary">
+              {t("dataSection")}
+            </h2>
+          </div>
           <div className="space-y-6">
             <div>
-              <label className="mb-2 block font-sarabun text-label text-text-secondary">
+              <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
                 {t("fieldTitle")} *
               </label>
               <input
@@ -376,7 +388,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
             </div>
 
             <div>
-              <label className="mb-2 block font-sarabun text-label text-text-secondary">
+              <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
                 {t("fieldDescription")} *
               </label>
               <textarea
@@ -400,7 +412,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
             />
 
             <div>
-              <label className="mb-2 block font-sarabun text-label text-text-secondary">
+              <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
                 {t("fieldTags")}
               </label>
               <Controller
@@ -420,9 +432,9 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-spacing-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <label className="mb-2 block font-sarabun text-label text-text-secondary">
+                <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
                   {t("fieldYearStart")} *
                 </label>
                 <select className={inputClass} {...register("yearStart")}>
@@ -439,7 +451,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
                 )}
               </div>
               <div>
-                <label className="mb-2 block font-sarabun text-label text-text-secondary">
+                <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
                   {t("fieldYearEnd")}
                 </label>
                 <select className={inputClass} {...register("yearEnd")}>
@@ -461,7 +473,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
             </div>
 
             <div>
-              <label className="mb-2 block font-sarabun text-label text-text-secondary">
+              <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
                 {t("fieldProvince")}
               </label>
               <div ref={provinceWrapperRef} className="relative">
@@ -488,11 +500,11 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
                   </button>
                 ) : null}
                 {provinceDropdownOpen ? (
-                  <div className="absolute z-20 mt-1 w-full rounded-radius-md border border-border-default bg-surface-card shadow-level-2">
+                  <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-border-default bg-surface-card shadow-level-2">
                     <button
                       type="button"
                       onClick={() => handleSelectProvince(ALL_PROVINCES_VALUE)}
-                      className="block w-full px-4 py-2 text-left font-sarabun text-label text-text-primary hover:bg-surface-container"
+                      className="block w-full px-4 py-2.5 text-left font-sarabun text-label text-text-primary hover:bg-surface-container"
                     >
                       {isThai ? t("provinceAllLabelTh") : t("provinceAllLabelEn")}
                     </button>
@@ -501,7 +513,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
                         key={province.value}
                         type="button"
                         onClick={() => handleSelectProvince(province.value)}
-                        className="block w-full px-4 py-2 text-left font-sarabun text-label text-text-primary hover:bg-surface-container"
+                        className="block w-full px-4 py-2.5 text-left font-sarabun text-label text-text-primary hover:bg-surface-container"
                       >
                         {province.label}
                       </button>
@@ -513,12 +525,13 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
           </div>
         </section>
 
-        <div className="flex flex-wrap justify-end gap-4 py-spacing-6">
+        {/* Action buttons */}
+        <div className="flex flex-wrap items-center justify-end gap-4 border-t border-border-default/30 pt-6">
           <button
             type="button"
             onClick={() => router.back()}
             disabled={isSubmitting}
-            className="rounded-radius-xl border-2 border-primary-dark px-8 py-2.5 font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-primary-light disabled:opacity-50"
+            className="rounded-xl border border-border-input px-8 py-2.5 font-sarabun text-label font-medium text-text-muted transition-colors hover:bg-surface-container disabled:opacity-50"
           >
             {t("cancel")}
           </button>
@@ -526,7 +539,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
             type="submit"
             disabled={isSubmitting}
             onClick={() => setSubmitStatus("draft")}
-            className="inline-flex items-center justify-center gap-2 rounded-radius-xl border-2 border-primary-dark px-8 py-2.5 font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-primary-light disabled:opacity-50"
+            className="rounded-xl border border-primary-dark/30 px-8 py-2.5 font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-primary-light disabled:opacity-50"
           >
             {isSubmitting && submitStatus === "draft" && <Spinner />}
             {t("saveDraft")}
@@ -536,7 +549,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
               type="submit"
               disabled={isSubmitting || hasPii}
               onClick={() => setSubmitStatus("published")}
-              className="inline-flex items-center justify-center gap-2 rounded-radius-xl bg-primary px-10 py-2.5 font-sarabun text-label font-medium text-surface-card shadow-level-1 transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-dark px-10 py-2.5 font-sarabun text-label font-medium text-white shadow-level-1 transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {isSubmitting && submitStatus === "published" && <Spinner />}
               {t("publish")}
@@ -550,14 +563,6 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
         </div>
       </form>
     </div>
-  );
-}
-
-function ChevronIcon() {
-  return (
-    <svg className="h-4 w-4 text-text-muted" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-    </svg>
   );
 }
 

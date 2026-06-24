@@ -26,6 +26,8 @@ const ACCEPTED_MIME_TYPES = [
   "text/x-sql",
 ];
 
+const FILE_TYPE_BADGES = ["CSV", "XLSX", "JSON", "PDF", "SQL"];
+
 type FileUploadZoneProps = {
   onAnalyzed: (result: PIIScanResult, file: File) => void;
   disabled?: boolean;
@@ -113,10 +115,10 @@ export default function FileUploadZone({
             inputRef.current?.click();
           }
         }}
-        className={`mb-spacing-6 flex flex-col items-center justify-center rounded-radius-md border-2 border-dashed border-border-input bg-surface-page p-spacing-12 text-center transition-colors ${
+        className={`mb-6 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border-input bg-surface-page px-6 py-12 text-center transition-colors ${
           disabled || isUploading
             ? "cursor-not-allowed opacity-60"
-            : "cursor-pointer hover:bg-surface-container"
+            : "cursor-pointer hover:border-primary-dark/40 hover:bg-surface-container"
         }`}
         onClick={() => {
           if (!disabled && !isUploading) {
@@ -124,14 +126,16 @@ export default function FileUploadZone({
           }
         }}
       >
-        <UploadIcon />
-        <p className="mb-4 font-sarabun text-body-md text-text-muted">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-light text-primary-dark">
+          <UploadIcon />
+        </div>
+        <p className="mb-4 font-kanit text-body-lg font-semibold text-text-primary">
           {t("dropzone")}
         </p>
         <button
           type="button"
           disabled={disabled || isUploading}
-          className="rounded-radius-xl border-2 border-primary-dark px-6 py-2 font-sarabun text-label text-primary-dark transition-colors hover:bg-primary-light disabled:opacity-50"
+          className="rounded-full bg-primary-dark px-8 py-2.5 font-sarabun text-label font-medium text-white shadow-level-1 transition-opacity hover:opacity-90 disabled:opacity-50"
           onClick={(event) => {
             event.stopPropagation();
             inputRef.current?.click();
@@ -139,9 +143,19 @@ export default function FileUploadZone({
         >
           {t("dropzoneClick")}
         </button>
-        <p className="mt-3 font-sarabun text-caption text-text-muted">
-          {t("dropzoneHint")}
-        </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          {FILE_TYPE_BADGES.map((ext) => (
+            <span
+              key={ext}
+              className="rounded-lg border border-border-default bg-surface-card px-3 py-1 font-sarabun text-caption font-medium text-text-muted"
+            >
+              {ext}
+            </span>
+          ))}
+          <span className="font-sarabun text-caption text-text-muted">
+            สูงสุด 100MB
+          </span>
+        </div>
         <input
           ref={inputRef}
           type="file"
@@ -169,9 +183,9 @@ export default function FileUploadZone({
             <span>{t("uploading")}</span>
             <span>{progress}%</span>
           </div>
-          <div className="h-2 w-full rounded-radius-full bg-surface-container">
+          <div className="h-2 w-full rounded-full bg-surface-container">
             <div
-              className="h-2 rounded-radius-full bg-primary transition-all"
+              className="h-2 rounded-full bg-primary-dark transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -188,12 +202,12 @@ export default function FileUploadZone({
 function UploadIcon() {
   return (
     <svg
-      className="mb-3 h-12 w-12 text-text-muted"
+      className="h-8 w-8"
       viewBox="0 0 24 24"
       fill="currentColor"
       aria-hidden
     >
-      <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-3.96ZM12 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.66-3.73 3.71-3.98l.49-.05.43-.07.08-.49C8.83 7.69 10.22 6 12 6c2.76 0 5 2.24 5 5h1c1.66 0 3 1.34 3 3s-1.34 3-3 3h-6v-2h4.5c.83 0 1.5-.67 1.5-1.5S17.33 12 16.5 12H12v6Z" />
+      <path d="M9 16h6v-6h4l-7-7-7 7h4v6Zm-4 2h14v2H5v-2Z" />
     </svg>
   );
 }

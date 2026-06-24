@@ -6,7 +6,10 @@ import { useState } from "react";
 import AgencyDatasetTable from "@/components/dataset/AgencyDatasetTable";
 import DeleteDatasetModal from "@/components/dataset/DeleteDatasetModal";
 import type { AgencyDatasetRow } from "@/data/mockData";
-import type { AgencyDatasetStatusFilter } from "@/hooks/useAgencyDatasets";
+import {
+  useAgencyDatasets,
+  type AgencyDatasetStatusFilter,
+} from "@/hooks/useAgencyDatasets";
 
 export default function AgencyDatasetsPage() {
   const t = useTranslations("agency.datasets");
@@ -15,16 +18,37 @@ export default function AgencyDatasetsPage() {
 
   const [activeTab, setActiveTab] = useState<AgencyDatasetStatusFilter>("all");
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<AgencyDatasetRow | null>(
     null
   );
   const [deleteTitle, setDeleteTitle] = useState("");
   const [toastError, setToastError] = useState<string | null>(null);
 
-  const tabs: { id: AgencyDatasetStatusFilter; label: string }[] = [
-    { id: "all", label: t("filterAll") },
-    { id: "draft", label: t("filterDraft") },
-    { id: "published", label: t("filterPublished") },
+  const allQuery = useAgencyDatasets("all", 1, 999);
+  const allRows = allQuery.data?.data ?? [];
+  const draftCount = allRows.filter((r) => r.status === "draft").length;
+  const publishedCount = allRows.filter((r) => r.status === "published").length;
+  const totalCount = allRows.length;
+
+  const publishedRows = allRows.filter((r) => r.status === "published");
+  const avgQuality =
+    publishedRows.length > 0
+      ? (
+          publishedRows.reduce((s, r) => s + r.qualityScore, 0) /
+          publishedRows.length
+        ).toFixed(1)
+      : "0";
+  const totalDownloads = allRows.reduce((s, r) => s + r.downloadCount, 0);
+
+  const tabs: {
+    id: AgencyDatasetStatusFilter;
+    label: string;
+    count: number;
+  }[] = [
+    { id: "all", label: t("filterAll"), count: totalCount },
+    { id: "draft", label: t("filterDraft"), count: draftCount },
+    { id: "published", label: t("filterPublished"), count: publishedCount },
   ];
 
   const handleTabChange = (tab: AgencyDatasetStatusFilter) => {
@@ -39,44 +63,97 @@ export default function AgencyDatasetsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+      {/* Breadcrumb */}
+      <nav className="font-sarabun text-caption uppercase tracking-wider text-text-muted">
+        <span>DATASETS</span>
+        <span className="mx-2">›</span>
+        <span className="font-semibold text-text-primary">MY REPOSITORY</span>
+      </nav>
+
+      <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="font-kanit text-[28px] font-bold text-text-primary">
             {t("title")}
           </h1>
+          <p className="mt-1 font-sarabun text-body-md text-text-muted">
+            จัดการและตรวจสอบข้อมูลการศึกษาที่คุณเผยแพร่เข้าสู่ระบบ
+          </p>
         </div>
-        <Link
-          href={`${base}/datasets/create`}
-          className="inline-flex items-center justify-center gap-2 rounded-radius-lg bg-primary px-6 py-2.5 font-sarabun text-label font-medium text-surface-card shadow-level-1 transition-opacity hover:opacity-90"
-        >
-          <PlusIcon />
-          {t("uploadNew")}
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`${base}/datasets/create`}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary-dark px-5 py-2.5 font-sarabun text-label font-medium text-white shadow-level-1 transition-opacity hover:opacity-90"
+          >
+            <PlusIcon />
+            {t("uploadNew")}
+          </Link>
+        </div>
       </header>
 
-      <div className="flex items-center gap-6 border-b border-border-default">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => handleTabChange(tab.id)}
-              className={`border-b-2 pb-3 font-kanit text-label font-medium transition-colors ${
-                isActive
-                  ? "border-primary-dark text-primary-dark"
-                  : "border-transparent text-text-muted hover:text-primary-dark"
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+      {/* Tabs + Filters */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-1">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                className={`inline-flex items-center gap-2 rounded-t-lg border-b-2 px-5 py-2.5 font-sarabun text-label font-medium transition-all ${
+                  isActive
+                    ? "border-b-primary-dark text-primary-dark"
+                    : "border-b-transparent text-text-muted hover:border-b-border-default hover:text-text-secondary"
+                }`}
+              >
+                {tab.label}
+                {tab.count > 0 && (
+                  <span
+                    className={`inline-flex min-w-[22px] items-center justify-center rounded-full px-1.5 py-0.5 font-sarabun text-[11px] font-bold ${
+                      isActive
+                        ? "bg-primary-dark text-white"
+                        : "bg-surface-container text-text-muted"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="ค้นหาชื่อ Dataset หรือหมวดหมู่..."
+              className="h-10 w-full rounded-xl border border-border-input bg-surface-card pl-10 pr-4 font-sarabun text-body-md text-text-primary placeholder:text-text-muted focus:border-primary-dark focus:outline-none focus:ring-2 focus:ring-primary-dark/20 md:w-[260px]"
+            />
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
+              <SearchIcon />
+            </span>
+          </div>
+          <button
+            type="button"
+            className="inline-flex h-10 items-center gap-2 rounded-xl border border-border-input bg-surface-card px-4 font-sarabun text-label text-text-muted transition-colors hover:bg-surface-container hover:text-primary-dark"
+          >
+            <FilterIcon />
+            <span className="hidden sm:inline">กรองข้อมูล</span>
+          </button>
+          <select className="h-10 rounded-xl border border-border-input bg-surface-card px-3 font-sarabun text-label text-text-muted focus:border-primary-dark focus:outline-none focus:ring-2 focus:ring-primary-dark/20">
+            <option>ปีงบประมาณ 2568</option>
+            <option>ปีงบประมาณ 2567</option>
+            <option>ปีงบประมาณ 2566</option>
+          </select>
+        </div>
       </div>
 
       {toastError && (
         <div
-          className="rounded-radius-md border border-status-error bg-status-error-bg px-4 py-3 font-sarabun text-label text-status-error"
+          className="rounded-xl border border-status-error bg-status-error-bg px-4 py-3 font-sarabun text-label text-status-error"
           role="alert"
         >
           {toastError}
@@ -89,6 +166,33 @@ export default function AgencyDatasetsPage() {
         onPageChange={setPage}
         onDelete={handleDeleteRequest}
       />
+
+      {/* Summary cards */}
+      {activeTab === "published" && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <SummaryCard
+            icon={<PublishIcon />}
+            iconBg="bg-primary-light"
+            iconColor="text-primary-dark"
+            label="เผยแพร่สำเร็จรวม"
+            value={`${publishedCount} รายการ`}
+          />
+          <SummaryCard
+            icon={<StarIcon />}
+            iconBg="bg-[#fff3e0]"
+            iconColor="text-[#f57c00]"
+            label="คะแนนข้อมูลเฉลี่ย"
+            value={`${avgQuality} / 100`}
+          />
+          <SummaryCard
+            icon={<TrendIcon />}
+            iconBg="bg-[#e8f5e9]"
+            iconColor="text-[#43a047]"
+            label="การดาวน์โหลดรวม"
+            value={`${totalDownloads.toLocaleString()} ครั้ง`}
+          />
+        </div>
+      )}
 
       <DeleteDatasetModal
         open={Boolean(deleteTarget)}
@@ -105,10 +209,80 @@ export default function AgencyDatasetsPage() {
   );
 }
 
+function SummaryCard({
+  icon,
+  iconBg,
+  iconColor,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  iconBg: string;
+  iconColor: string;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-4 rounded-2xl border border-border-default/60 bg-surface-card px-6 py-5 shadow-level-1">
+      <div
+        className={`flex h-12 w-12 items-center justify-center rounded-full ${iconBg} ${iconColor}`}
+      >
+        {icon}
+      </div>
+      <div>
+        <p className="font-sarabun text-caption text-text-muted">{label}</p>
+        <p className="font-kanit text-heading-3-mobile font-bold text-text-primary">
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function PlusIcon() {
   return (
     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
+      <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+  );
+}
+
+function FilterIcon() {
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M10 18h4v-2h-4v2ZM3 6v2h18V6H3Zm3 7h12v-2H6v2Z" />
+    </svg>
+  );
+}
+
+function PublishIcon() {
+  return (
+    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M19 9h-4V3H9v6H5l7 7 7-7ZM5 18v2h14v-2H5Z" />
+    </svg>
+  );
+}
+
+function StarIcon() {
+  return (
+    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+    </svg>
+  );
+}
+
+function TrendIcon() {
+  return (
+    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="m16 6 2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z" />
     </svg>
   );
 }

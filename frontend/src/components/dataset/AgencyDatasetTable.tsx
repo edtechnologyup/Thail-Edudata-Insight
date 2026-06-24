@@ -18,6 +18,24 @@ type AgencyDatasetTableProps = {
   onDelete: (dataset: AgencyDatasetRow, title: string) => void;
 };
 
+function DatasetRowIcon() {
+  return (
+    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-light text-primary-dark">
+      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+      </svg>
+    </div>
+  );
+}
+
+function CategoryPill({ label }: { label: string }) {
+  return (
+    <span className="inline-flex max-w-[140px] truncate rounded-full bg-primary-light px-3 py-1 font-sarabun text-caption font-medium text-primary-dark">
+      {label}
+    </span>
+  );
+}
+
 function StatusBadge({
   status,
   publishedLabel,
@@ -29,14 +47,16 @@ function StatusBadge({
 }) {
   if (status === "published") {
     return (
-      <span className="inline-flex rounded-radius-full bg-status-published-bg px-3 py-1 font-sarabun text-caption font-semibold text-status-published">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-status-published-bg px-3 py-1 font-sarabun text-caption font-semibold text-status-published">
+        <span className="h-2 w-2 rounded-full bg-status-published" />
         {publishedLabel}
       </span>
     );
   }
 
   return (
-    <span className="inline-flex rounded-radius-full bg-status-draft-bg px-3 py-1 font-sarabun text-caption font-semibold text-status-draft">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-status-draft-bg px-3 py-1 font-sarabun text-caption font-semibold text-status-draft">
+      <span className="h-2 w-2 rounded-full bg-status-draft" />
       {draftLabel}
     </span>
   );
@@ -45,9 +65,9 @@ function StatusBadge({
 function QualityScoreBar({ score }: { score: number }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="h-2 w-20 rounded-radius-full bg-surface-container">
+      <div className="h-2 w-16 rounded-full bg-surface-container">
         <div
-          className="h-2 rounded-radius-full bg-primary"
+          className="h-2 rounded-full bg-primary-dark"
           style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
         />
       </div>
@@ -62,7 +82,7 @@ function TableSkeleton() {
   return (
     <div className="animate-pulse space-y-3 p-6">
       {Array.from({ length: 5 }).map((_, index) => (
-        <div key={index} className="h-12 rounded-radius-sm bg-surface-container" />
+        <div key={index} className="h-14 rounded-xl bg-surface-container" />
       ))}
     </div>
   );
@@ -113,7 +133,7 @@ export default function AgencyDatasetTable({
 
   if (isError) {
     return (
-      <div className="rounded-radius-lg border border-status-error/30 bg-status-error/5 px-6 py-8 text-center shadow-level-1">
+      <div className="rounded-2xl border border-status-error/30 bg-status-error/5 px-6 py-8 text-center shadow-level-1">
         <p className="font-sarabun text-body-md text-status-error">
           {error instanceof Error
             ? error.message
@@ -125,7 +145,7 @@ export default function AgencyDatasetTable({
 
   if (isLoading && rows.length === 0) {
     return (
-      <div className="overflow-hidden rounded-radius-lg border border-border-default/80 bg-surface-card shadow-level-1">
+      <div className="overflow-hidden rounded-2xl border border-border-default/60 bg-surface-card shadow-level-1">
         <TableSkeleton />
       </div>
     );
@@ -133,11 +153,11 @@ export default function AgencyDatasetTable({
 
   if (!isLoading && rows.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-radius-lg border border-border-default/80 bg-surface-card px-6 py-16 text-center shadow-level-1">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-border-default/60 bg-surface-card px-6 py-16 text-center shadow-level-1">
         <p className="font-sarabun text-body-lg text-text-secondary">{t("empty")}</p>
         <Link
           href={`${base}/datasets/create`}
-          className="mt-4 rounded-radius-lg bg-primary-dark px-6 py-2.5 font-sarabun text-label font-medium text-surface-card transition-opacity hover:opacity-90"
+          className="mt-4 rounded-xl bg-primary-dark px-6 py-2.5 font-sarabun text-label font-medium text-white transition-opacity hover:opacity-90"
         >
           {t("emptyAction")}
         </Link>
@@ -165,17 +185,17 @@ export default function AgencyDatasetTable({
     <>
       {publishError && (
         <div
-          className="mb-4 rounded-radius-md border border-status-error bg-status-error-bg px-4 py-3 font-sarabun text-label text-status-error"
+          className="mb-4 rounded-xl border border-status-error bg-status-error-bg px-4 py-3 font-sarabun text-label text-status-error"
           role="alert"
         >
           {publishError}
         </div>
       )}
-      <div className="overflow-hidden rounded-radius-lg border border-border-default/80 bg-surface-card shadow-level-1">
+      <div className="overflow-hidden rounded-2xl border border-border-default/60 bg-surface-card shadow-level-1">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="bg-surface-container font-kanit text-label font-semibold text-text-secondary">
+              <tr className="border-b border-border-default/30 font-sarabun text-caption font-semibold uppercase tracking-wide text-text-muted">
                 <th className="px-6 py-4">{t("colTitle")}</th>
                 <th className="px-6 py-4">{t("colCategory")}</th>
                 <th className="px-6 py-4">{t("colStatus")}</th>
@@ -184,13 +204,11 @@ export default function AgencyDatasetTable({
                 <th className="px-6 py-4 text-center">{t("colAction")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-default/30">
+            <tbody className="divide-y divide-border-default/20">
               {rows.map((row) => {
                 const title = locale === "th" ? row.title : row.titleEn;
-                const categoryPath =
-                  locale === "th"
-                    ? `${row.category} > ${row.subcategory}`
-                    : `${row.categoryEn} > ${row.subcategoryEn}`;
+                const categoryLabel =
+                  locale === "th" ? row.category : row.categoryEn;
                 const updated = new Date(row.updatedAt).toLocaleDateString(
                   locale === "th" ? "th-TH" : "en-US",
                   { year: "numeric", month: "short", day: "numeric" }
@@ -201,38 +219,48 @@ export default function AgencyDatasetTable({
                     key={row.id}
                     className="transition-colors hover:bg-surface-page"
                   >
-                    <td className="max-w-xs truncate px-6 py-3">
-                      <Link
-                        href={`${base}/datasets/${row.id}`}
-                        className="font-sarabun text-label font-semibold text-primary-dark hover:underline"
-                      >
-                        {title}
-                      </Link>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <DatasetRowIcon />
+                        <div className="min-w-0">
+                          <Link
+                            href={`${base}/datasets/${row.id}`}
+                            className="block max-w-[200px] truncate font-sarabun text-label font-semibold text-text-primary hover:underline"
+                          >
+                            {title}
+                          </Link>
+                          {row.fileFormat && (
+                            <p className="mt-0.5 font-sarabun text-[11px] text-text-muted">
+                              {row.fileFormat}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </td>
-                    <td className="px-6 py-3 font-sarabun text-label text-text-muted">
-                      {categoryPath}
+                    <td className="px-6 py-4">
+                      <CategoryPill label={categoryLabel} />
                     </td>
-                    <td className="px-6 py-3">
+                    <td className="px-6 py-4">
                       <StatusBadge
                         status={row.status}
                         publishedLabel={tStatus("published")}
                         draftLabel={tStatus("draft")}
                       />
                     </td>
-                    <td className="px-6 py-3">
+                    <td className="px-6 py-4">
                       <QualityScoreBar score={row.qualityScore} />
                     </td>
-                    <td className="px-6 py-3 font-sarabun text-label text-text-muted">
+                    <td className="px-6 py-4 font-sarabun text-label text-text-muted">
                       {updated}
                     </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-center justify-center gap-3">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center gap-2">
                         {row.status === "draft" && (
                           <button
                             type="button"
                             onClick={() => void handlePublish(row)}
                             disabled={publishingId === row.id}
-                            className="rounded-radius-sm bg-primary px-2.5 py-1 font-sarabun text-caption font-semibold text-surface-card transition-opacity hover:bg-primary-hover disabled:opacity-50"
+                            className="rounded-lg bg-primary-dark px-2.5 py-1 font-sarabun text-caption font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                           >
                             {publishingId === row.id
                               ? t("publishing")
@@ -241,7 +269,7 @@ export default function AgencyDatasetTable({
                         )}
                         <Link
                           href={`${base}/datasets/${row.id}/edit`}
-                          className="text-text-muted transition-colors hover:text-primary-dark"
+                          className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-container hover:text-primary-dark"
                           aria-label={t("edit")}
                           title={t("edit")}
                         >
@@ -249,7 +277,7 @@ export default function AgencyDatasetTable({
                         </Link>
                         <Link
                           href={`${base}/datasets/${row.id}/versions`}
-                          className="text-text-muted transition-colors hover:text-primary-dark"
+                          className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-container hover:text-primary-dark"
                           aria-label={t("versions")}
                           title={t("versions")}
                         >
@@ -263,7 +291,7 @@ export default function AgencyDatasetTable({
                               fileFormat: row.fileFormat ?? null,
                             })
                           }
-                          className="text-text-muted transition-colors hover:text-primary-dark"
+                          className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-container hover:text-primary-dark"
                           aria-label={t("download")}
                           title={t("download")}
                         >
@@ -272,7 +300,7 @@ export default function AgencyDatasetTable({
                         <button
                           type="button"
                           onClick={() => onDelete(row, title)}
-                          className="text-text-muted transition-colors hover:text-status-error"
+                          className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-[#ffdad6] hover:text-status-error"
                           aria-label={t("delete")}
                           title={t("delete")}
                         >
@@ -288,55 +316,60 @@ export default function AgencyDatasetTable({
         </div>
       </div>
 
-      {totalPages > 1 && (
-        <div className="mt-6 flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
+      {totalPages > 0 && (
+        <div className="flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-sarabun text-label text-text-muted">
             {t("paginationSummary", { from, to, total })}
           </p>
-          <nav className="flex items-center gap-1" aria-label={t("pagination")}>
-            <button
-              type="button"
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage <= 1}
-              className="flex h-10 w-10 items-center justify-center rounded-radius-md transition-colors hover:bg-surface-container disabled:opacity-40"
-              aria-label={t("prevPage")}
-            >
-              <ChevronLeftIcon />
-            </button>
-            {pages.map((pageNum, index) =>
-              pageNum === "ellipsis" ? (
-                <span
-                  key={`ellipsis-${index}`}
-                  className="px-2 font-sarabun text-label text-text-muted"
-                >
-                  ...
-                </span>
-              ) : (
-                <button
-                  key={pageNum}
-                  type="button"
-                  onClick={() => onPageChange(pageNum)}
-                  className={`flex h-10 w-10 items-center justify-center rounded-radius-sm font-sarabun text-label font-bold transition-colors ${
-                    pageNum === currentPage
-                      ? "bg-primary text-surface-card shadow-level-1"
-                      : "text-text-primary hover:bg-surface-container"
-                  }`}
-                  aria-current={pageNum === currentPage ? "page" : undefined}
-                >
-                  {pageNum}
-                </button>
-              )
-            )}
-            <button
-              type="button"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage >= totalPages}
-              className="flex h-10 w-10 items-center justify-center rounded-radius-md transition-colors hover:bg-surface-container disabled:opacity-40"
-              aria-label={t("nextPage")}
-            >
-              <ChevronRightIcon />
-            </button>
-          </nav>
+          <div className="flex items-center gap-3">
+            <nav className="flex items-center gap-1" aria-label={t("pagination")}>
+              <button
+                type="button"
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage <= 1}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-border-input text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
+                aria-label={t("prevPage")}
+              >
+                <ChevronLeftIcon />
+              </button>
+              {pages.map((pageNum, index) =>
+                pageNum === "ellipsis" ? (
+                  <span
+                    key={`ellipsis-${index}`}
+                    className="px-2 font-sarabun text-label text-text-muted"
+                  >
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => onPageChange(pageNum)}
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl font-sarabun text-label font-bold transition-colors ${
+                      pageNum === currentPage
+                        ? "bg-primary-dark text-white shadow-level-1"
+                        : "border border-border-input text-text-primary hover:bg-surface-container"
+                    }`}
+                    aria-current={pageNum === currentPage ? "page" : undefined}
+                  >
+                    {pageNum}
+                  </button>
+                )
+              )}
+              <button
+                type="button"
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-border-input text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
+                aria-label={t("nextPage")}
+              >
+                <ChevronRightIcon />
+              </button>
+            </nav>
+            <span className="hidden font-sarabun text-caption text-text-muted sm:inline">
+              {pageSize} แสดง
+            </span>
+          </div>
         </div>
       )}
 
@@ -352,7 +385,7 @@ export default function AgencyDatasetTable({
 
 function DownloadIcon() {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M19 9h-4V3H9v6H5l7 7 7-7ZM5 18v2h14v-2H5Z" />
     </svg>
   );
@@ -360,7 +393,7 @@ function DownloadIcon() {
 
 function EditIcon() {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
     </svg>
   );
@@ -368,7 +401,7 @@ function EditIcon() {
 
 function HistoryIcon() {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M13 3a9 9 0 1 0 9 9h-2a7 7 0 1 1-2.05-4.95L15 9h6V3l-2.24 2.24A8.96 8.96 0 0 0 13 3zm-1 5h2v5h-5V11h3V8z" />
     </svg>
   );
@@ -376,7 +409,7 @@ function HistoryIcon() {
 
 function DeleteIcon() {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
     </svg>
   );

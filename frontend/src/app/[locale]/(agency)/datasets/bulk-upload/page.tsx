@@ -44,70 +44,90 @@ export default function BulkUploadPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[800px] space-y-spacing-6 pb-24">
+    <div className="mx-auto max-w-[960px] space-y-8 pb-24">
+      {/* Breadcrumb */}
+      <nav className="flex flex-wrap items-center gap-2 font-sarabun text-caption uppercase tracking-wider text-text-muted">
+        <Link href={`${base}/dashboard`} className="hover:text-primary-dark">
+          {t("breadcrumbDashboard")}
+        </Link>
+        <span>›</span>
+        <span className="font-semibold text-text-primary">
+          {t("breadcrumbCurrent")}
+        </span>
+      </nav>
+
       <header>
-        <nav className="mb-2 flex flex-wrap items-center gap-2 font-sarabun text-label text-text-muted">
-          <Link href={`${base}/dashboard`} className="hover:text-primary-dark">
-            {t("breadcrumbDashboard")}
-          </Link>
-          <ChevronIcon />
-          <span className="font-medium text-primary-dark">{t("breadcrumbCurrent")}</span>
-        </nav>
         <h1 className="font-kanit text-[28px] font-bold text-text-primary">
           {t("title")}
         </h1>
-        <p className="mt-1 font-sarabun text-body-md text-text-muted">{t("subtitle")}</p>
+        <p className="mt-1 font-sarabun text-body-md text-text-muted">
+          {t("subtitle")}
+        </p>
       </header>
 
-      <section className="rounded-radius-lg border border-border-default bg-surface-card p-spacing-6 shadow-level-1 transition-shadow hover:shadow-level-2">
-        <span className="mb-1 block font-kanit text-label font-semibold text-primary-dark">
-          {t("step1")}
-        </span>
-        <h2 className="mb-2 font-kanit text-heading-3-mobile font-semibold text-text-primary">
-          {t("step1Title")}
-        </h2>
-        <p className="mb-spacing-6 font-sarabun text-body-md text-text-muted">
-          {t("step1Desc")}
-        </p>
-        <button
-          type="button"
-          onClick={handleDownloadTemplate}
-          disabled={isDownloadingTemplate}
-          className="inline-flex items-center gap-2 rounded-radius-full border-2 border-primary-dark px-6 py-2.5 font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <DownloadIcon />
-          {isDownloadingTemplate ? t("templateDownloading") : t("downloadTemplate")}
-        </button>
-        {templateError && (
-          <p className="mt-2 font-sarabun text-body-sm text-error" role="alert">
-            {templateError}
+      {/* Step 1 & 2 side by side */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* Step 1 — Download template */}
+        <section className="flex flex-col rounded-2xl border border-border-default/60 bg-surface-card p-6 shadow-level-1">
+          <div className="mb-4 flex items-center gap-3">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-dark font-sarabun text-label font-bold text-white">
+              1
+            </span>
+            <h2 className="font-kanit text-body-lg font-semibold text-text-primary">
+              {t("step1Title")}
+            </h2>
+          </div>
+          <p className="mb-6 flex-1 font-sarabun text-body-md leading-relaxed text-text-muted">
+            {t("step1Desc")}
           </p>
-        )}
-      </section>
+          <div>
+            <button
+              type="button"
+              onClick={() => void handleDownloadTemplate()}
+              disabled={isDownloadingTemplate}
+              className="inline-flex items-center gap-2 rounded-xl border border-primary-dark/30 bg-surface-card px-5 py-2.5 font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <DownloadIcon />
+              {isDownloadingTemplate
+                ? t("templateDownloading")
+                : t("downloadTemplate")}
+            </button>
+            {templateError && (
+              <p
+                className="mt-2 font-sarabun text-caption text-status-error"
+                role="alert"
+              >
+                {templateError}
+              </p>
+            )}
+          </div>
+        </section>
 
-      <BulkUploadZone
-        resetKey={resetKey}
-        onComplete={(result) => setUploadResult(result)}
-      />
+        {/* Step 2 — Upload */}
+        <BulkUploadZone
+          resetKey={resetKey}
+          onComplete={(result) => setUploadResult(result)}
+        />
+      </div>
 
       {uploadResult && (
-        <BulkUploadResult result={uploadResult} onUploadAgain={handleUploadAgain} />
+        <BulkUploadResult
+          result={uploadResult}
+          onUploadAgain={handleUploadAgain}
+        />
       )}
     </div>
   );
 }
 
-function ChevronIcon() {
-  return (
-    <svg className="h-4 w-4 text-text-muted" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-    </svg>
-  );
-}
-
 function DownloadIcon() {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg
+      className="h-5 w-5"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+    >
       <path d="M19 9h-4V3H9v6H5l7 7 7-7ZM5 18v2h14v-2H5Z" />
     </svg>
   );

@@ -85,13 +85,15 @@ export default function BulkUploadZone({
   };
 
   return (
-    <div className="rounded-radius-lg border border-border-default bg-surface-card p-spacing-6 shadow-level-1">
-      <span className="mb-1 block font-kanit text-label font-semibold text-primary-dark">
-        {t("step2")}
-      </span>
-      <h2 className="mb-4 font-kanit text-heading-3-mobile font-semibold text-text-primary">
-        {t("step2Title")}
-      </h2>
+    <section className="flex flex-col rounded-2xl border border-border-default/60 bg-surface-card p-6 shadow-level-1">
+      <div className="mb-4 flex items-center gap-3">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-dark font-sarabun text-label font-bold text-white">
+          2
+        </span>
+        <h2 className="font-kanit text-body-lg font-semibold text-text-primary">
+          {t("step2Title")}
+        </h2>
+      </div>
 
       <div
         role="button"
@@ -108,15 +110,19 @@ export default function BulkUploadZone({
             inputRef.current?.click();
           }
         }}
-        className={`flex flex-col items-center justify-center gap-4 rounded-radius-lg border-2 border-dashed border-border-input bg-surface-page p-10 text-center transition-colors ${
+        className={`flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-border-input bg-surface-page px-6 py-10 text-center transition-colors ${
           isProcessing
             ? "cursor-not-allowed opacity-60"
-            : "cursor-pointer hover:bg-surface-container"
+            : "cursor-pointer hover:border-primary-dark/40 hover:bg-surface-container"
         }`}
       >
-        <FileIcon />
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-light text-primary-dark">
+          <FileIcon />
+        </div>
         <div>
-          <p className="font-sarabun text-body-md text-text-muted">{t("dropzone")}</p>
+          <p className="font-kanit text-body-md font-semibold text-text-primary">
+            {t("dropzone")}
+          </p>
           <button
             type="button"
             disabled={isProcessing}
@@ -124,12 +130,14 @@ export default function BulkUploadZone({
               event.stopPropagation();
               inputRef.current?.click();
             }}
-            className="mt-2 rounded-radius-full border-2 border-primary-dark px-6 py-2 font-sarabun text-label text-primary-dark transition-colors hover:bg-primary-light disabled:opacity-50"
+            className="mt-2 rounded-full border border-primary-dark/30 px-6 py-2 font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-primary-light disabled:opacity-50"
           >
             {t("dropzoneClick")}
           </button>
         </div>
-        <p className="font-sarabun text-caption text-text-muted">{t("dropzoneHint")}</p>
+        <p className="font-sarabun text-caption text-text-muted">
+          {t("dropzoneHint")}
+        </p>
         <input
           ref={inputRef}
           type="file"
@@ -146,20 +154,22 @@ export default function BulkUploadZone({
       </div>
 
       {fileName && (
-        <p className="mt-3 font-sarabun text-label text-text-secondary">{fileName}</p>
+        <p className="mt-3 font-sarabun text-label text-text-secondary">
+          {fileName}
+        </p>
       )}
 
       {isProcessing && (
-        <div className="mt-spacing-6">
+        <div className="mt-4">
           <div className="mb-2 flex items-center justify-between">
             <span className="font-sarabun text-label text-text-muted">
               {t("processing", { percent: progress })}
             </span>
             <SpinnerIcon />
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-radius-full bg-surface-container">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container">
             <div
-              className="h-full rounded-radius-full bg-primary transition-all duration-300"
+              className="h-full rounded-full bg-primary-dark transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -167,16 +177,18 @@ export default function BulkUploadZone({
       )}
 
       {error && (
-        <p className="mt-3 font-sarabun text-caption text-status-error">{error}</p>
+        <p className="mt-3 font-sarabun text-caption text-status-error">
+          {error}
+        </p>
       )}
-    </div>
+    </section>
   );
 }
 
 function FileIcon() {
   return (
     <svg
-      className="h-12 w-12 text-text-muted"
+      className="h-7 w-7"
       viewBox="0 0 24 24"
       fill="currentColor"
       aria-hidden

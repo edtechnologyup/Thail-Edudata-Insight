@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import type { AdminTag } from "@/data/mockData";
+import type { AdminTag } from "@/types/admin";
 import { useDeleteTag } from "@/hooks/useAdminTags";
 
 type TagTableProps = {

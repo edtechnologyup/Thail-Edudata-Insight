@@ -11,7 +11,10 @@ import {
   YAxis,
 } from "recharts";
 import { CHART_COLORS } from "@/constants/chartColors";
-import { mockWidgetBarData } from "@/data/mockData";
+import type { WidgetChartPoint } from "@/types/stats";
+
+// TODO: ดึงข้อมูลกราฟจาก API
+const mockWidgetBarData: WidgetChartPoint[] = [];
 
 function ChartTooltip({
   active,

@@ -1,4 +1,4 @@
-import type { StatsYearPoint } from "@/data/mockData";
+import type { StatsYearPoint } from "@/types/stats";
 
 export function formatCompactCount(value: number, locale: string): string {
   if (value >= 1_000_000) {

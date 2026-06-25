@@ -11,7 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { CHART_COLORS } from "@/constants/chartColors";
-import type { StatsYearPoint } from "@/data/mockData";
+import type { StatsYearPoint } from "@/types/stats";
 import { formatYearTick } from "./chartUtils";
 
 type SchoolChartProps = {

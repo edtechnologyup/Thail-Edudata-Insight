@@ -1,7 +1,16 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { mockWidgetStatData } from "@/data/mockData";
+import type { WidgetStatData } from "@/types/stats";
+
+// TODO: ดึงข้อมูล stat จาก API
+const mockWidgetStatData: WidgetStatData = {
+  value: 0,
+  labelTh: "รอข้อมูล",
+  labelEn: "Awaiting data",
+  trend: "0%",
+  trendUp: false,
+};
 
 export default function StatWidget() {
   const t = useTranslations("agency.customDashboard.widgets");

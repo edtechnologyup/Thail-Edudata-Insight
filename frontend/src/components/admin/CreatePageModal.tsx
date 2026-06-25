@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import type { StaticPageStatus } from "@/data/mockData";
+import type { StaticPageStatus } from "@/types/content";
 
 type CreatePageModalProps = {
   open: boolean;

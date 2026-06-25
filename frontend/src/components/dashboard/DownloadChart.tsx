@@ -11,7 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { CHART_COLORS } from "@/constants/chartColors";
-import type { AgencyMonthlyDownload } from "@/data/mockData";
+import type { AgencyMonthlyDownload } from "@/types/stats";
 
 type DownloadChartProps = {
   data: AgencyMonthlyDownload[];

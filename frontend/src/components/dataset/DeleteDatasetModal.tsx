@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { AgencyDatasetRow } from "@/data/mockData";
+import type { AgencyDatasetRow } from "@/types/dataset";
 import { useDeleteDataset } from "@/hooks/useDeleteDataset";
 
 type DeleteDatasetModalProps = {

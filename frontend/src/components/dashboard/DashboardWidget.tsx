@@ -3,7 +3,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslations } from "next-intl";
-import type { DashboardGridWidget, DashboardWidgetType } from "@/data/mockData";
+import type { DashboardGridWidget, DashboardWidgetType } from "@/types/stats";
 import BarChartWidget from "./widgets/BarChartWidget";
 import LineChartWidget from "./widgets/LineChartWidget";
 import PieChartWidget from "./widgets/PieChartWidget";

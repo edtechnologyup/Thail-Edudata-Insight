@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import type { AdminUser } from "@/data/mockData";
+import type { AdminUser } from "@/types/admin";
 import { useChangeUserRole } from "@/hooks/useChangeUserRole";
 
 type ChangeRoleModalProps = {

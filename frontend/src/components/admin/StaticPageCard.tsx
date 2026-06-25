@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import type { AdminStaticPageMeta } from "@/data/mockData";
+import type { AdminStaticPageMeta } from "@/types/content";
 
 const ICON_CONFIG = {
   policy: {

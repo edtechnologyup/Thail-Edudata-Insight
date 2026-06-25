@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import type { DatasetLicense } from "@/data/mockData";
+import type { DatasetLicense } from "@/types/dataset";
 import type { DatasetDetailView } from "@/types/dataset";
 import { useAddBookmark } from "@/hooks/useBookmarks";
 import { useDatasetCitation } from "@/hooks/useDatasetCitation";

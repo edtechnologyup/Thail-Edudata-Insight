@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import DownloadModal from "@/components/dataset/DownloadModal";
-import type { AgencyDatasetRow } from "@/data/mockData";
+import type { AgencyDatasetRow } from "@/types/dataset";
 import {
   useAgencyDatasets,
   type AgencyDatasetStatusFilter,

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import type { DatasetLicense, DatasetStatus, HomeDatasetMock } from "@/data/mockData";
+import type { DatasetLicense, DatasetStatus, HomeDatasetMock } from "@/types/dataset";
 import { useDatasetNewBadge } from "@/hooks/useDatasetNewBadge";
 
 type DatasetCardProps = HomeDatasetMock & {

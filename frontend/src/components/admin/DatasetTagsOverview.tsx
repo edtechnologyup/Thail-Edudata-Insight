@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import type { AdminTag } from "@/data/mockData";
+import type { AdminTag } from "@/types/admin";
 
 type DatasetTagsOverviewProps = {
   tags: AdminTag[];

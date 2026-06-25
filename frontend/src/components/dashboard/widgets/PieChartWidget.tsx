@@ -9,7 +9,10 @@ import {
   Tooltip,
 } from "recharts";
 import { CHART_COLORS } from "@/constants/chartColors";
-import { mockWidgetPieData } from "@/data/mockData";
+import type { WidgetChartPoint } from "@/types/stats";
+
+// TODO: ดึงข้อมูลกราฟจาก API
+const mockWidgetPieData: WidgetChartPoint[] = [];
 
 function ChartTooltip({
   active,

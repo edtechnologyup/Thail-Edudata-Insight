@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import type { BulkUploadResult as BulkUploadResultData } from "@/data/mockData";
+import type { BulkUploadResult as BulkUploadResultData } from "@/types/dataset";
 
 type BulkUploadResultProps = {
   result: BulkUploadResultData;

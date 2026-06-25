@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import type { AdminPendingUser } from "@/data/mockData";
+import type { AdminPendingUser } from "@/types/admin";
 import { useApproveUser } from "@/hooks/useApproveUser";
 import { useRejectUser } from "@/hooks/useRejectUser";
 

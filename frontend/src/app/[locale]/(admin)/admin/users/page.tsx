@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AdminStatsCard from "@/components/admin/AdminStatsCard";
 import UserTable from "@/components/admin/UserTable";
-import type { AdminUsersFilters } from "@/data/mockData";
+import type { AdminUsersFilters } from "@/types/admin";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 
 type StatusFilter = "all" | "pending" | "active" | "rejected" | "suspended";

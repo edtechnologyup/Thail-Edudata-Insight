@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { MOCK_MEGAMENU_AGENCIES } from "@/data/mockData";
+import type { MegaMenuLink } from "@/types/category";
 import { useCategories } from "@/hooks/useCategories";
 
 // TODO: เชื่อม GET /api/v1/public/agencies เมื่อ Backend เพิ่ม endpoint นี้
+const MOCK_MEGAMENU_AGENCIES: MegaMenuLink[] = [];
 
 type MegaMenuProps = {
   open: boolean;

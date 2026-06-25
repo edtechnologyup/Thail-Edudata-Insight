@@ -16,12 +16,24 @@ import {
 } from "@dnd-kit/sortable";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
-import {
-  createDashboardWidgetId,
-  defaultColSpanForWidgetType,
-  type DashboardGridWidget,
-  type DashboardWidgetType,
-} from "@/data/mockData";
+import type { DashboardGridWidget, DashboardWidgetType } from "@/types/stats";
+
+function createDashboardWidgetId(): string {
+  return `widget-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function defaultColSpanForWidgetType(type: DashboardWidgetType): 1 | 2 | 3 {
+  switch (type) {
+    case "bar":
+      return 2;
+    case "line":
+      return 3;
+    case "pie":
+    case "stat":
+    default:
+      return 1;
+  }
+}
 import DashboardWidget from "./DashboardWidget";
 
 type DashboardGridProps = {

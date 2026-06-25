@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import type { AdminUser, AdminUsersFilters } from "@/data/mockData";
+import type { AdminUser, AdminUsersFilters } from "@/types/admin";
 import { useAdminUsers } from "@/hooks/useAdminUsers";
 import { useUnsuspendUser } from "@/hooks/useSuspendUser";
 import { useAuthStore } from "@/stores/useAuthStore";

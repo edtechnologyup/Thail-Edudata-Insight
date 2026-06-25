@@ -8,7 +8,7 @@ import AuditLogFilter, {
   type AuditLogFilterValues,
 } from "@/components/admin/AuditLogFilter";
 import AuditLogTable from "@/components/admin/AuditLogTable";
-import type { AuditLogsFilters } from "@/data/mockData";
+import type { AuditLogsFilters } from "@/types/admin";
 import { exportAuditLogsCsv } from "@/hooks/useAuditLogs";
 
 const emptyFilters: AuditLogFilterValues = {

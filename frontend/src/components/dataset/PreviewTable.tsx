@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import type { DatasetDetailMock } from "@/data/mockData";
+import type { DatasetDetailMock } from "@/types/dataset";
 
 type PreviewTableProps = {
   columns: DatasetDetailMock["columns"];

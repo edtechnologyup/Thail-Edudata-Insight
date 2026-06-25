@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import BulkUploadResult from "@/components/dataset/BulkUploadResult";
 import BulkUploadZone from "@/components/dataset/BulkUploadZone";
-import type { BulkUploadResult as BulkUploadResultData } from "@/data/mockData";
+import type { BulkUploadResult as BulkUploadResultData } from "@/types/dataset";
 import { downloadBulkUploadTemplate } from "@/hooks/useBulkUpload";
 
 export default function BulkUploadPage() {

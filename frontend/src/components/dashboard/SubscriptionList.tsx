@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import type { AgencySubscriptionMock } from "@/data/mockData";
+import type { AgencySubscriptionMock } from "@/types/stats";
 import {
   useDeleteSubscription,
   useSubscriptions,

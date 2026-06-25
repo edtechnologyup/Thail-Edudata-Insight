@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import type { AdminUser } from "@/data/mockData";
+import type { AdminUser } from "@/types/admin";
 import { useSuspendUser } from "@/hooks/useSuspendUser";
 
 type SuspendUserModalProps = {

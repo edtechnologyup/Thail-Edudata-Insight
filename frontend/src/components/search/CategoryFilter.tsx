@@ -1,11 +1,12 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import {
-  MOCK_FILTER_AGENCIES,
-  MOCK_FILTER_FORMATS,
-  MOCK_FILTER_YEARS,
-} from "@/data/mockData";
+import type { SearchFileFormat } from "@/types/dataset";
+
+// TODO: ดึงตัวเลือกกรองจาก API
+const MOCK_FILTER_AGENCIES: { id: string; labelTh: string; labelEn: string }[] = [];
+const MOCK_FILTER_YEARS: string[] = [];
+const MOCK_FILTER_FORMATS: { id: SearchFileFormat; label: string }[] = [];
 import {
   parseListParam,
   toggleListParam,

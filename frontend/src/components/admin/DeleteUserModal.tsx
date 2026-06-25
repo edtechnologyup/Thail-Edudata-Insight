@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { AdminUser } from "@/data/mockData";
+import type { AdminUser } from "@/types/admin";
 import { useDeleteUser } from "@/hooks/useDeleteUser";
 
 type DeleteUserModalProps = {

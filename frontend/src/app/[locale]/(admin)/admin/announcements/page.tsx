@@ -6,7 +6,7 @@ import AdminStatsCard from "@/components/admin/AdminStatsCard";
 import AnnouncementForm from "@/components/admin/AnnouncementForm";
 import AnnouncementTable from "@/components/admin/AnnouncementTable";
 import DeleteAnnouncementModal from "@/components/admin/DeleteAnnouncementModal";
-import type { Announcement } from "@/data/mockData";
+import type { Announcement } from "@/types/content";
 import { useAdminAnnouncements } from "@/hooks/useAdminAnnouncements";
 
 export default function AdminAnnouncementsPage() {

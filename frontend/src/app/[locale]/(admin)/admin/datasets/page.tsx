@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AdminDatasetTable from "@/components/admin/AdminDatasetTable";
 import AdminStatsCard from "@/components/admin/AdminStatsCard";
-import type { AdminDatasetsFilters } from "@/data/mockData";
+import type { AdminDatasetsFilters } from "@/types/admin";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 import { useAdminDatasets } from "@/hooks/useAdminDatasets";
 

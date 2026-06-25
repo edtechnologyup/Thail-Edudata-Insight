@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import AgencyDatasetTable from "@/components/dataset/AgencyDatasetTable";
 import DeleteDatasetModal from "@/components/dataset/DeleteDatasetModal";
-import type { AgencyDatasetRow } from "@/data/mockData";
+import type { AgencyDatasetRow } from "@/types/dataset";
 import {
   useAgencyDatasets,
   type AgencyDatasetStatusFilter,

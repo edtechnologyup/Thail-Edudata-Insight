@@ -3,11 +3,18 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import {
-  buildSavedSearchUrl,
-  type AgencySavedSearchMock,
-  type SavedSearchFilters,
-} from "@/data/mockData";
+import type { AgencySavedSearchMock, SavedSearchFilters } from "@/types/stats";
+
+function buildSavedSearchUrl(locale: string, filters: SavedSearchFilters): string {
+  const params = new URLSearchParams();
+  if (filters.q) params.set("q", filters.q);
+  if (filters.category) params.set("category", filters.category);
+  if (filters.year) params.set("year", filters.year);
+  if (filters.format) params.set("format", filters.format);
+  if (filters.agency) params.set("agency", filters.agency);
+  const query = params.toString();
+  return `/${locale}/search${query ? `?${query}` : ""}`;
+}
 import {
   useDeleteSavedSearch,
   useSavedSearches,

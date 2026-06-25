@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import ToggleSwitch from "@/components/admin/ToggleSwitch";
-import type { Announcement } from "@/data/mockData";
+import type { Announcement } from "@/types/content";
 import { useToggleAnnouncement } from "@/hooks/useToggleAnnouncement";
 
 type AnnouncementTableProps = {

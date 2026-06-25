@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { Announcement } from "@/data/mockData";
+import type { Announcement } from "@/types/content";
 import { useDeleteAnnouncement } from "@/hooks/useDeleteAnnouncement";
 
 type DeleteAnnouncementModalProps = {

@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { DragEvent, useEffect, useRef, useState } from "react";
-import type { BulkUploadResult } from "@/data/mockData";
+import type { BulkUploadResult } from "@/types/dataset";
 import { useBulkUpload } from "@/hooks/useBulkUpload";
 
 type BulkUploadZoneProps = {

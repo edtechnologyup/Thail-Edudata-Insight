@@ -15,7 +15,7 @@ import {
 import FileUploadZone from "@/components/dataset/FileUploadZone";
 import PIIWarning from "@/components/dataset/PIIWarning";
 import TagInput from "@/components/dataset/TagInput";
-import { type AgencyDatasetFormInitial } from "@/data/mockData";
+import type { AgencyDatasetFormInitial } from "@/types/dataset";
 import { THAI_PROVINCES } from "@/data/thaiProvinces";
 import { useCategorySuggestedTags } from "@/hooks/useCategorySuggestedTags";
 import { usePIIScan } from "@/hooks/usePIIScan";

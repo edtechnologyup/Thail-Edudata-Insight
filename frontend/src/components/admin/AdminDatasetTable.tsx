@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import DeleteDatasetModal from "@/components/admin/DeleteDatasetModal";
-import type { AdminDataset, AdminDatasetsFilters } from "@/data/mockData";
+import type { AdminDataset, AdminDatasetsFilters } from "@/types/admin";
 import { useAdminDatasets } from "@/hooks/useAdminDatasets";
 import { useHideDataset } from "@/hooks/useHideDataset";
 

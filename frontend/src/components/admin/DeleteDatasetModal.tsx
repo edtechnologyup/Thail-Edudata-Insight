@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { AdminDataset } from "@/data/mockData";
+import type { AdminDataset } from "@/types/admin";
 import { useAdminDeleteDataset } from "@/hooks/useAdminDeleteDataset";
 
 type DeleteDatasetModalProps = {

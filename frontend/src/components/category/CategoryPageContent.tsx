@@ -11,7 +11,7 @@ import CategoryFilter, {
   type CategorySortOption,
 } from "@/components/search/CategoryFilter";
 import Pagination from "@/components/search/Pagination";
-import type { SearchResultMock } from "@/data/mockData";
+import type { SearchResultMock } from "@/types/dataset";
 import type { PublicCategoryPageData } from "@/utils/publicCategoryApi";
 
 const PAGE_SIZE = 10;

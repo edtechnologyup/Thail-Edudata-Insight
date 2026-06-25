@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import type { DatasetVersionItem } from "@/data/mockData";
+import type { DatasetVersionItem } from "@/types/dataset";
 
 type VersionTimelineProps = {
   versions: DatasetVersionItem[];

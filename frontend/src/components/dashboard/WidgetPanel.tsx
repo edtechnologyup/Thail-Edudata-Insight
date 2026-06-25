@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { useTranslations } from "next-intl";
-import type { DashboardWidgetType } from "@/data/mockData";
+import type { DashboardWidgetType } from "@/types/stats";
 
 type WidgetPanelProps = {
   snapToGrid: boolean;

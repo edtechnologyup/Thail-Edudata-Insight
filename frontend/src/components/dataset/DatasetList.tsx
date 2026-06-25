@@ -1,5 +1,5 @@
 import DatasetCard from "@/components/dataset/DatasetCard";
-import type { MockDataset } from "@/data/mockDatasets";
+import type { MockDataset } from "@/types/dataset";
 
 type DatasetListProps = {
   datasets: MockDataset[];

@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import ToggleSwitch from "@/components/admin/ToggleSwitch";
-import type { Announcement } from "@/data/mockData";
+import type { Announcement } from "@/types/content";
 import { useCreateAnnouncement } from "@/hooks/useCreateAnnouncement";
 import { useUpdateAnnouncement } from "@/hooks/useUpdateAnnouncement";
 

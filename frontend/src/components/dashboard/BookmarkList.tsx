@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import type { AgencyBookmarkMock } from "@/data/mockData";
+import type { AgencyBookmarkMock } from "@/types/stats";
 import { useBookmarks, useDeleteBookmark } from "@/hooks/useBookmarks";
 
 function formatViewCount(count: number, locale: string): string {

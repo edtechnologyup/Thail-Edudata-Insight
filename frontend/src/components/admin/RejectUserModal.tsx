@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import type { AdminUser } from "@/data/mockData";
+import type { AdminUser } from "@/types/admin";
 import { useRejectUser } from "@/hooks/useRejectUser";
 
 const rejectSchema = z.object({

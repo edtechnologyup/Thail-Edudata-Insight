@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import type { AdminTag } from "@/data/mockData";
+import type { AdminTag } from "@/types/admin";
 import { useCreateTag, useUpdateTag } from "@/hooks/useAdminTags";
 
 type TagFormValues = {

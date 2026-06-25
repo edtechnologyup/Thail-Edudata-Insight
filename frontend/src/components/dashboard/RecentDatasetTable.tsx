@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useRef, useEffect } from "react";
-import type { AgencyDatasetRow } from "@/data/mockData";
+import type { AgencyDatasetRow } from "@/types/dataset";
 import { useAgencyDatasets } from "@/hooks/useAgencyDatasets";
 
 type RecentDatasetTableProps = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { AuditLog, AuditLogAction, AuditLogsFilters } from "@/data/mockData";
+import type { AuditLog, AuditLogAction, AuditLogsFilters } from "@/types/admin";
 import { useAuditLogs } from "@/hooks/useAuditLogs";
 
 type AuditLogTableProps = {

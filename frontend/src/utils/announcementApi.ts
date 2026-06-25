@@ -1,4 +1,4 @@
-import type { Announcement, AnnouncementInput } from "@/data/mockData";
+import type { Announcement, AnnouncementInput } from "@/types/content";
 
 export type ApiAnnouncement = {
   id: string;

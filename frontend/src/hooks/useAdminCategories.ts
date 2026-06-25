@@ -2,9 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import {
-  type AdminCategoryInput,
-} from "@/data/mockData";
+import type { AdminCategoryInput } from "@/types/admin";
 import {
   toCategoryMutationBody,
   toCategoryUpdateBody,

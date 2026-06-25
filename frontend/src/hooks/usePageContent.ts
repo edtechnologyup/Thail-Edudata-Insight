@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { PageContentMock } from "@/data/mockData";
+import type { PageContentMock } from "@/types/content";
 import apiClient from "@/services/api";
 import {
   mapApiPageToPublicContent,

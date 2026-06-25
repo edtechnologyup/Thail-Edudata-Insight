@@ -4,7 +4,7 @@ import type {
   PageContentMock,
   StaticPageIcon,
   StaticPageStatus,
-} from "@/data/mockData";
+} from "@/types/content";
 
 export type ApiPageContent = {
   slug: string;

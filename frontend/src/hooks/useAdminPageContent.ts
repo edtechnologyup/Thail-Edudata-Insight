@@ -7,7 +7,7 @@ import type {
   AdminPageUpdateInput,
   AdminStaticPageMeta,
   StaticPageStatus,
-} from "@/data/mockData";
+} from "@/types/content";
 import {
   mapPageContent,
   mapPageListItem,

@@ -1,11 +1,13 @@
-import type { DatasetDetailView, ApiDataset } from "@/types/dataset";
 import type {
+  DatasetDetailView,
+  ApiDataset,
   DatasetLicense,
   DatasetPreviewColumn,
   DatasetStatus,
-} from "@/data/mockData";
+  DatasetCitationData,
+  DatasetPreviewData,
+} from "@/types/dataset";
 import type { ApiCategory } from "@/utils/categoryApi";
-import type { DatasetCitationData, DatasetPreviewData } from "@/types/dataset";
 
 export function resolveCategoryLabels(
   categoryId: string | null,

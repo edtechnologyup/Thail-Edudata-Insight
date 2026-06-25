@@ -6,7 +6,7 @@ import type {
   AuditLog,
   AuditLogsFilters,
   AuditLogsResult,
-} from "@/data/mockData";
+} from "@/types/admin";
 import { mapAuditLog, type ApiAuditLog } from "@/utils/auditLogApi";
 
 const AUDIT_LOGS_PAGE_SIZE = 20;

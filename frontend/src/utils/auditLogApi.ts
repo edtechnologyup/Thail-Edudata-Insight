@@ -1,4 +1,4 @@
-import type { AuditLog, AuditLogAction } from "@/data/mockData";
+import type { AuditLog, AuditLogAction } from "@/types/admin";
 
 export type ApiAuditLog = {
   id: string;

@@ -1,6 +1,6 @@
 import apiClient from "@/services/api";
 import type { DatasetFormValues } from "@/components/dataset/datasetFormSchema";
-import type { AgencyDatasetFormInitial } from "@/data/mockData";
+import type { AgencyDatasetFormInitial } from "@/types/dataset";
 
 type ApiDataset = {
   id: string;

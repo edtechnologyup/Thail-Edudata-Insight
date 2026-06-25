@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import type { SearchResultMock } from "@/data/mockData";
+import type { SearchResultMock } from "@/types/dataset";
 import type { ApiCategory } from "@/utils/categoryApi";
 import {
   mapApiDatasetToSearchResult,

@@ -2,12 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import {
-  ADMIN_USERS_PAGE_SIZE,
-  type AdminUser,
-  type AdminUsersFilters,
-  type AdminUsersResult,
-} from "@/data/mockData";
+const ADMIN_USERS_PAGE_SIZE = 5;
+import type { AdminUser, AdminUsersFilters, AdminUsersResult } from "@/types/admin";
 
 type ApiAdminUser = {
   id: string;

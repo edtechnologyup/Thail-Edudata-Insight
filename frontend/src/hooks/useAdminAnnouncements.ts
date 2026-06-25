@@ -2,10 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import {
-  ADMIN_ANNOUNCEMENTS_PAGE_SIZE,
-  type AdminAnnouncementsResult,
-} from "@/data/mockData";
+const ADMIN_ANNOUNCEMENTS_PAGE_SIZE = 10;
+import type { AdminAnnouncementsResult } from "@/types/content";
 import { mapAnnouncement, type ApiAnnouncement } from "@/utils/announcementApi";
 
 type AdminAnnouncementsFilters = {

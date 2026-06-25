@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import type { Announcement } from "@/data/mockData";
+import type { Announcement } from "@/types/content";
 import { mapAnnouncement, type ApiAnnouncement } from "@/utils/announcementApi";
 
 type AnnouncementsResponse = {

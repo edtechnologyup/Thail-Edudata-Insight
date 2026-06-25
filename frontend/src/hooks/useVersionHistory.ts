@@ -5,7 +5,7 @@ import apiClient from "@/services/api";
 import type {
   DatasetVersionChangelogType,
   DatasetVersionItem,
-} from "@/data/mockData";
+} from "@/types/dataset";
 
 type ApiDatasetVersion = {
   version_number: number;

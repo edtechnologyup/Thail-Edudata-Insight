@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import type { AgencyDatasetRow } from "@/data/mockData";
+import type { AgencyDatasetRow } from "@/types/dataset";
 
 export type AgencyDatasetStatusFilter =
   | "all"

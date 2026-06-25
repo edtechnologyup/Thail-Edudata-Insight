@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import type { BulkUploadResult } from "@/data/mockData";
+import type { BulkUploadResult } from "@/types/dataset";
 
 // TODO: ต้องการ MinIO รันก่อนทดสอบ
 // docker-compose up -d minio

@@ -1,4 +1,4 @@
-import type { SearchResultMock } from "@/data/mockData";
+import type { SearchResultMock } from "@/types/dataset";
 import type { ApiCategory } from "@/utils/categoryApi";
 import {
   buildCategoryTree,

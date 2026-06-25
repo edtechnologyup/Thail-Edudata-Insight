@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import apiClient from "@/services/api";
-import type { AgencyBookmarkMock } from "@/data/mockData";
+import type { AgencyBookmarkMock } from "@/types/stats";
 import { fetchBookmarks } from "@/utils/savedItemsApi";
 
 export function useBookmarks() {

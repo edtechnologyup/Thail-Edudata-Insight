@@ -1,4 +1,4 @@
-import type { DatasetLicense, DatasetStatus, HomeDatasetMock } from "@/data/mockData";
+import type { DatasetLicense, DatasetStatus, HomeDatasetMock } from "@/types/dataset";
 import type { ApiDataset } from "@/types/dataset";
 import type { ApiCategory } from "@/utils/categoryApi";
 

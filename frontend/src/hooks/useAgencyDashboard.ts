@@ -5,7 +5,7 @@ import apiClient from "@/services/api";
 import type {
   AgencyDashboardStats,
   AgencyMonthlyDownload,
-} from "@/data/mockData";
+} from "@/types/stats";
 
 type ApiMonthlyDownload = {
   month: string;

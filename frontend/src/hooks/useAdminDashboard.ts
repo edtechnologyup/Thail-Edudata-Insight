@@ -6,7 +6,7 @@ import type {
   AdminDashboardData,
   AdminMonthlyCount,
   AdminPendingUser,
-} from "@/data/mockData";
+} from "@/types/admin";
 
 type AdminStatsApiData = {
   total_users: number;

@@ -2,10 +2,13 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import {
-  DEFAULT_DASHBOARD_WIDGETS,
-  type DashboardGridWidget,
-} from "@/data/mockData";
+import type { DashboardGridWidget } from "@/types/stats";
+
+const DEFAULT_DASHBOARD_WIDGETS: DashboardGridWidget[] = [
+  { id: "widget-bar-default", type: "bar", colSpan: 2 },
+  { id: "widget-stat-default", type: "stat", colSpan: 1 },
+  { id: "widget-line-default", type: "line", colSpan: 3 },
+];
 
 type DashboardLayoutRecord = {
   id: string;

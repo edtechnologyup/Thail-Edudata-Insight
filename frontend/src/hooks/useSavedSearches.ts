@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/services/api";
-import type { SavedSearchFilters } from "@/data/mockData";
+import type { SavedSearchFilters } from "@/types/stats";
 
 export type SavedSearch = {
   id: string;

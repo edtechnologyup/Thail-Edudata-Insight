@@ -4,7 +4,7 @@ import type {
   AgencySavedSearchMock,
   AgencySubscriptionMock,
   SavedSearchFilters,
-} from "@/data/mockData";
+} from "@/types/stats";
 
 type JSendList<T> = {
   success: boolean;

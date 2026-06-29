@@ -249,18 +249,43 @@ def get_all_audit_logs(
     return items, total
 
 
+def get_audit_log_stats(db: Session) -> dict[str, int]:
+    rows = (
+        db.query(AuditLog.action, func.count())
+        .group_by(AuditLog.action)
+        .all()
+    )
+    stats: dict[str, int] = {}
+    for action, count in rows:
+        stats[action] = count
+    total = db.query(func.count(AuditLog.id)).scalar() or 0
+
+    login_count = sum(v for k, v in stats.items() if "login" in k.lower())
+    delete_count = sum(v for k, v in stats.items() if "delete" in k.lower())
+    upload_count = sum(v for k, v in stats.items() if "upload" in k.lower() or "create" in k.lower())
+
+    return {
+        "total": total,
+        "logins": login_count,
+        "deletions": delete_count,
+        "uploads": upload_count,
+    }
+
+
 def create_announcement(
     db: Session,
     title: str,
     content: str,
     is_active: bool,
     created_by: uuid.UUID,
+    image_url: str | None = None,
 ) -> Announcement:
     announcement = Announcement(
         title=title,
         content=content,
         is_active=is_active,
         created_by=created_by,
+        image_url=image_url,
     )
     db.add(announcement)
     db.flush()

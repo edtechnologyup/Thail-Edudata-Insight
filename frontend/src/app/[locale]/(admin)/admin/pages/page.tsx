@@ -5,7 +5,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import CreatePageModal from "@/components/admin/CreatePageModal";
-import HeroImageUpload from "@/components/admin/HeroImageUpload";
 import StaticPageCard from "@/components/admin/StaticPageCard";
 import { useAdminStaticPages, useCreatePage } from "@/hooks/useAdminPageContent";
 
@@ -82,17 +81,6 @@ export default function AdminPagesPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section>
-        <div className="mb-5 flex items-center gap-3">
-          <ImageIcon />
-          <h2 className="font-kanit text-2xl font-bold text-text-primary">
-            {t("heroSectionTitle")}
-          </h2>
-        </div>
-        <HeroImageUpload onSuccess={showToast} onError={showError} />
-      </section>
-
       {/* Documents Directory */}
       <section>
         <div className="mb-6 flex items-center gap-3">
@@ -158,14 +146,6 @@ function PlusIcon() {
   return (
     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-    </svg>
-  );
-}
-
-function ImageIcon() {
-  return (
-    <svg className="h-7 w-7 text-primary-dark" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
     </svg>
   );
 }

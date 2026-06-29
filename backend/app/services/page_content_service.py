@@ -110,6 +110,11 @@ def get_public_page(db: Session, slug: str) -> PageContentResponse:
     return result
 
 
+def list_published_pages(db: Session) -> list[PageContentResponse]:
+    all_pages = list_pages(db)
+    return [p for p in all_pages if p.status == "published"]
+
+
 def list_pages(db: Session) -> list[PageContentResponse]:
     rows_by_slug = {row.slug: row for row in page_content_repo.list_all(db)}
     results: list[PageContentResponse] = []
@@ -190,6 +195,17 @@ def update_page(
             updated_by=user_id,
         )
 
+    if request.status is not None:
+        row.status = request.status
+
     db.commit()
     db.refresh(row)
     return _row_to_response(row)
+
+
+def delete_page(db: Session, slug: str) -> None:
+    row = page_content_repo.get_by_slug(db, slug)
+    if row is None:
+        raise_app_error("PAGE_NOT_FOUND", "ไม่พบหน้าที่ต้องการ")
+    page_content_repo.delete(db, row)
+    db.commit()

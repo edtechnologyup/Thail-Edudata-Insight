@@ -2,11 +2,11 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useHeroImage } from "@/hooks/useHeroImage";
 import {
-  useDeleteHeroImage,
-  useHeroImage,
-  useUploadHeroImage,
-} from "@/hooks/useHeroImage";
+  useUploadSettingImage,
+  useDeleteSettingImage,
+} from "@/hooks/useAdminSiteSettings";
 
 type HeroImageUploadProps = {
   onSuccess?: (message: string) => void;
@@ -23,8 +23,8 @@ export default function HeroImageUpload({
   const [localPreview, setLocalPreview] = useState<string | null>(null);
 
   const { data: heroData } = useHeroImage();
-  const uploadMutation = useUploadHeroImage();
-  const deleteMutation = useDeleteHeroImage();
+  const uploadMutation = useUploadSettingImage();
+  const deleteMutation = useDeleteSettingImage();
 
   const imageUrl = localPreview ?? heroData?.imageUrl ?? null;
   const isBusy = uploadMutation.isPending || deleteMutation.isPending;
@@ -40,7 +40,7 @@ export default function HeroImageUpload({
     setLocalPreview(previewUrl);
 
     try {
-      await uploadMutation.mutateAsync(file);
+      await uploadMutation.mutateAsync({ key: "home_hero_image", file });
       URL.revokeObjectURL(previewUrl);
       setLocalPreview(null);
       onSuccess?.(t("uploadSuccess"));
@@ -53,7 +53,7 @@ export default function HeroImageUpload({
 
   const handleReset = async () => {
     try {
-      await deleteMutation.mutateAsync();
+      await deleteMutation.mutateAsync("home_hero_image");
       setLocalPreview(null);
       onSuccess?.(t("resetSuccess"));
     } catch {
@@ -97,7 +97,6 @@ export default function HeroImageUpload({
           </div>
         )}
 
-        {/* Bottom overlay with info + buttons */}
         <div className="relative z-10 flex w-full items-end justify-between bg-gradient-to-t from-black/70 to-transparent px-8 pb-6 pt-16">
           <div>
             <span className="mb-2 inline-block rounded-md bg-emerald-500 px-3 py-1 font-sarabun text-body-sm font-bold uppercase tracking-wider text-white">

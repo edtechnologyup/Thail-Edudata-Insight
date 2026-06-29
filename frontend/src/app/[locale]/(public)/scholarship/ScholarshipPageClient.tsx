@@ -9,6 +9,7 @@ import ScholarshipFilter, {
   parseScholarshipFilterParams,
 } from "@/components/scholarship/ScholarshipFilter";
 import { useScholarships } from "@/hooks/useScholarships";
+import { useSettingImage } from "@/hooks/useHeroImage";
 
 type ScholarshipPageClientProps = {
   searchParams: Record<string, string | string[] | undefined>;
@@ -40,6 +41,8 @@ export default function ScholarshipPageClient({
   const { page, q, scholarship_type, target_level, application_status } =
     parseScholarshipFilterParams(searchParams);
 
+  const { data: heroImg } = useSettingImage("scholarship_hero_image");
+
   const { data, isLoading, isError } = useScholarships({
     q: q || undefined,
     scholarship_type: scholarship_type || undefined,
@@ -57,8 +60,15 @@ export default function ScholarshipPageClient({
 
   return (
     <>
-      <section className="px-4 py-10 md:px-spacing-10 md:py-14" style={{ backgroundColor: "#00695c" }}>
-        <div className="mx-auto max-w-container-max">
+      <section className="relative overflow-hidden px-4 py-10 md:px-spacing-10 md:py-14" style={{ backgroundColor: "#00695c" }}>
+        {heroImg?.imageUrl && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={heroImg.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden />
+            <div className="absolute inset-0" style={{ backgroundColor: "rgba(0,105,92,0.75)" }} aria-hidden />
+          </>
+        )}
+        <div className="relative z-10 mx-auto max-w-container-max">
           <h1 className="mb-3 font-kanit text-[2rem] font-bold text-white md:text-[2.5rem]">
             {t("title")}
           </h1>

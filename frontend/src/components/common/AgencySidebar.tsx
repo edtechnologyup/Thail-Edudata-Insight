@@ -74,6 +74,12 @@ function NavIcon({ name }: { name: string }) {
           <path d="M12 3 1 9l4 2.18v6L12 21l7-3.82v-6L23 9 12 3zm0 2.18 6.5 3.5L12 12.18 5.5 8.68 12 5.18zM7 11.09v4.36L12 18.5l5-3.05v-4.36L12 14.82 7 11.09z" />
         </svg>
       );
+    case "profile":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -265,7 +271,6 @@ export default function AgencySidebar() {
         p === `${base}/datasets` ||
         (p.startsWith(`${base}/datasets/`) &&
           !p.includes("/create") &&
-          !p.includes("/bulk-upload") &&
           !p.includes("/edit") &&
           !p.includes("/versions")),
     },
@@ -274,12 +279,6 @@ export default function AgencySidebar() {
       labelKey: "upload",
       icon: "upload",
       match: (p) => p.startsWith(`${base}/datasets/create`),
-    },
-    {
-      href: `${base}/datasets/bulk-upload`,
-      labelKey: "bulkUpload",
-      icon: "bulk",
-      match: (p) => p.startsWith(`${base}/datasets/bulk-upload`),
     },
     {
       href: `${base}/manage/categories`,
@@ -298,6 +297,13 @@ export default function AgencySidebar() {
       labelKey: "activityLog",
       icon: "activity",
       match: (p) => p.startsWith(`${base}/activity`),
+    },
+    {
+      href: `${base}/profile`,
+      labelKey: "profile",
+      icon: "profile",
+      match: (p) => p.startsWith(`${base}/profile`),
+      dividerBefore: true,
     },
   ];
 
@@ -318,7 +324,7 @@ export default function AgencySidebar() {
         <MenuIcon />
       </button>
 
-      <aside className="hidden w-[260px] shrink-0 flex-col border-l-4 border-l-primary-dark border-r border-r-border-sidebar bg-surface-card lg:flex">
+      <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-[260px] shrink-0 flex-col border-l-4 border-l-primary-dark border-r border-r-border-sidebar bg-surface-card lg:flex">
         <SidebarBrand />
         <SidebarNav items={items} pathname={pathname} />
         <SidebarFooter />

@@ -14,6 +14,7 @@ import app.services.download_service as download_service
 import app.services.hero_image_service as hero_image_service
 import app.services.page_content_service as page_content_service
 import app.services.public_service as public_service
+import app.services.site_setting_service as site_setting_service
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.pagination import PaginationParams, get_pagination_params
@@ -38,6 +39,12 @@ def _get_redis():
     import redis
 
     return redis.from_url(settings.redis_url, decode_responses=True)
+
+
+@router.get("/pages", status_code=200)
+def public_list_pages(db: Session = Depends(get_db)):
+    result = page_content_service.list_published_pages(db)
+    return success_response([r.model_dump(mode="json") for r in result])
 
 
 @router.get("/pages/{slug}", status_code=200)
@@ -70,6 +77,56 @@ def public_stream_hero_image():
     from app.core.errors import raise_app_error
 
     payload = hero_image_service.stream_hero_image(_get_minio())
+    if payload is None:
+        raise_app_error("FILE_NOT_FOUND", "ไม่พบไฟล์")
+
+    content, media_type = payload
+    return StreamingResponse(
+        io.BytesIO(content),
+        media_type=media_type,
+        headers={"Cache-Control": "public, max-age=300"},
+    )
+
+
+@router.get("/settings/site", status_code=200)
+def public_get_site_settings(db: Session = Depends(get_db)):
+    """
+    ดึง site settings (ribbon, grayscale)
+    - Auth ❌
+    """
+    result = site_setting_service.get_public_settings(db, _get_minio())
+    return success_response(result.model_dump(mode="json"))
+
+
+@router.get("/settings/ribbon-image/file")
+def public_stream_ribbon_image():
+    """
+    สตรีมรูป ribbon จาก MinIO
+    - Auth ❌
+    """
+    from app.core.errors import raise_app_error
+
+    payload = site_setting_service.stream_ribbon_image(_get_minio())
+    if payload is None:
+        raise_app_error("FILE_NOT_FOUND", "ไม่พบไฟล์")
+
+    content, media_type = payload
+    return StreamingResponse(
+        io.BytesIO(content),
+        media_type=media_type,
+        headers={"Cache-Control": "public, max-age=300"},
+    )
+
+
+@router.get("/settings/{key}/file")
+def public_stream_setting_image(key: str):
+    """
+    สตรีมรูป setting image จาก MinIO
+    - Auth ❌
+    """
+    from app.core.errors import raise_app_error
+
+    payload = site_setting_service.stream_setting_image(_get_minio(), key)
     if payload is None:
         raise_app_error("FILE_NOT_FOUND", "ไม่พบไฟล์")
 

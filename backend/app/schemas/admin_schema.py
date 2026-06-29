@@ -107,12 +107,14 @@ class AnnouncementCreateRequest(BaseModel):
     title: str = Field(min_length=1, max_length=500)
     content: str = Field(min_length=1)
     is_active: bool = True
+    image_url: str | None = Field(default=None, max_length=500)
 
 
 class AnnouncementUpdateRequest(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=500)
     content: str | None = Field(default=None, min_length=1)
     is_active: bool | None = None
+    image_url: str | None = Field(default=None, max_length=500)
 
 
 class AnnouncementResponse(BaseModel):
@@ -120,6 +122,7 @@ class AnnouncementResponse(BaseModel):
     title: str
     content: str
     is_active: bool
+    image_url: str | None = None
     created_by: uuid.UUID
     created_at: datetime
     updated_at: datetime
@@ -141,6 +144,7 @@ class PageContentCreateRequest(BaseModel):
 class PageContentUpdateRequest(BaseModel):
     content_th: str = ""
     content_en: str = ""
+    status: str | None = Field(default=None, pattern=r"^(draft|published)$")
 
 
 class PageContentResponse(BaseModel):

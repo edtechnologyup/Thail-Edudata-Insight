@@ -37,16 +37,16 @@ function NavIcon({ name }: { name: string }) {
           <path d="M4 4h16v4H4V4Zm0 6h10v4H4v-4Zm0 6h16v4H4v-4Z" />
         </svg>
       );
+    case "scholarships":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
+        </svg>
+      );
     case "categories":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="m12 2 2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7l2-7Z" />
-        </svg>
-      );
-    case "announcements":
-      return (
-        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M18 11v2h4v-2h-4Zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.31.79-.62 1.2-.92v-14.16l-5.5 3.32c-.55-.34-1.16-.62-1.87-.62-1.93 0-3.5 1.57-3.5 3.5 0 1.93 1.57 3.5 3.5 3.5.71 0 1.32-.28 1.87-.62l5.3 3.19ZM9 4v16h2V4H9Z" />
         </svg>
       );
     case "pages":
@@ -65,6 +65,12 @@ function NavIcon({ name }: { name: string }) {
       return (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z" />
+        </svg>
+      );
+    case "settings":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2Z" />
         </svg>
       );
     default:
@@ -176,7 +182,7 @@ function SidebarFooter({ onNavigate }: { onNavigate?: () => void }) {
       <button
         type="button"
         onClick={handleLogout}
-        className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-2.5 font-sarabun text-label font-semibold text-yellow-300 transition-colors hover:bg-red-700"
+        className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-2.5 font-sarabun text-label font-normal text-yellow-300 transition-colors hover:bg-red-700"
       >
         <LogoutIcon />
         {tNav("logout")}
@@ -212,22 +218,28 @@ export default function AdminSidebar() {
       match: (p) => p.startsWith(`${base}/admin/datasets`),
     },
     {
+      href: `${base}/admin/scholarships`,
+      labelKey: "scholarships",
+      icon: "scholarships",
+      match: (p) => p.startsWith(`${base}/admin/scholarships`),
+    },
+    {
       href: `${base}/admin/categories`,
       labelKey: "categories",
       icon: "categories",
       match: (p) => p.startsWith(`${base}/admin/categories`),
     },
     {
-      href: `${base}/admin/announcements`,
-      labelKey: "announcements",
-      icon: "announcements",
-      match: (p) => p.startsWith(`${base}/admin/announcements`),
-    },
-    {
       href: `${base}/admin/pages`,
       labelKey: "pages",
       icon: "pages",
       match: (p) => p.startsWith(`${base}/admin/pages`),
+    },
+    {
+      href: `${base}/admin/site-settings`,
+      labelKey: "siteSettings",
+      icon: "settings",
+      match: (p) => p.startsWith(`${base}/admin/site-settings`),
     },
     {
       href: `${base}/admin/audit-logs`,
@@ -251,10 +263,10 @@ export default function AdminSidebar() {
 
   const sidebarHeader = (
     <div className="px-4 py-6">
-      <h2 className="font-kanit text-body-lg font-bold text-white">
+      <h2 className="font-kanit text-xl font-bold text-white">
         Thai EduData
       </h2>
-      <p className="font-sarabun text-caption text-white/60">{t("portal")}</p>
+      <p className="font-sarabun text-body-sm text-white/60">{t("portal")}</p>
     </div>
   );
 
@@ -271,7 +283,7 @@ export default function AdminSidebar() {
       </button>
 
       <aside
-        className="hidden h-full w-[240px] shrink-0 flex-col lg:flex"
+        className="sticky top-20 hidden h-[calc(100vh-5rem)] w-[240px] shrink-0 flex-col lg:flex"
         style={{
           background: "#0045bc",
           boxShadow: "4px 0 32px 0 rgba(60,100,255,0.3)",

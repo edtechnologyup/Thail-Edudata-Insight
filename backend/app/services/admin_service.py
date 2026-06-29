@@ -389,6 +389,10 @@ def get_audit_logs(
     return results, total
 
 
+def get_audit_log_stats(db: Session) -> dict[str, int]:
+    return admin_repo.get_audit_log_stats(db)
+
+
 def create_announcement(
     db: Session,
     request: AnnouncementCreateRequest,
@@ -402,6 +406,7 @@ def create_announcement(
         content=request.content,
         is_active=request.is_active,
         created_by=uuid.UUID(current_user["sub"]),
+        image_url=request.image_url,
     )
     if request.is_active:
         notification_service.create_announcement_notification(
@@ -409,6 +414,7 @@ def create_announcement(
             title=request.title,
             content=request.content,
             announcement_id=announcement.id,
+            image_url=request.image_url,
         )
     db.commit()
     db.refresh(announcement)
@@ -439,6 +445,8 @@ def update_announcement(
         fields["content"] = request.content
     if request.is_active is not None:
         fields["is_active"] = request.is_active
+    if request.image_url is not None:
+        fields["image_url"] = request.image_url
 
     import app.services.notification_service as notification_service
 
@@ -451,6 +459,7 @@ def update_announcement(
             title=announcement.title,
             content=announcement.content,
             announcement_id=announcement.id,
+            image_url=announcement.image_url,
         )
     db.commit()
     db.refresh(announcement)

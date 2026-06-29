@@ -102,6 +102,32 @@ type CreatePageVariables = {
 };
 
 /** POST /api/v1/admin/pages */
+export function useTogglePageStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ slug, status }: { slug: string; status: "draft" | "published" }) => {
+      await apiClient.put(`/admin/pages/${slug}`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "pages"] });
+    },
+  });
+}
+
+export function useDeletePage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (slug: string) => {
+      await apiClient.delete(`/admin/pages/${slug}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "pages"] });
+    },
+  });
+}
+
 export function useCreatePage() {
   const queryClient = useQueryClient();
 

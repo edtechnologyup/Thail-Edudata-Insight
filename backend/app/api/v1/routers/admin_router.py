@@ -21,6 +21,7 @@ import app.services.admin_service as admin_service
 import app.services.dataset_service as dataset_service
 import app.services.hero_image_service as hero_image_service
 import app.services.page_content_service as page_content_service
+import app.services.site_setting_service as site_setting_service
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.pagination import PaginationParams, get_pagination_params
@@ -450,6 +451,15 @@ def get_audit_log_filters(
     )
 
 
+@router.get("/audit-logs/stats", status_code=status.HTTP_200_OK)
+def admin_audit_log_stats(
+    payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    result = admin_service.get_audit_log_stats(db)
+    return success_response(result)
+
+
 @router.get("/audit-logs", status_code=status.HTTP_200_OK)
 def admin_audit_logs(
     pagination: PaginationParams = Depends(get_pagination_params),
@@ -575,6 +585,88 @@ def delete_hero_image(
     return success_response(result.model_dump(mode="json"))
 
 
+@router.get("/settings/site", status_code=status.HTTP_200_OK)
+def admin_get_site_settings(
+    payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """
+    ดึง site settings ทั้งหมด
+    - Auth ✅ Admin
+    """
+    items = site_setting_service.get_all_settings(db)
+    return success_response([i.model_dump(mode="json") for i in items])
+
+
+@router.put("/settings/site/{key}", status_code=status.HTTP_200_OK)
+def admin_update_site_setting(
+    key: str,
+    body: site_setting_service.SiteSettingUpdateRequest,
+    payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """
+    อัปเดต site setting (ribbon, grayscale)
+    - Auth ✅ Admin
+    """
+    result = site_setting_service.update_setting(db, key, body)
+    return success_response(result.model_dump(mode="json"))
+
+
+@router.post("/settings/ribbon-image", status_code=status.HTTP_200_OK)
+def admin_upload_ribbon_image(
+    image: UploadFile = File(...),
+    payload: dict = Depends(require_roles("admin")),
+):
+    """
+    อัปโหลดรูป ribbon มุมขวา
+    - Auth ✅ Admin
+    """
+    url = site_setting_service.upload_ribbon_image(_get_minio(), image)
+    return success_response({"image_url": url})
+
+
+@router.delete("/settings/ribbon-image", status_code=status.HTTP_200_OK)
+def admin_delete_ribbon_image(
+    payload: dict = Depends(require_roles("admin")),
+):
+    """
+    ลบรูป ribbon
+    - Auth ✅ Admin
+    """
+    site_setting_service.delete_ribbon_image(_get_minio())
+    return success_response({"image_url": None})
+
+
+@router.post("/settings/images/{key}", status_code=status.HTTP_200_OK)
+def admin_upload_setting_image(
+    key: str,
+    image: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    payload: dict = Depends(require_roles("admin")),
+):
+    """
+    อัปโหลดรูป setting (hero, guide, popup ฯลฯ)
+    - Auth ✅ Admin
+    """
+    url = site_setting_service.upload_setting_image(db, _get_minio(), key, image)
+    return success_response({"image_url": url})
+
+
+@router.delete("/settings/images/{key}", status_code=status.HTTP_200_OK)
+def admin_delete_setting_image(
+    key: str,
+    db: Session = Depends(get_db),
+    payload: dict = Depends(require_roles("admin")),
+):
+    """
+    ลบรูป setting
+    - Auth ✅ Admin
+    """
+    site_setting_service.delete_setting_image(db, _get_minio(), key)
+    return success_response({"image_url": None})
+
+
 @router.post("/pages", status_code=status.HTTP_201_CREATED)
 def admin_create_page(
     request_body: PageContentCreateRequest,
@@ -635,3 +727,13 @@ def admin_update_page(
         db, slug, request=request_body, current_user=payload
     )
     return success_response(result.model_dump(mode="json"))
+
+
+@router.delete("/pages/{slug}", status_code=status.HTTP_200_OK)
+def admin_delete_page(
+    slug: str,
+    payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    page_content_service.delete_page(db, slug)
+    return success_response({"deleted": slug})

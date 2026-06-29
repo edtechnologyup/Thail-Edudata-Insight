@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import FooterAboutLinks from "@/components/common/FooterAboutLinks";
 
 type FooterProps = {
   locale: string;
@@ -14,14 +15,6 @@ export default async function Footer({ locale }: FooterProps) {
     { href: `${base}/search`, label: t("catalog") },
     { href: `${base}/stats`, label: t("dashboard") },
     { href: `${base}/api-docs`, label: t("apiDocs") },
-    { href: `${base}/privacy-policy`, label: t("dataStandards") },
-  ];
-
-  const aboutLinks = [
-    { href: `${base}/privacy-policy`, label: t("openDataPolicy") },
-    { href: `${base}/privacy-policy`, label: t("privacy") },
-    { href: `${base}/terms`, label: t("terms") },
-    { href: `${base}/privacy-policy`, label: t("contact") },
   ];
 
   const agencyLinks = [
@@ -97,23 +90,7 @@ export default async function Footer({ locale }: FooterProps) {
           </ul>
         </div>
 
-        <div>
-          <h4 className="mb-4 font-kanit text-caption font-bold uppercase tracking-widest text-white">
-            {t("aboutTitle")}
-          </h4>
-          <ul className="space-y-3">
-            {aboutLinks.map((link) => (
-              <li key={link.label}>
-                <Link
-                  href={link.href}
-                  className="font-sarabun text-label transition-colors hover:text-primary"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <FooterAboutLinks locale={locale} title={t("aboutTitle")} />
 
         <div>
           <h4 className="mb-4 font-kanit text-caption font-bold uppercase tracking-widest text-white">

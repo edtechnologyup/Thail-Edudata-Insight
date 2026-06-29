@@ -9,7 +9,7 @@ import AuditLogFilter, {
 } from "@/components/admin/AuditLogFilter";
 import AuditLogTable from "@/components/admin/AuditLogTable";
 import type { AuditLogsFilters } from "@/types/admin";
-import { exportAuditLogsCsv } from "@/hooks/useAuditLogs";
+import { exportAuditLogsCsv, useAuditLogStats } from "@/hooks/useAuditLogs";
 
 const emptyFilters: AuditLogFilterValues = {
   dateFrom: "",
@@ -22,6 +22,8 @@ export default function AdminAuditLogsPage() {
   const t = useTranslations("admin.auditLogs");
   const locale = useLocale();
   const base = `/${locale}`;
+
+  const { data: stats } = useAuditLogStats();
 
   const [draftFilters, setDraftFilters] =
     useState<AuditLogFilterValues>(emptyFilters);
@@ -84,6 +86,28 @@ export default function AdminAuditLogsPage() {
         </button>
       </header>
 
+      {/* Stats Cards */}
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <AdminStatsCard
+          label={t("statSessions")}
+          value={stats?.logins?.toLocaleString() ?? "—"}
+          icon={<SessionIcon />}
+          iconClassName="bg-blue-50 text-blue-600"
+        />
+        <AdminStatsCard
+          label={t("statDeletions")}
+          value={stats?.deletions?.toLocaleString() ?? "—"}
+          icon={<DeleteStatIcon />}
+          iconClassName="bg-red-50 text-red-500"
+        />
+        <AdminStatsCard
+          label={t("statUploads")}
+          value={stats?.uploads?.toLocaleString() ?? "—"}
+          icon={<UploadStatIcon />}
+          iconClassName="bg-blue-50 text-blue-600"
+        />
+      </section>
+
       {/* Filters */}
       <AuditLogFilter
         values={draftFilters}
@@ -93,28 +117,6 @@ export default function AdminAuditLogsPage() {
 
       {/* Table */}
       <AuditLogTable filters={queryFilters} onPageChange={setPage} />
-
-      {/* Stats Cards */}
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <AdminStatsCard
-          label={t("statSessions")}
-          value="1,284"
-          icon={<SessionIcon />}
-          iconClassName="bg-blue-50 text-blue-600"
-        />
-        <AdminStatsCard
-          label={t("statDeletions")}
-          value="12"
-          icon={<DeleteStatIcon />}
-          iconClassName="bg-red-50 text-red-500"
-        />
-        <AdminStatsCard
-          label={t("statUploads")}
-          value="48"
-          icon={<UploadStatIcon />}
-          iconClassName="bg-blue-50 text-blue-600"
-        />
-      </section>
     </div>
   );
 }

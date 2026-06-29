@@ -82,6 +82,17 @@ export function useAuditLogs(filters?: AuditLogsFilters) {
   });
 }
 
+export function useAuditLogStats() {
+  return useQuery<{ total: number; logins: number; deletions: number; uploads: number }>({
+    queryKey: ["admin", "audit-logs", "stats"],
+    queryFn: async () => {
+      const res = await apiClient.get("/admin/audit-logs/stats");
+      return res.data.data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 /** Client-side CSV export — TODO: GET /admin/audit-logs/export when backend adds it */
 export async function exportAuditLogsCsv(
   filters?: Omit<AuditLogsFilters, "page">

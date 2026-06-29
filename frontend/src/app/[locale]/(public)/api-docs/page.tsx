@@ -16,6 +16,7 @@ import {
   getLocalizedText,
 } from "@/data/apiDocsContent";
 import { useApiDocs } from "@/hooks/useApiDocs";
+import { useSettingImage } from "@/hooks/useHeroImage";
 
 function ApiDocsSkeleton() {
   return (
@@ -37,6 +38,7 @@ export default function ApiDocsPage() {
   const t = useTranslations("apiDocs");
   const locale = useLocale();
   const { data, isLoading, isError, isFetching } = useApiDocs();
+  const { data: heroImg } = useSettingImage("apidocs_hero_image");
 
   const navItems = useMemo<ApiDocNavItem[]>(
     () => [
@@ -93,7 +95,14 @@ export default function ApiDocsPage() {
             </span>
           </nav>
 
-          <div className="overflow-hidden rounded-2xl p-8 md:p-10" style={{ backgroundColor: "#004d40" }}>
+          <div className="relative overflow-hidden rounded-2xl p-8 md:p-10" style={{ backgroundColor: "#004d40" }}>
+            {heroImg?.imageUrl && (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={heroImg.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden />
+                <div className="absolute inset-0" style={{ backgroundColor: "rgba(0,77,64,0.75)" }} aria-hidden />
+              </>
+            )}
             <div className="relative">
               <p className="mb-3 inline-flex rounded-full px-4 py-1 font-sarabun text-caption font-semibold uppercase tracking-[0.18em]" style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "#a5d6a7" }}>
                 {t("portalEyebrow")}

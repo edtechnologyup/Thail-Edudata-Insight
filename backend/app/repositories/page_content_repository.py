@@ -39,6 +39,11 @@ def create(
     return row
 
 
+def delete(db: Session, row: PageContent) -> None:
+    db.delete(row)
+    db.flush()
+
+
 def update_content(
     db: Session,
     row: PageContent,

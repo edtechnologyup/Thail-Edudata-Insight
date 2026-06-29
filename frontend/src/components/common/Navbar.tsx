@@ -139,14 +139,7 @@ export default function Navbar({ variant }: NavbarProps) {
         }}
       >
         <div className="flex w-full items-center gap-4">
-          <Link
-            href={base}
-            className="shrink-0 font-kanit text-body-lg font-bold text-white"
-          >
-            Thai EduData Insight
-          </Link>
           <div className="ml-auto flex items-center gap-5">
-            <NotificationBell variant="admin" />
             <LanguageSwitcher variant="admin" />
             <div className="flex items-center gap-3 border-l border-white/25 pl-5">
               <span className="hidden font-sarabun text-body-md font-bold text-white sm:inline">
@@ -174,30 +167,13 @@ export default function Navbar({ variant }: NavbarProps) {
       >
         <div className="flex w-full items-center gap-4">
           <Link
-            href={base}
+            href={`${base}/dashboard`}
             className="shrink-0 font-kanit text-label font-bold text-white md:text-body-lg"
           >
             Thai EduData Insight
           </Link>
 
-          <div className="relative mx-4 hidden max-w-sm flex-1 md:flex">
-            <input
-              type="search"
-              readOnly
-              onFocus={() => {
-                window.location.href = `${base}/search`;
-              }}
-              placeholder={t("searchPlaceholder")}
-              className="h-9 w-full cursor-pointer rounded-full border-0 bg-white/20 px-4 pr-10 font-sarabun text-body-md text-white placeholder:text-white/70 focus:bg-white/30 focus:outline-none"
-              aria-label={t("search")}
-            />
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/70">
-              <SearchIcon className="h-4 w-4" />
-            </span>
-          </div>
-
           <div className="ml-auto flex items-center gap-4">
-            <NotificationBell variant="admin" />
             <LanguageSwitcher variant="admin" />
             <Link
               href={`${base}/profile`}
@@ -228,31 +204,14 @@ export default function Navbar({ variant }: NavbarProps) {
         <div className="mx-auto flex h-16 max-w-container-max items-center justify-between gap-4 px-4 md:px-10">
           <Link
             href={base}
-            className="shrink-0 font-kanit text-label font-bold text-primary-dark md:text-body-lg"
+            className="flex shrink-0 items-center gap-3 font-kanit text-xl font-bold text-primary-dark md:text-2xl"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="" className="h-[72px] w-[72px] object-contain" />
             Thai EduData Insight
           </Link>
 
-          {!pathname.startsWith(`${base}/datasets/`) && !pathname.startsWith(`${base}/search`) && !pathname.startsWith(`${base}/scholarship`) && (
-            <div className="relative mx-4 hidden max-w-xl flex-1 md:flex">
-              <input
-                type="search"
-                readOnly
-                onFocus={() => {
-                  window.location.href = `${base}/search`;
-                }}
-                placeholder={t("searchPlaceholder")}
-                className="h-10 w-full cursor-pointer rounded-radius-sm border border-border-input bg-surface-card px-4 pr-10 font-sarabun text-body-md text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-primary-dark/20"
-                aria-label={t("search")}
-              />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-muted">
-                <SearchIcon className="h-5 w-5" />
-              </span>
-            </div>
-          )}
-
           <div className="flex items-center gap-3 md:gap-4">
-            <NotificationBell />
             <LanguageSwitcher />
             <Link
               href={`${base}/login`}

@@ -1,12 +1,35 @@
+"use client";
+
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import apiClient from "@/services/api";
+
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 type HomeCtaSectionProps = {
   locale: string;
 };
 
-export default async function HomeCtaSection({ locale }: HomeCtaSectionProps) {
-  const t = await getTranslations("home.cta");
+function useGuideImage() {
+  return useQuery({
+    queryKey: ["settings", "guide-image"],
+    queryFn: async () => {
+      const res = await apiClient.get<{
+        data: { image_urls: Record<string, string> };
+      }>("/public/settings/site");
+      const path = res.data.data.image_urls?.home_guide_image ?? null;
+      if (!path) return null;
+      if (path.startsWith("http")) return path;
+      return `${API}${path.startsWith("/") ? path : `/${path}`}`;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export default function HomeCtaSection({ locale }: HomeCtaSectionProps) {
+  const t = useTranslations("home.cta");
+  const { data: guideImageUrl } = useGuideImage();
 
   return (
     <section className="px-4 py-12 md:px-10 md:py-16">
@@ -33,7 +56,22 @@ export default async function HomeCtaSection({ locale }: HomeCtaSectionProps) {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl p-8 md:p-10" style={{ backgroundColor: "#f5f5f5" }}>
+        <div
+          className="relative overflow-hidden rounded-2xl p-8 md:p-10"
+          style={{ backgroundColor: "#f5f5f5" }}
+        >
+          {guideImageUrl && (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={guideImageUrl}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+                aria-hidden
+              />
+              <div className="absolute inset-0 bg-white/70" aria-hidden />
+            </>
+          )}
           <div className="relative z-10">
             <h3 className="font-kanit text-heading-2 text-text-primary">
               {t("manualTitle")}

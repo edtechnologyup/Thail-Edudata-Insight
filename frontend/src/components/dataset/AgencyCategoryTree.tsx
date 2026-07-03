@@ -12,6 +12,7 @@ type AgencyCategoryTreeProps = {
   onAddChild: (parent: CategoryTreeNode) => void;
   onEdit: (node: CategoryTreeNode) => void;
   onDelete: (node: CategoryTreeNode, displayName: string) => void;
+  onMove?: (node: CategoryTreeNode) => void;
   filterLevel?: 1 | 2;
 };
 
@@ -44,6 +45,7 @@ function TreeRow({
   onAddChild,
   onEdit,
   onDelete,
+  onMove,
   locale,
   t,
 }: {
@@ -54,6 +56,7 @@ function TreeRow({
   onAddChild: (parent: CategoryTreeNode) => void;
   onEdit: (node: CategoryTreeNode) => void;
   onDelete: (node: CategoryTreeNode, displayName: string) => void;
+  onMove?: (node: CategoryTreeNode) => void;
   locale: string;
   t: ReturnType<typeof useTranslations>;
 }) {
@@ -114,6 +117,17 @@ function TreeRow({
                 <PlusSmallIcon />
               </button>
             )}
+            {onMove && node.parentId && (
+              <button
+                type="button"
+                onClick={() => onMove(node)}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-[#e3f2fd] hover:text-[#1565c0]"
+                aria-label="ย้ายหมวดหมู่"
+                title="ย้ายหมวดหมู่"
+              >
+                <MoveIcon />
+              </button>
+            )}
             <button
               type="button"
               onClick={() => onEdit(node)}
@@ -147,6 +161,7 @@ function TreeRow({
             onAddChild={onAddChild}
             onEdit={onEdit}
             onDelete={onDelete}
+            onMove={onMove}
             locale={locale}
             t={t}
           />
@@ -162,6 +177,7 @@ export default function AgencyCategoryTree({
   onAddChild,
   onEdit,
   onDelete,
+  onMove,
   filterLevel,
 }: AgencyCategoryTreeProps) {
   const t = useTranslations("agency.categories");
@@ -235,6 +251,7 @@ export default function AgencyCategoryTree({
                 onAddChild={onAddChild}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onMove={onMove}
                 locale={locale}
                 t={t}
               />
@@ -271,6 +288,14 @@ function PlusSmallIcon() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+    </svg>
+  );
+}
+
+function MoveIcon() {
+  return (
+    <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z" />
     </svg>
   );
 }

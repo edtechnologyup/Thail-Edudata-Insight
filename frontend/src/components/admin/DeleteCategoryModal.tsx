@@ -32,18 +32,10 @@ export default function DeleteCategoryModal({
 
   const hasDatasets = target.datasetCount > 0;
   const hasChildren = target.childCount > 0;
-  const blocked = hasDatasets || hasChildren;
 
-  const blockMessage = hasChildren
-    ? t("deleteErrorChildren")
-    : t("deleteErrorDetail", {
-        name: displayName,
-        count: target.datasetCount,
-      });
-
-  const handleDelete = async () => {
+  const handleDelete = async (force: boolean = false) => {
     try {
-      await deleteMutation.mutateAsync({ id: target.id });
+      await deleteMutation.mutateAsync({ id: target.id, force });
       onSuccess();
       onClose();
     } catch {
@@ -63,24 +55,25 @@ export default function DeleteCategoryModal({
         type="button"
         className="absolute inset-0 bg-surface-navy/40 backdrop-blur-sm"
         onClick={onClose}
-        aria-label={hasDatasets ? t("close") : t("cancel")}
+        aria-label={t("cancel")}
       />
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white p-8 shadow-xl">
         <div className="flex flex-col items-center text-center">
           <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
             <WarningIcon />
           </div>
-          <h2
-            id="admin-delete-category-title"
-            className="mb-2 font-kanit text-heading-3 font-bold text-text-primary"
-          >
-            {blocked ? t("deleteBlockedTitle") : t("deleteTitle")}
-          </h2>
-          <p className="mb-6 px-4 font-sarabun text-body-md text-text-secondary">
-            {blocked ? blockMessage : t("deleteMsg", { name: displayName })}
-          </p>
-          <div className="flex w-full flex-col gap-3">
-            {blocked ? (
+
+          {hasChildren ? (
+            <>
+              <h2
+                id="admin-delete-category-title"
+                className="mb-2 font-kanit text-heading-3 font-bold text-text-primary"
+              >
+                {t("deleteBlockedTitle")}
+              </h2>
+              <p className="mb-6 px-4 font-sarabun text-body-md text-text-secondary">
+                {t("deleteErrorChildren")}
+              </p>
               <button
                 type="button"
                 onClick={onClose}
@@ -88,8 +81,56 @@ export default function DeleteCategoryModal({
               >
                 {t("close")}
               </button>
-            ) : (
-              <>
+            </>
+          ) : hasDatasets ? (
+            <>
+              <h2
+                id="admin-delete-category-title"
+                className="mb-2 font-kanit text-heading-3 font-bold text-text-primary"
+              >
+                ลบหมวดหมู่ไม่ได้
+              </h2>
+              <p className="mb-2 px-4 font-sarabun text-body-md text-text-secondary">
+                หมวดหมู่ &quot;{displayName}&quot; มี{" "}
+                <span className="font-bold text-status-error">
+                  {target.datasetCount} dataset
+                </span>{" "}
+                อยู่ ยังลบไม่ได้
+              </p>
+              <p className="mb-6 font-sarabun text-label text-text-muted">
+                ต้องการลบ dataset ทั้งหมดในหมวดนี้แล้วลบหมวดหมู่ด้วยหรือไม่?
+              </p>
+              <div className="flex w-full flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={deleteMutation.isPending}
+                  className="w-full rounded-full border border-border-default py-3 font-kanit text-label font-medium text-text-secondary transition-colors hover:bg-surface-container disabled:opacity-50"
+                >
+                  ไม่ลบ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(true)}
+                  disabled={deleteMutation.isPending}
+                  className="w-full rounded-full bg-status-error py-3 font-kanit text-label font-medium text-surface-card transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  {deleteMutation.isPending ? "กำลังลบ..." : "ลบทั้งหมด"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2
+                id="admin-delete-category-title"
+                className="mb-2 font-kanit text-heading-3 font-bold text-text-primary"
+              >
+                {t("deleteTitle")}
+              </h2>
+              <p className="mb-6 px-4 font-sarabun text-body-md text-text-secondary">
+                {t("deleteMsg", { name: displayName })}
+              </p>
+              <div className="flex w-full flex-col gap-3">
                 <button
                   type="button"
                   onClick={onClose}
@@ -100,15 +141,15 @@ export default function DeleteCategoryModal({
                 </button>
                 <button
                   type="button"
-                  onClick={handleDelete}
+                  onClick={() => handleDelete(false)}
                   disabled={deleteMutation.isPending}
                   className="w-full rounded-full bg-status-error py-3 font-kanit text-label font-medium text-surface-card transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
                   {deleteMutation.isPending ? t("deleting") : t("confirmDelete")}
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

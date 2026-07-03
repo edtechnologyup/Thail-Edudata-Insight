@@ -200,7 +200,7 @@ export default function Navbar({ variant }: NavbarProps) {
         }}
       >
         {/* Tier 1 */}
-        <div className="mx-auto flex h-16 max-w-container-max items-center justify-between gap-4 px-4 md:px-10">
+        <div className="mx-auto flex h-24 max-w-container-max items-center justify-between gap-4 px-4 md:px-10">
           <Link
             href={base}
             className="flex shrink-0 items-center gap-3 font-kanit text-xl font-bold text-primary-dark md:text-2xl"
@@ -231,7 +231,7 @@ export default function Navbar({ variant }: NavbarProps) {
 
         {/* Tier 2 — desktop */}
         <div className="hidden border-t border-border-input/30 md:block">
-          <div className="mx-auto flex h-11 max-w-container-max items-center gap-6 px-10">
+          <div className="mx-auto flex h-14 max-w-container-max items-center gap-6 px-10">
             {navLinks.map((link) => (
               <Link
                 key={link.href}

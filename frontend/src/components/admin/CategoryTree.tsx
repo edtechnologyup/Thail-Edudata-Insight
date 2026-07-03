@@ -12,6 +12,7 @@ type CategoryTreeProps = {
   onAddChild: (parent: AdminCategoryTreeNode) => void;
   onEdit: (node: AdminCategoryTreeNode) => void;
   onDelete: (node: AdminCategoryTreeNode, displayName: string) => void;
+  onMove?: (node: AdminCategoryTreeNode) => void;
 };
 
 function formatCount(value: number, locale: string): string {
@@ -26,6 +27,7 @@ function TreeRow({
   onAddChild,
   onEdit,
   onDelete,
+  onMove,
   locale,
   t,
 }: {
@@ -36,6 +38,7 @@ function TreeRow({
   onAddChild: (parent: AdminCategoryTreeNode) => void;
   onEdit: (node: AdminCategoryTreeNode) => void;
   onDelete: (node: AdminCategoryTreeNode, displayName: string) => void;
+  onMove?: (node: AdminCategoryTreeNode) => void;
   locale: string;
   t: ReturnType<typeof useTranslations>;
 }) {
@@ -98,6 +101,11 @@ function TreeRow({
                 <PlusIcon />
               </ActionButton>
             )}
+            {onMove && node.parentId && (
+              <ActionButton label="ย้าย" onClick={() => onMove(node)}>
+                <MoveIcon />
+              </ActionButton>
+            )}
             <ActionButton label={t("edit")} onClick={() => onEdit(node)}>
               <EditIcon />
             </ActionButton>
@@ -123,6 +131,7 @@ function TreeRow({
             onAddChild={onAddChild}
             onEdit={onEdit}
             onDelete={onDelete}
+            onMove={onMove}
             locale={locale}
             t={t}
           />
@@ -138,6 +147,7 @@ export default function CategoryTree({
   onAddChild,
   onEdit,
   onDelete,
+  onMove,
 }: CategoryTreeProps) {
   const t = useTranslations("admin.categories");
   const locale = useLocale();
@@ -210,6 +220,7 @@ export default function CategoryTree({
                 onAddChild={onAddChild}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onMove={onMove}
                 locale={locale}
                 t={t}
               />
@@ -275,6 +286,14 @@ function PlusIcon() {
   return (
     <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+    </svg>
+  );
+}
+
+function MoveIcon() {
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z" />
     </svg>
   );
 }

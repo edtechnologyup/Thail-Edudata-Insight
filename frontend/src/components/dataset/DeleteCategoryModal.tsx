@@ -28,15 +28,10 @@ export default function DeleteCategoryModal({
 
   const hasDatasets = category.datasetCount > 0;
   const hasChildren = category.childCount > 0;
-  const blocked = hasDatasets || hasChildren;
 
-  const blockMessage = hasChildren
-    ? t("deleteErrorChildren")
-    : t("deleteError");
-
-  const handleDelete = async () => {
+  const handleDelete = async (force: boolean = false) => {
     try {
-      await deleteMutation.mutateAsync({ id: category.id });
+      await deleteMutation.mutateAsync({ id: category.id, force });
       onClose();
     } catch (error) {
       const code =
@@ -65,52 +60,97 @@ export default function DeleteCategoryModal({
         type="button"
         className="absolute inset-0 bg-surface-navy/40 backdrop-blur-sm"
         onClick={onClose}
-        aria-label={blocked ? t("close") : t("cancel")}
+        aria-label={t("cancel")}
       />
       <div className="relative w-full max-w-md rounded-radius-lg bg-surface-card p-6 shadow-level-3">
         <button
           type="button"
           onClick={onClose}
           className="absolute right-4 top-4 text-text-muted transition-colors hover:text-text-primary"
-          aria-label={blocked ? t("close") : t("cancel")}
+          aria-label={t("cancel")}
         >
           <CloseIcon />
         </button>
         <div className="flex flex-col items-center text-center">
           <div
             className={`mb-4 flex h-16 w-16 items-center justify-center rounded-radius-full ${
-              blocked ? "bg-status-warning-bg" : "bg-status-error-bg"
+              hasChildren ? "bg-status-warning-bg" : "bg-status-error-bg"
             }`}
           >
-            <WarningIcon blocked={blocked} />
+            <WarningIcon blocked={hasChildren} />
           </div>
-          <h2
-            id="delete-category-title"
-            className="mb-2 font-kanit text-heading-3 font-bold text-text-primary"
-          >
-            {blocked ? blockMessage : t("deleteTitle")}
-          </h2>
-          <p className="mb-1 font-sarabun text-body-md text-text-secondary">
-            {blocked
-              ? blockMessage
-              : t("deleteMsg", { name: displayName })}
-          </p>
-          {!blocked && (
-            <p className="mb-8 font-sarabun text-label italic text-status-error">
-              {t("deleteWarning")}
-            </p>
-          )}
-          <div className="flex w-full gap-4">
-            {blocked ? (
+
+          {hasChildren ? (
+            <>
+              <h2
+                id="delete-category-title"
+                className="mb-2 font-kanit text-heading-3 font-bold text-text-primary"
+              >
+                {t("deleteErrorChildren")}
+              </h2>
+              <p className="mb-4 font-sarabun text-body-md text-text-secondary">
+                {t("deleteErrorChildren")}
+              </p>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 rounded-radius-lg bg-primary py-3 font-sarabun text-label font-medium text-surface-card transition-opacity hover:opacity-90"
+                className="w-full rounded-radius-lg bg-primary py-3 font-sarabun text-label font-medium text-surface-card transition-opacity hover:opacity-90"
               >
                 {t("close")}
               </button>
-            ) : (
-              <>
+            </>
+          ) : hasDatasets ? (
+            <>
+              <h2
+                id="delete-category-title"
+                className="mb-2 font-kanit text-heading-3 font-bold text-text-primary"
+              >
+                ลบหมวดหมู่ไม่ได้
+              </h2>
+              <p className="mb-2 font-sarabun text-body-md text-text-secondary">
+                หมวดหมู่ &quot;{displayName}&quot; มี{" "}
+                <span className="font-bold text-status-error">
+                  {category.datasetCount} dataset
+                </span>{" "}
+                อยู่ ยังลบไม่ได้
+              </p>
+              <p className="mb-6 font-sarabun text-label text-text-muted">
+                ต้องการลบ dataset ทั้งหมดในหมวดนี้แล้วลบหมวดหมู่ด้วยหรือไม่?
+              </p>
+              <div className="flex w-full gap-4">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={deleteMutation.isPending}
+                  className="flex-1 rounded-radius-lg border border-border-default py-3 font-sarabun text-label font-medium text-text-secondary transition-colors hover:bg-surface-container disabled:opacity-50"
+                >
+                  ไม่ลบ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(true)}
+                  disabled={deleteMutation.isPending}
+                  className="flex-1 rounded-radius-lg bg-status-error py-3 font-sarabun text-label font-medium text-surface-card transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  {deleteMutation.isPending ? "กำลังลบ..." : "ลบทั้งหมด"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2
+                id="delete-category-title"
+                className="mb-2 font-kanit text-heading-3 font-bold text-text-primary"
+              >
+                {t("deleteTitle")}
+              </h2>
+              <p className="mb-1 font-sarabun text-body-md text-text-secondary">
+                {t("deleteMsg", { name: displayName })}
+              </p>
+              <p className="mb-8 font-sarabun text-label italic text-status-error">
+                {t("deleteWarning")}
+              </p>
+              <div className="flex w-full gap-4">
                 <button
                   type="button"
                   onClick={onClose}
@@ -121,15 +161,15 @@ export default function DeleteCategoryModal({
                 </button>
                 <button
                   type="button"
-                  onClick={handleDelete}
+                  onClick={() => handleDelete(false)}
                   disabled={deleteMutation.isPending}
                   className="flex-1 rounded-radius-lg bg-status-error py-3 font-sarabun text-label font-medium text-surface-card transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
                   {deleteMutation.isPending ? t("deleting") : t("confirmDelete")}
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

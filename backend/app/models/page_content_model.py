@@ -30,6 +30,12 @@ class PageContent(BaseModel):
         default=PageContentStatus.published,
         server_default="published",
     )
+
+    display_mode: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="markdown", server_default="markdown"
+    )
+    pdf_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
     updated_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id", name="fk_page_contents_users"),

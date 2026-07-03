@@ -77,10 +77,12 @@ export function toCategoryMutationBody(input: {
   };
 }
 
-/** PATCH /categories/{id} — CategoryUpdateRequest: name_th?, name_en? (ส่งเฉพาะที่เปลี่ยน) */
+/** PATCH /categories/{id} — CategoryUpdateRequest: name_th?, name_en?, parent_id?, move_to_root? */
 export type CategoryUpdateBody = {
   name_th?: string;
   name_en?: string;
+  parent_id?: string;
+  move_to_root?: boolean;
 };
 
 export function toCategoryUpdateBody(

@@ -148,8 +148,15 @@ def upload_dataset(
 def _require_admin_payload(
     credentials: HTTPAuthorizationCredentials | None,
     db: Session,
+    request: Request | None = None,
 ) -> dict:
-    token = extract_bearer_token(credentials)
+    token = None
+    if credentials is not None:
+        token = extract_bearer_token(credentials)
+    elif request:
+        token = request.cookies.get("access_token")
+    if not token:
+        raise_app_error("AUTH_TOKEN_MISSING")
     payload = decode_access_token(token)
     user_id = payload.get("sub")
     if not user_id:
@@ -164,12 +171,15 @@ def _require_admin_payload(
 
 def _get_optional_user_payload(
     credentials: HTTPAuthorizationCredentials | None,
+    request: Request,
 ) -> dict | None:
-    if credentials is None:
+    token = None
+    if credentials is not None and credentials.scheme.lower() == "bearer":
+        token = credentials.credentials
+    elif request:
+        token = request.cookies.get("access_token")
+    if not token:
         return None
-    if credentials.scheme.lower() != "bearer":
-        return None
-    token = credentials.credentials
     try:
         payload = decode_access_token(token)
         if payload.get("sub"):
@@ -181,6 +191,7 @@ def _get_optional_user_payload(
 
 @router.get("/datasets", status_code=status.HTTP_200_OK)
 def list_datasets(
+    request: Request,
     pagination: PaginationParams = Depends(get_pagination_params),
     all: bool = Query(default=False, description="Admin: ทุกหน่วยงาน ทุก status"),
     status: str | None = Query(default=None, description="กรอง status (ใช้กับ all=true)"),
@@ -195,7 +206,7 @@ def list_datasets(
     - all=true: ทุก Agency ทุก status, Auth ✅ Admin
     """
     if all:
-        _require_admin_payload(credentials, db)
+        _require_admin_payload(credentials, db, request)
         items, total = dataset_service.list_admin_datasets(
             db=db,
             pagination=pagination,
@@ -225,6 +236,7 @@ def list_datasets(
 @router.get("/datasets/{dataset_id}", status_code=status.HTTP_200_OK)
 def get_dataset(
     dataset_id: uuid.UUID,
+    request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_optional),
     db: Session = Depends(get_db),
 ):
@@ -235,7 +247,7 @@ def get_dataset(
     result = dataset_service.get_dataset(
         db=db,
         dataset_id=dataset_id,
-        current_user=_get_optional_user_payload(credentials),
+        current_user=_get_optional_user_payload(credentials, request),
     )
     return success_response(data=result.model_dump(mode="json"))
 

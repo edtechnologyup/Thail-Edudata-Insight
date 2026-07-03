@@ -59,6 +59,7 @@ ERROR_DEFINITIONS: dict[str, tuple[int, str]] = {
     "CATEGORY_NOT_LEAF": (400, "Dataset ต้องผูกกับหมวดหมู่ปลายทางเท่านั้น"),
     "CATEGORY_PERMISSION_DENIED": (403, "ไม่ใช่เจ้าของหมวดหมู่นี้"),
     "CATEGORY_NOT_OWNED": (403, "หมวดหมู่นี้เป็นของ Agency อื่น"),
+    "CATEGORY_INVALID_PARENT": (400, "ไม่สามารถย้ายหมวดหมู่ไปเป็นลูกของตัวเองได้"),
     "TAG_NOT_FOUND": (404, "ไม่พบแท็ก"),
     "TAG_NAME_EXISTS": (409, "ชื่อแท็กนี้มีในระบบแล้ว"),
     # Page

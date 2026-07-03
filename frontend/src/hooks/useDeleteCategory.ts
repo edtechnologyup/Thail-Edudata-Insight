@@ -5,10 +5,12 @@ import apiClient from "@/services/api";
 
 type DeleteCategoryVariables = {
   id: string;
+  force?: boolean;
 };
 
 async function deleteCategory(variables: DeleteCategoryVariables): Promise<void> {
-  await apiClient.delete(`/categories/${variables.id}`);
+  const params = variables.force ? { force: true } : undefined;
+  await apiClient.delete(`/categories/${variables.id}`, { params });
 }
 
 export function useDeleteCategory() {

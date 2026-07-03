@@ -4,10 +4,19 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import StaticPageSection from "@/components/common/StaticPageSection";
-import TableOfContents from "@/components/common/TableOfContents";
+import TableOfContents, { type TocPageLink } from "@/components/common/TableOfContents";
 import { usePageContent } from "@/hooks/usePageContent";
 
 const PAGE_SLUG = "terms";
+
+function useStaticPageLinks(locale: string, currentSlug: string): TocPageLink[] {
+  return useMemo(() => [
+    { href: `/${locale}/privacy-policy`, label: locale === "th" ? "นโยบายความเป็นส่วนตัว" : "Privacy Policy", active: currentSlug === "privacy-policy" },
+    { href: `/${locale}/terms`, label: locale === "th" ? "เงื่อนไขการใช้งาน" : "Terms of Service", active: currentSlug === "terms" },
+    { href: `/${locale}/api-docs`, label: locale === "th" ? "เครื่องมือ API" : "API Documentation", active: currentSlug === "api-docs" },
+    { href: `/${locale}/help-center`, label: locale === "th" ? "ศูนย์ช่วยเหลือ" : "Help Center", active: currentSlug === "help-center" },
+  ], [locale, currentSlug]);
+}
 
 function formatUpdatedAt(iso: string, locale: string): string {
   return new Date(iso).toLocaleDateString(locale === "th" ? "th-TH" : "en-US", {
@@ -44,6 +53,8 @@ export default function TermsPage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   const { data: page, isLoading, isError } = usePageContent(PAGE_SLUG);
+
+  const pageLinks = useStaticPageLinks(locale, PAGE_SLUG);
 
   const tocSections = useMemo(() => {
     if (!page) return [];
@@ -116,33 +127,53 @@ export default function TermsPage() {
       )}
 
       <div className="relative flex flex-col gap-spacing-6 md:flex-row">
-        {tocSections.length > 0 && (
-          <aside className="hidden w-[240px] shrink-0 md:block">
-            <div className="sticky top-[108px]">
-              <TableOfContents sections={tocSections} />
-            </div>
-          </aside>
-        )}
+        <aside className="hidden w-[240px] shrink-0 md:block">
+          <div className="sticky top-[108px]">
+            <TableOfContents sections={tocSections} pageLinks={pageLinks} />
+          </div>
+        </aside>
 
         <article className="min-w-0 flex-1 rounded-radius-lg border border-border-default/80 bg-surface-card p-6 shadow-level-1 md:p-10">
-          <div className="space-y-spacing-12">
-            {page.sections.length === 0 ? (
-              <p className="font-sarabun text-body-md text-text-secondary">
-                {tPrivacy("emptyContent")}
-              </p>
-            ) : (
-              page.sections.map((section, index) => (
-                <StaticPageSection
-                  key={section.id}
-                  section={section}
-                  index={index}
-                  locale={locale}
-                  allowedLabel={t("allowed")}
-                  prohibitedLabel={t("prohibited")}
+          {(!page.displayMode || page.displayMode === "markdown" || page.displayMode === "both") && (
+            <div className="space-y-spacing-12">
+              {page.sections.length === 0 ? (
+                <p className="font-sarabun text-body-md text-text-secondary">
+                  {tPrivacy("emptyContent")}
+                </p>
+              ) : (
+                page.sections.map((section, index) => (
+                  <StaticPageSection
+                    key={section.id}
+                    section={section}
+                    index={index}
+                    locale={locale}
+                    allowedLabel={t("allowed")}
+                    prohibitedLabel={t("prohibited")}
+                  />
+                ))
+              )}
+            </div>
+          )}
+
+          {(page.displayMode === "pdf" || page.displayMode === "both") &&
+            page.pdfUrl && (
+              <div className={page.displayMode === "both" ? "mt-spacing-12 border-t border-border-default pt-spacing-8" : ""}>
+                <h2 className="mb-4 font-kanit text-heading-3 text-text-primary">
+                  {locale === "th" ? "เอกสาร PDF" : "PDF Document"}
+                </h2>
+                <iframe
+                  src={`${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1${page.pdfUrl}`}
+                  className="h-[800px] w-full rounded-radius-md border border-border-default"
+                  title={title}
                 />
-              ))
+              </div>
             )}
-          </div>
+
+          {page.displayMode === "pdf" && !page.pdfUrl && (
+            <p className="font-sarabun text-body-md text-text-secondary">
+              {tPrivacy("emptyContent")}
+            </p>
+          )}
 
           <div className="mt-spacing-12 flex flex-col items-center justify-between gap-4 border-t border-border-default/30 pt-spacing-6 md:flex-row">
             <p className="font-sarabun text-body-md text-text-secondary">

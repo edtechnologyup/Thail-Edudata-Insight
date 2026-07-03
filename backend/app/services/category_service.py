@@ -152,6 +152,20 @@ def update_category(
             request.name_th or category.name_th,
         )
 
+    if request.move_to_root:
+        fields["parent_id"] = None
+        fields["level"] = 1
+    elif request.parent_id is not None:
+        if str(request.parent_id) == str(category_id):
+            raise_app_error("CATEGORY_INVALID_PARENT")
+        new_parent = cat_repo.get_category_by_id(db, request.parent_id)
+        if new_parent is None:
+            raise_app_error("CATEGORY_PARENT_NOT_FOUND")
+        if new_parent.level >= MAX_CATEGORY_DEPTH:
+            raise_app_error("CATEGORY_MAX_DEPTH_REACHED")
+        fields["parent_id"] = request.parent_id
+        fields["level"] = new_parent.level + 1
+
     if fields:
         if "slug" in fields:
             _ensure_slug_available(
@@ -170,6 +184,7 @@ def delete_category(
     db: Session,
     category_id: uuid.UUID,
     current_user: dict,
+    force: bool = False,
 ) -> None:
     category = cat_repo.get_category_by_id(db, category_id)
     if category is None:
@@ -183,10 +198,23 @@ def delete_category(
         raise_app_error("CATEGORY_HAS_CHILDREN")
 
     if cat_repo.check_category_has_datasets(db, category_id):
-        raise_app_error("CATEGORY_HAS_DATASETS")
+        if not force:
+            raise_app_error("CATEGORY_HAS_DATASETS")
+        _soft_delete_datasets_in_category(db, category_id)
 
     cat_repo.soft_delete_category(db, category_id)
     db.commit()
+
+
+def _soft_delete_datasets_in_category(
+    db: Session, category_id: uuid.UUID
+) -> None:
+    from app.models.dataset import Dataset
+
+    db.query(Dataset).filter(
+        Dataset.category_id == category_id,
+        Dataset.is_deleted.is_(False),
+    ).update({"is_deleted": True}, synchronize_session="fetch")
 
 
 def _categories_with_dataset_counts(

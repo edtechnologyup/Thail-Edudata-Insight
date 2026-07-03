@@ -145,6 +145,8 @@ class PageContentUpdateRequest(BaseModel):
     content_th: str = ""
     content_en: str = ""
     status: str | None = Field(default=None, pattern=r"^(draft|published)$")
+    display_mode: str | None = Field(default=None, pattern=r"^(markdown|pdf|both)$")
+    pdf_url: str | None = None
 
 
 class PageContentResponse(BaseModel):
@@ -154,6 +156,8 @@ class PageContentResponse(BaseModel):
     content_th: str
     content_en: str
     status: str
+    display_mode: str = "markdown"
+    pdf_url: str | None = None
     updated_at: datetime
 
 

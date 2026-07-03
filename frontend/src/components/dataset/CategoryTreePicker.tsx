@@ -283,7 +283,6 @@ function CategoryPickerBody({
   const canAddSubcategory =
     allowCreate &&
     lastPathNode !== null &&
-    !isCategoryLeaf(lastPathNode) &&
     canAddChild(lastPathNode);
 
   const applyPath = (ids: string[]) => {

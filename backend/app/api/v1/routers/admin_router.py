@@ -17,6 +17,8 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 
+from app.core.errors import raise_app_error
+
 import app.services.admin_service as admin_service
 import app.services.dataset_service as dataset_service
 import app.services.hero_image_service as hero_image_service
@@ -737,3 +739,71 @@ def admin_delete_page(
 ):
     page_content_service.delete_page(db, slug)
     return success_response({"deleted": slug})
+
+
+@router.post("/pages/{slug}/pdf", status_code=status.HTTP_200_OK)
+def admin_upload_page_pdf(
+    slug: str,
+    file: UploadFile = File(...),
+    payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """
+    อัปโหลด PDF สำหรับหน้า static
+    - Auth ✅ Admin
+    """
+    import io as _io
+
+    content = file.file.read()
+    max_size = 10 * 1024 * 1024
+    if len(content) > max_size:
+        raise_app_error("FILE_TOO_LARGE", "ไฟล์ใหญ่เกิน 10MB")
+
+    content_type = (file.content_type or "").split(";")[0].strip().lower()
+    if content_type != "application/pdf":
+        raise_app_error("FILE_INVALID_FORMAT", "ไฟล์ต้องเป็น PDF เท่านั้น")
+
+    object_name = f"pages/{slug}/document.pdf"
+    minio_client = _get_minio()
+    bucket = settings.MINIO_BUCKET_NAME
+
+    try:
+        minio_client.stat_object(bucket, object_name)
+        minio_client.remove_object(bucket, object_name)
+    except Exception:
+        pass
+
+    minio_client.put_object(
+        bucket,
+        object_name,
+        _io.BytesIO(content),
+        length=len(content),
+        content_type="application/pdf",
+    )
+
+    pdf_url = f"/public/pages/{slug}/pdf"
+    page_content_service.set_pdf_url(db, slug, pdf_url, payload)
+    return success_response({"pdf_url": pdf_url})
+
+
+@router.delete("/pages/{slug}/pdf", status_code=status.HTTP_200_OK)
+def admin_delete_page_pdf(
+    slug: str,
+    payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """
+    ลบ PDF ของหน้า static
+    - Auth ✅ Admin
+    """
+    object_name = f"pages/{slug}/document.pdf"
+    minio_client = _get_minio()
+    bucket = settings.MINIO_BUCKET_NAME
+
+    try:
+        minio_client.remove_object(bucket, object_name)
+    except Exception:
+        pass
+
+    page_content_service.set_pdf_url(db, slug, None, payload)
+    return success_response({"deleted": True})

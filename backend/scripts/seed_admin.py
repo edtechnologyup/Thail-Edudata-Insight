@@ -23,8 +23,8 @@ from app.core.security import hash_password, verify_password
 from app.models.user_model import User
 from app.services import auth_service
 
-ADMIN_EMAIL = "admin@edudata.go.th"
-ADMIN_PASSWORD = "admintest12345"
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@edudata.go.th")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admintest12345")
 
 
 def _database_target() -> str:

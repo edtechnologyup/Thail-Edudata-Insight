@@ -282,10 +282,12 @@ export const useAdminUpdateCategory = useUpdateCategory;
 
 type DeleteCategoryVariables = {
   id: string;
+  force?: boolean;
 };
 
 async function deleteCategory(variables: DeleteCategoryVariables): Promise<void> {
-  await apiClient.delete(`/admin/categories/${variables.id}`);
+  const params = variables.force ? { force: true } : undefined;
+  await apiClient.delete(`/admin/categories/${variables.id}`, { params });
 }
 
 /** DELETE /api/v1/admin/categories/{id} */

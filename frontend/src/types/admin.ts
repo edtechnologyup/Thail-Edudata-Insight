@@ -46,6 +46,7 @@ export type AdminDataset = {
   agencyEn: string;
   category: string;
   categoryEn: string;
+  categoryId: string | null;
   status: AdminDatasetStatus;
   qualityScore: number;
   updatedAt: string;

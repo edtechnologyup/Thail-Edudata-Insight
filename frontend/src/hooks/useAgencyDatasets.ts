@@ -24,6 +24,7 @@ type ApiAgencyDataset = {
   category: string;
   categoryEn?: string;
   category_en?: string;
+  category_id?: string | null;
   subcategory: string;
   subcategoryEn?: string;
   subcategory_en?: string;
@@ -63,6 +64,7 @@ function mapDataset(item: ApiAgencyDataset): AgencyDatasetRow {
     titleEn: item.titleEn ?? item.title_en ?? item.title,
     category: item.category,
     categoryEn: item.categoryEn ?? item.category_en ?? item.category,
+    categoryId: item.category_id ?? null,
     subcategory: item.subcategory,
     subcategoryEn: item.subcategoryEn ?? item.subcategory_en ?? item.subcategory,
     status: normalizeStatus(item.status),

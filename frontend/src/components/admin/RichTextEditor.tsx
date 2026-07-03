@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import DOMPurify from "dompurify";
+import { marked } from "marked";
 
 type RichTextEditorProps = {
   contentTh: string;
@@ -34,10 +36,17 @@ export default function RichTextEditor({
 }: RichTextEditorProps) {
   const t = useTranslations("admin.pages");
   const [activeTab, setActiveTab] = useState<EditorTab>("th");
+  const [showPreview, setShowPreview] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const value = activeTab === "th" ? contentTh : contentEn;
   const onChange = activeTab === "th" ? onChangeTh : onChangeEn;
+
+  const previewHtml = useMemo(() => {
+    if (!showPreview) return "";
+    const html = marked.parse(value, { async: false }) as string;
+    return DOMPurify.sanitize(html);
+  }, [showPreview, value]);
 
   const handleToolbarClick = useCallback(
     (insert: string, wrap: boolean) => {
@@ -115,6 +124,24 @@ export default function RichTextEditor({
               {item.label}
             </button>
           ))}
+
+          <div className="mx-2 h-6 w-px bg-gray-200" />
+
+          <button
+            type="button"
+            onClick={() => setShowPreview((prev) => !prev)}
+            className={`flex h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors ${
+              showPreview
+                ? "bg-primary-dark/10 text-primary-dark"
+                : "text-text-secondary hover:bg-gray-100 hover:text-text-primary"
+            }`}
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            {showPreview ? "ซ่อนตัวอย่าง" : "แสดงตัวอย่าง"}
+          </button>
         </div>
       </div>
 
@@ -125,11 +152,37 @@ export default function RichTextEditor({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
-          rows={24}
+          rows={showPreview ? 14 : 24}
           placeholder={t("contentPlaceholder")}
-          className="min-h-[500px] w-full resize-y border-0 bg-transparent px-0 py-0 font-sarabun text-lg leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-60"
+          className={`${showPreview ? "min-h-[280px]" : "min-h-[500px]"} w-full resize-y border-0 bg-transparent px-0 py-0 font-sarabun text-lg leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-60`}
         />
       </div>
+
+      {/* Preview */}
+      {showPreview && (
+        <div className="border-t border-gray-200 bg-gray-50/50">
+          <div className="flex items-center gap-2 border-b border-gray-100 px-8 py-2.5">
+            <svg className="h-4 w-4 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span className="font-sarabun text-sm font-medium text-text-muted">
+              ตัวอย่างการแสดงผล
+            </span>
+          </div>
+          <div className="max-h-[400px] overflow-y-auto p-8">
+            <div
+              className="static-page-content"
+              dangerouslySetInnerHTML={{ __html: previewHtml }}
+            />
+            {!value.trim() && (
+              <p className="text-center text-sm text-text-muted">
+                พิมพ์เนื้อหาด้านบนเพื่อดูตัวอย่าง
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

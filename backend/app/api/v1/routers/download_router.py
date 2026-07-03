@@ -35,11 +35,17 @@ def _get_redis():
     return redis.from_url(settings.redis_url, decode_responses=True)
 
 
-def _get_optional_user_id(request: Request) -> uuid.UUID | None:
+def _extract_optional_token(request: Request) -> str | None:
     auth = request.headers.get("Authorization")
-    if not auth or not auth.lower().startswith("bearer "):
+    if auth and auth.lower().startswith("bearer "):
+        return auth.split(" ", 1)[1].strip()
+    return request.cookies.get("access_token")
+
+
+def _get_optional_user_id(request: Request) -> uuid.UUID | None:
+    token = _extract_optional_token(request)
+    if not token:
         return None
-    token = auth.split(" ", 1)[1].strip()
     try:
         payload = decode_access_token(token)
         sub = payload.get("sub")
@@ -51,10 +57,9 @@ def _get_optional_user_id(request: Request) -> uuid.UUID | None:
 
 
 def _get_optional_user_payload(request: Request) -> dict | None:
-    auth = request.headers.get("Authorization")
-    if not auth or not auth.lower().startswith("bearer "):
+    token = _extract_optional_token(request)
+    if not token:
         return None
-    token = auth.split(" ", 1)[1].strip()
     try:
         payload = decode_access_token(token)
         if payload.get("sub"):

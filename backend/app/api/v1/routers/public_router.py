@@ -58,6 +58,35 @@ def public_get_page(slug: str, db: Session = Depends(get_db)):
     return success_response(result.model_dump(mode="json"))
 
 
+@router.get("/pages/{slug}/pdf")
+def public_stream_page_pdf(slug: str):
+    """
+    สตรีม PDF ของหน้า static จาก MinIO
+    - Auth ❌
+    """
+    from app.core.errors import raise_app_error
+
+    object_name = f"pages/{slug}/document.pdf"
+    minio_client = _get_minio()
+    bucket = settings.MINIO_BUCKET_NAME
+    response = None
+
+    try:
+        response = minio_client.get_object(bucket, object_name)
+        content = response.read()
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type="application/pdf",
+            headers={"Cache-Control": "public, max-age=300"},
+        )
+    except Exception:
+        raise_app_error("FILE_NOT_FOUND", "ไม่พบไฟล์ PDF")
+    finally:
+        if response is not None:
+            response.close()
+            response.release_conn()
+
+
 @router.get("/settings/hero-image", status_code=200)
 def public_get_hero_image():
     """

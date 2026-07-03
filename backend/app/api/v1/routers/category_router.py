@@ -108,15 +108,17 @@ def update_category(
 @router.delete("/categories/{category_id}", status_code=status.HTTP_200_OK)
 def delete_category(
     category_id: uuid.UUID,
+    force: bool = False,
     payload: dict = Depends(require_roles("agency", "admin")),
     db: Session = Depends(get_db),
 ):
     """
     ลบหมวดของตัวเอง ตาม #20
     - Auth ✅ Agency/Admin
+    - force=true → ลบ dataset ทั้งหมดในหมวดด้วย
     """
     cat_service.delete_category(
-        db=db, category_id=category_id, current_user=payload
+        db=db, category_id=category_id, current_user=payload, force=force
     )
     return delete_response()
 
@@ -175,14 +177,16 @@ def admin_update_category(
 @router.delete("/admin/categories/{category_id}", status_code=status.HTTP_200_OK)
 def admin_delete_category(
     category_id: uuid.UUID,
+    force: bool = False,
     payload: dict = Depends(require_roles("admin")),
     db: Session = Depends(get_db),
 ):
     """
     Admin: ลบหมวดของ Agency ใดก็ได้ ตาม #20
+    - force=true → ลบ dataset ทั้งหมดในหมวดด้วย
     - Auth ✅ Admin
     """
     cat_service.delete_category(
-        db=db, category_id=category_id, current_user=payload
+        db=db, category_id=category_id, current_user=payload, force=force
     )
     return delete_response()

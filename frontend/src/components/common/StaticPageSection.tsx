@@ -1,7 +1,13 @@
 "use client";
 
 import DOMPurify from "dompurify";
+import { marked } from "marked";
 import type { PageContentSection } from "@/types/content";
+
+function renderMarkdown(raw: string): string {
+  const html = marked.parse(raw, { async: false }) as string;
+  return DOMPurify.sanitize(html);
+}
 
 type StaticPageSectionProps = {
   section: PageContentSection;
@@ -107,7 +113,7 @@ export default function StaticPageSection({
     return null;
   }
 
-  const html = locale === "th" ? section.contentTh : section.contentEn;
+  const raw = locale === "th" ? section.contentTh : section.contentEn;
 
   return (
     <section
@@ -119,7 +125,7 @@ export default function StaticPageSection({
       </h2>
       <div
         className="static-page-content"
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(raw) }}
       />
     </section>
   );

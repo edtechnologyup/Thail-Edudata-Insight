@@ -16,6 +16,7 @@ type AgencyDatasetTableProps = {
   page: number;
   onPageChange: (page: number) => void;
   onDelete: (dataset: AgencyDatasetRow, title: string) => void;
+  onMoveCategory?: (dataset: AgencyDatasetRow) => void;
   search?: string;
   year?: number;
 };
@@ -111,6 +112,7 @@ export default function AgencyDatasetTable({
   page,
   onPageChange,
   onDelete,
+  onMoveCategory,
   search,
   year,
 }: AgencyDatasetTableProps) {
@@ -279,6 +281,17 @@ export default function AgencyDatasetTable({
                         >
                           <EditIcon />
                         </Link>
+                        {onMoveCategory && (
+                          <button
+                            type="button"
+                            onClick={() => onMoveCategory(row)}
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-[#e3f2fd] hover:text-[#1565c0]"
+                            aria-label="ย้ายหมวดหมู่"
+                            title="ย้ายหมวดหมู่"
+                          >
+                            <MoveIcon />
+                          </button>
+                        )}
                         <Link
                           href={`${base}/datasets/${row.id}/versions`}
                           className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-container hover:text-primary-dark"
@@ -391,6 +404,14 @@ function DownloadIcon() {
   return (
     <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M19 9h-4V3H9v6H5l7 7 7-7ZM5 18v2h14v-2H5Z" />
+    </svg>
+  );
+}
+
+function MoveIcon() {
+  return (
+    <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z" />
     </svg>
   );
 }

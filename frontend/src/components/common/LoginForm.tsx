@@ -82,7 +82,6 @@ export default function LoginForm() {
         throw new Error(t("errorInvalid"));
       }
 
-      localStorage.setItem("token", token);
       const meRes = await apiClient.get("/auth/me");
       const me = (meRes.data as { data?: MeResponseData }).data;
       if (!me) {

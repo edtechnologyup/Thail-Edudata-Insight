@@ -99,7 +99,7 @@ function DeleteScholarshipDialog({
           {confirmTitle}
         </h2>
         <p className="mb-6 font-sarabun text-body-md text-text-secondary">
-          {confirmMsg.replace("{title}", title)}
+          {confirmMsg}
         </p>
         <div className="flex gap-3">
           <button
@@ -456,7 +456,7 @@ export default function ManageScholarshipsPage() {
         onConfirm={() => void handleDelete()}
         isDeleting={deleteMutation.isPending}
         confirmTitle={tManage("confirmTitle")}
-        confirmMsg={tManage("confirmMsg")}
+        confirmMsg={tManage("confirmMsg", { title: deleteTarget?.title ?? "" })}
         cancelLabel={tManage("cancel")}
         confirmLabel={tManage("confirm")}
       />

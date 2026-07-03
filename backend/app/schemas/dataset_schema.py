@@ -130,6 +130,8 @@ class CategoryCreateRequest(BaseModel):
 class CategoryUpdateRequest(BaseModel):
     name_th: str | None = Field(default=None, min_length=1, max_length=255)
     name_en: str | None = Field(default=None, min_length=1, max_length=255)
+    parent_id: uuid.UUID | None = None
+    move_to_root: bool = False
 
 
 class CategoryResponse(BaseModel):

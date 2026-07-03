@@ -2,14 +2,39 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import {
-  useMarkNotificationRead,
-  useNotifications,
-} from "@/hooks/useNotifications";
+import { useQuery } from "@tanstack/react-query";
+import apiClient from "@/services/api";
 import {
   dismissAnnouncement,
   getDismissedAnnouncementId,
 } from "@/utils/notificationStorage";
+
+type ApiAnnouncement = {
+  id: string;
+  title: string;
+  content: string;
+  is_active: boolean;
+  created_at: string;
+};
+
+type PublicAnnouncementsResponse = {
+  success: boolean;
+  data: ApiAnnouncement[];
+};
+
+function usePublicAnnouncements() {
+  return useQuery({
+    queryKey: ["public", "announcements"],
+    queryFn: async () => {
+      const res = await apiClient.get<PublicAnnouncementsResponse>(
+        "/public/announcements"
+      );
+      return res.data.data ?? [];
+    },
+    staleTime: 1000 * 60,
+    refetchInterval: 1000 * 60 * 2,
+  });
+}
 
 function MegaphoneIcon() {
   return (
@@ -32,8 +57,7 @@ function MegaphoneIcon() {
 
 export default function AnnouncementBanner() {
   const t = useTranslations("notifications.announcementBanner");
-  const { data, isLoading } = useNotifications(1, 20);
-  const markRead = useMarkNotificationRead();
+  const { data: announcements, isLoading } = usePublicAnnouncements();
   const [dismissedId, setDismissedId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -42,17 +66,15 @@ export default function AnnouncementBanner() {
     setDismissedId(getDismissedAnnouncementId());
   }, []);
 
-  const announcement = (data?.items ?? []).find(
-    (item) => item.type === "announcement" && !item.is_read
+  const announcement = (announcements ?? []).find(
+    (item) => item.id !== dismissedId
   );
 
   if (!mounted || isLoading || !announcement) return null;
-  if (dismissedId === announcement.id) return null;
 
   const handleDismiss = () => {
     dismissAnnouncement(announcement.id);
     setDismissedId(announcement.id);
-    markRead.mutate(announcement.id);
   };
 
   return (

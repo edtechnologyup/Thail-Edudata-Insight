@@ -37,30 +37,29 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       hasHydrated: false,
       setHasHydrated: (value) => set({ hasHydrated: value }),
-      login: (token, user) => {
-        localStorage.setItem("token", token);
-        set({ token, user });
+      login: (_token, user) => {
+        set({ token: "cookie", user });
       },
       logout: () => {
-        localStorage.removeItem("token");
         localStorage.removeItem("auth");
         set({ token: null, user: null });
       },
       initAuth: async () => {
-        const storedToken = localStorage.getItem("token");
-        const { token: stateToken, user: stateUser } = get();
-
-        if (!storedToken) {
+        const cached = localStorage.getItem("auth");
+        let hasSession = false;
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            hasSession = Boolean(parsed?.state?.token);
+          } catch {
+            hasSession = false;
+          }
+        }
+        if (!hasSession) {
           set({ token: null, user: null });
           return;
         }
 
-        if (stateToken && stateUser) {
-          set({ token: stateToken });
-          return;
-        }
-
-        set({ token: storedToken });
         try {
           const res = await apiClient.get("/auth/me");
           const me = (res.data as { data?: User }).data;
@@ -68,11 +67,10 @@ export const useAuthStore = create<AuthState>()(
             throw new Error("no user");
           }
           set({
-            token: storedToken,
+            token: "cookie",
             user: mapMeToUser(me),
           });
         } catch {
-          localStorage.removeItem("token");
           localStorage.removeItem("auth");
           set({ token: null, user: null });
         }

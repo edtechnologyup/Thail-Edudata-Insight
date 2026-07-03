@@ -18,16 +18,6 @@ const apiClient = axios.create({
   withCredentials: true,
 });
 
-apiClient.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
-});
-
 apiClient.interceptors.response.use(
   (response: AxiosResponse<JSendResponse>) => {
     if (response.data?.success === true) {
@@ -46,15 +36,15 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       const requestUrl = error.config?.url ?? "";
       const isLoginRequest = requestUrl.includes("/auth/login");
-      const hadAuth = Boolean(error.config?.headers?.Authorization);
+      const isAuthMeRequest = requestUrl.includes("/auth/me");
       const isPublicDatasetEndpoint =
         /\/datasets\/[^/]+(\/preview|\/download|\/citation)?$/.test(
           requestUrl.split("?")[0] ?? ""
         );
 
-      if (!isLoginRequest && hadAuth && typeof window !== "undefined") {
+      const wasLoggedIn = typeof window !== "undefined" && Boolean(localStorage.getItem("auth"));
+      if (!isLoginRequest && !isAuthMeRequest && wasLoggedIn && typeof window !== "undefined") {
         const isOnLoginPage = window.location.pathname.includes("/login");
-        localStorage.removeItem("token");
         localStorage.removeItem("auth");
 
         if (!isPublicDatasetEndpoint && !isOnLoginPage) {

@@ -74,11 +74,6 @@ export default function ApiDocsPage() {
     locale === "th"
       ? "Thai EduData Insight API Documentation"
       : "Thai EduData Insight API Documentation";
-  const pageDescription = docs
-    ? locale === "th"
-      ? docs.descriptionTh
-      : docs.descriptionEn
-    : t("portalDescription");
   const version = docs?.version ?? "v1";
 
   return (
@@ -110,9 +105,6 @@ export default function ApiDocsPage() {
               <h1 className="mb-3 font-kanit text-[2rem] font-bold text-white md:text-[2.5rem]">
                 {pageTitle}
               </h1>
-              <p className="max-w-3xl font-sarabun text-body-lg leading-relaxed text-white/85">
-                {pageDescription}
-              </p>
               <div className="pointer-events-none absolute -right-4 -top-4 hidden opacity-20 md:block">
                 <svg width="120" height="120" viewBox="0 0 24 24" fill="white" aria-hidden>
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />

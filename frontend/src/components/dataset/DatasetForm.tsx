@@ -67,6 +67,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
   const [submitStatus, setSubmitStatus] = useState<"draft" | "published" | null>(
     null
   );
+  const submitStatusRef = useRef<"draft" | "published" | null>(null);
   const provinceWrapperRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -456,10 +457,11 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
       {/* Step 2 — Dataset Info */}
       <form
         onSubmit={handleSubmit((values) => {
-          if (!submitStatus) {
+          const status = submitStatusRef.current;
+          if (!status) {
             return;
           }
-          void onSubmit(values, submitStatus);
+          void onSubmit(values, status);
         })}
         className="space-y-8"
       >
@@ -712,7 +714,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
           <button
             type="submit"
             disabled={isSubmitting}
-            onClick={() => setSubmitStatus("draft")}
+            onClick={() => { submitStatusRef.current = "draft"; setSubmitStatus("draft"); }}
             className="rounded-xl border border-primary-dark/30 px-8 py-2.5 font-sarabun text-label font-medium text-primary-dark transition-colors hover:bg-primary-light disabled:opacity-50"
           >
             {isSubmitting && submitStatus === "draft" && <Spinner />}
@@ -722,7 +724,7 @@ export default function DatasetForm({ mode, datasetId }: DatasetFormProps) {
             <button
               type="submit"
               disabled={isSubmitting || hasPii}
-              onClick={() => setSubmitStatus("published")}
+              onClick={() => { submitStatusRef.current = "published"; setSubmitStatus("published"); }}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-dark px-10 py-2.5 font-sarabun text-label font-medium text-white shadow-level-1 transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {isSubmitting && submitStatus === "published" && <Spinner />}

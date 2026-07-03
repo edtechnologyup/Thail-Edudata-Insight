@@ -122,10 +122,13 @@ def login(
     """
     Login ด้วย Email + Password
     - Auth ❌
-    - คืน 200 OK พร้อม Token
+    - คืน 200 OK พร้อม Token (httpOnly cookie + response body)
     - Errors: AUTH_INVALID_CREDENTIALS 401, AUTH_ACCOUNT_SUSPENDED 403,
               AUTH_EMAIL_NOT_VERIFIED 403, AUTH_ACCOUNT_LOCKED 423
     """
+    from fastapi.responses import JSONResponse
+    from app.core.config import settings as app_settings
+
     verify_turnstile(request_body.turnstile_token, get_client_ip(request))
     redis_client = get_redis_client()
     token_response = auth_service.login(
@@ -136,7 +139,19 @@ def login(
         ip_address=get_client_ip(request),
         user_agent=get_user_agent(request),
     )
-    return success_response(data=token_response.model_dump(), message="ok")
+    body = success_response(data=token_response.model_dump(), message="ok")
+    response = JSONResponse(content=body)
+    is_prod = app_settings.is_production
+    response.set_cookie(
+        key="access_token",
+        value=token_response.access_token,
+        httponly=True,
+        secure=is_prod,
+        samesite="lax",
+        max_age=app_settings.JWT_EXPIRE_MINUTES * 60,
+        path="/",
+    )
+    return response
 
 
 @router.post("/auth/verify-email", status_code=status.HTTP_200_OK)
@@ -304,13 +319,18 @@ def logout(
     payload: dict = Depends(get_current_user_payload_with_status),
 ):
     """
-    Logout — ลบ Token ออกจาก Redis
+    Logout — ลบ Token ออกจาก Redis + ลบ cookie
     - Auth ✅
     - คืน 200 OK
     """
+    from fastapi.responses import JSONResponse
+
     redis_client = get_redis_client()
     auth_service.logout(redis_client=redis_client, user_id=payload["sub"])
-    return delete_response()
+    body = delete_response()
+    response = JSONResponse(content=body)
+    response.delete_cookie(key="access_token", path="/")
+    return response
 
 
 @router.get("/auth/me", status_code=status.HTTP_200_OK)

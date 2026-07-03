@@ -180,10 +180,23 @@ def validate_user_status(status: str | None) -> None:
         raise_app_error("USER_STATUS_INVALID")
 
 
+def _extract_token(
+    credentials: HTTPAuthorizationCredentials | None,
+    request: Request,
+) -> str:
+    if credentials is not None:
+        return extract_bearer_token(credentials)
+    cookie_token = request.cookies.get("access_token")
+    if cookie_token:
+        return cookie_token
+    raise_app_error("AUTH_TOKEN_MISSING")
+
+
 def get_current_user_payload(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    request: Request = None,
 ) -> dict[str, Any]:
-    token = extract_bearer_token(credentials)
+    token = _extract_token(credentials, request)
     payload = decode_access_token(token)
     user_id = payload.get("sub")
     if not user_id:
@@ -194,9 +207,10 @@ def get_current_user_payload(
 
 def get_current_user_payload_with_status(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    request: Request = None,
     db: Session = Depends(get_db),
 ) -> dict[str, Any]:
-    payload = get_current_user_payload(credentials)
+    payload = get_current_user_payload(credentials, request)
     user_id = payload["sub"]
     if is_user_deleted(db, user_id):
         raise_app_error("AUTH_ACCOUNT_DELETED")

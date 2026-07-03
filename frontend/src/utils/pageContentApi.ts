@@ -1,6 +1,7 @@
 import type {
   AdminPageEditorContent,
   AdminStaticPageMeta,
+  DisplayMode,
   PageContentMock,
   StaticPageIcon,
   StaticPageStatus,
@@ -13,6 +14,8 @@ export type ApiPageContent = {
   content_th: string;
   content_en: string;
   status: string;
+  display_mode: string;
+  pdf_url: string | null;
   updated_at: string;
 };
 
@@ -43,6 +46,8 @@ export function mapPageContent(item: ApiPageContent): AdminPageEditorContent {
     titleTh: item.title_th,
     titleEn: item.title_en,
     updatedAt: formatUpdatedAt(item.updated_at),
+    displayMode: (item.display_mode as DisplayMode) || "markdown",
+    pdfUrl: item.pdf_url ?? null,
     contentTh: item.content_th ?? "",
     contentEn: item.content_en ?? "",
     sections: [],
@@ -60,6 +65,8 @@ export function mapApiPageToPublicContent(item: ApiPageContent): PageContentMock
       titleTh: item.title_th,
       titleEn: item.title_en,
       updatedAt: formatUpdatedAt(item.updated_at),
+      displayMode: (item.display_mode as DisplayMode) || "markdown",
+      pdfUrl: item.pdf_url ?? null,
       sections: [
         {
           id: "main-content",
@@ -77,6 +84,8 @@ export function mapApiPageToPublicContent(item: ApiPageContent): PageContentMock
     titleTh: item.title_th,
     titleEn: item.title_en,
     updatedAt: formatUpdatedAt(item.updated_at),
+    displayMode: (item.display_mode as DisplayMode) || "markdown",
+    pdfUrl: item.pdf_url ?? null,
     sections: [],
   };
 }
@@ -116,9 +125,14 @@ export function toPageCreateBody(input: {
 export function toPageContentUpdateBody(input: {
   contentTh: string;
   contentEn: string;
+  displayMode?: string;
+  pdfUrl?: string | null;
 }) {
-  return {
+  const body: Record<string, unknown> = {
     content_th: input.contentTh,
     content_en: input.contentEn,
   };
+  if (input.displayMode) body.display_mode = input.displayMode;
+  if (input.pdfUrl !== undefined) body.pdf_url = input.pdfUrl;
+  return body;
 }

@@ -86,6 +86,7 @@ export type AgencyDatasetRow = {
   titleEn: string;
   category: string;
   categoryEn: string;
+  categoryId: string | null;
   subcategory: string;
   subcategoryEn: string;
   status: "draft" | "published";

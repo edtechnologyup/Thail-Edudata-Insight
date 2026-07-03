@@ -2,18 +2,16 @@ services:
   postgres:
     image: postgres:15
     restart: unless-stopped
-    env_file:
-      - .env.prod
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: datacatalog
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - datacatalog_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d datacatalog"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,14 +20,13 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    env_file:
-      - .env.prod
+    command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
     networks:
       - datacatalog_network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,11 +36,9 @@ services:
     image: minio/minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
-    env_file:
-      - .env.prod
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     volumes:
       - minio_data:/data
     networks:
@@ -54,27 +49,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
-  elasticsearch:
-    image: elasticsearch:8.11.0
-    restart: unless-stopped
-    env_file:
-      - .env.prod
-    environment:
-      discovery.type: single-node
-      xpack.security.enabled: "false"
-      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    networks:
-      - datacatalog_network
-    mem_limit: 1g
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
 
   backend:
     build:
@@ -90,11 +64,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
     networks:
       - datacatalog_network
-    mem_limit: 512m
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
       interval: 10s
@@ -106,15 +77,16 @@ services:
     build:
       context: ./frontend
       dockerfile: ../docker/frontend.dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+        NEXT_PUBLIC_APP_ENV: production
     restart: unless-stopped
-    env_file:
-      - .env.prod
     depends_on:
       backend:
         condition: service_healthy
     networks:
       - datacatalog_network
-    mem_limit: 256m
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3000 > /dev/null || exit 1"]
       interval: 15s
@@ -130,6 +102,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - ./docker/nginx/ssl:/etc/nginx/ssl
     depends_on:
       backend:
         condition: service_healthy
@@ -137,12 +111,6 @@ services:
         condition: service_healthy
     networks:
       - datacatalog_network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fk https://localhost > /dev/null || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
 networks:
   datacatalog_network:
@@ -152,4 +120,3 @@ volumes:
   postgres_data:
   redis_data:
   minio_data:
-  elasticsearch_data:

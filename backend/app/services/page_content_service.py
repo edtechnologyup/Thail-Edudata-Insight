@@ -56,6 +56,8 @@ def _to_response(
     content_en: str,
     status: str,
     updated_at: datetime,
+    display_mode: str = "markdown",
+    pdf_url: str | None = None,
 ) -> PageContentResponse:
     return PageContentResponse(
         slug=slug,
@@ -64,6 +66,8 @@ def _to_response(
         content_th=content_th or "",
         content_en=content_en or "",
         status=status,
+        display_mode=display_mode,
+        pdf_url=pdf_url,
         updated_at=updated_at,
     )
 
@@ -91,6 +95,8 @@ def _row_to_response(row) -> PageContentResponse:
         content_en=row.content_en,
         status=row.status,
         updated_at=row.updated_at,
+        display_mode=getattr(row, "display_mode", "markdown") or "markdown",
+        pdf_url=getattr(row, "pdf_url", None),
     )
 
 
@@ -197,10 +203,37 @@ def update_page(
 
     if request.status is not None:
         row.status = request.status
+    if request.display_mode is not None:
+        row.display_mode = request.display_mode
+    if request.pdf_url is not None:
+        row.pdf_url = request.pdf_url
 
     db.commit()
     db.refresh(row)
     return _row_to_response(row)
+
+
+def set_pdf_url(
+    db: Session, slug: str, pdf_url: str | None, current_user: dict
+) -> None:
+    user_id = uuid.UUID(current_user["sub"])
+    row = page_content_repo.get_by_slug(db, slug)
+    if row is None:
+        if slug not in DEFAULT_PAGES:
+            raise_app_error("PAGE_NOT_FOUND", "ไม่พบหน้าที่ต้องการ")
+        meta = DEFAULT_PAGES[slug]
+        row = page_content_repo.create(
+            db,
+            slug=slug,
+            title_th=meta["title_th"],
+            title_en=meta["title_en"],
+            content_th="",
+            content_en="",
+            status=meta["status"],
+            updated_by=user_id,
+        )
+    row.pdf_url = pdf_url
+    db.commit()
 
 
 def delete_page(db: Session, slug: str) -> None:

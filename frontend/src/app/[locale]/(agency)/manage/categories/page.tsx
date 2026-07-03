@@ -6,7 +6,9 @@ import { useState } from "react";
 import AgencyCategoryTree from "@/components/dataset/AgencyCategoryTree";
 import CategoryForm from "@/components/dataset/CategoryForm";
 import DeleteCategoryModal from "@/components/dataset/DeleteCategoryModal";
+import MoveCategoryModal from "@/components/dataset/MoveCategoryModal";
 import { useAgencyCategoryTree } from "@/hooks/useAgencyCategories";
+import { useMoveCategory } from "@/hooks/useMoveCategory";
 import { useAuthStore } from "@/stores/useAuthStore";
 import type { CategoryTreeNode } from "@/utils/categoryTreeUtils";
 
@@ -29,8 +31,10 @@ export default function AgencyCategoriesPage() {
   );
   const [deleteDisplayName, setDeleteDisplayName] = useState("");
   const [toastError, setToastError] = useState<string | null>(null);
+  const [moveTarget, setMoveTarget] = useState<CategoryTreeNode | null>(null);
 
   const { data, isLoading, isError } = useAgencyCategoryTree();
+  const moveMutation = useMoveCategory();
   const tree = data?.tree ?? [];
   const lastUpdatedAt = data?.lastUpdatedAt ?? null;
 
@@ -177,6 +181,7 @@ export default function AgencyCategoriesPage() {
         onAddChild={openCreateChild}
         onEdit={openEditForm}
         onDelete={handleDeleteRequest}
+        onMove={(node) => { setMoveTarget(node); setToastError(null); }}
         filterLevel={activeLevel}
       />
 
@@ -203,6 +208,24 @@ export default function AgencyCategoriesPage() {
         }}
         onError={(message) => setToastError(message)}
       />
+
+      {moveTarget && (
+        <MoveCategoryModal
+          node={moveTarget}
+          allNodes={tree}
+          isLoading={moveMutation.isPending}
+          onCancel={() => setMoveTarget(null)}
+          onConfirm={(targetParentId) => {
+            moveMutation.mutate(
+              { id: moveTarget.id, parentId: targetParentId },
+              {
+                onSuccess: () => setMoveTarget(null),
+                onError: () => setToastError("ย้ายหมวดหมู่ไม่สำเร็จ"),
+              }
+            );
+          }}
+        />
+      )}
     </div>
   );
 }

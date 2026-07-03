@@ -6,11 +6,13 @@ import { useMemo, useState } from "react";
 import CategoryForm from "@/components/admin/CategoryForm";
 import CategoryTree from "@/components/admin/CategoryTree";
 import DeleteCategoryModal from "@/components/admin/DeleteCategoryModal";
+import MoveCategoryModal from "@/components/dataset/MoveCategoryModal";
 import {
   ADMIN_AGENCY_PAGE_SIZE,
   useAdminCategories,
   type AdminCategoryTreeNode,
 } from "@/hooks/useAdminCategories";
+import { useMoveCategory } from "@/hooks/useMoveCategory";
 import { MAX_CATEGORY_DEPTH } from "@/utils/categoryTreeUtils";
 import { toast } from "@/stores/toastStore";
 
@@ -39,6 +41,8 @@ export default function AdminCategoriesPage() {
     null
   );
   const [deleteDisplayName, setDeleteDisplayName] = useState("");
+  const [moveTarget, setMoveTarget] = useState<AdminCategoryTreeNode | null>(null);
+  const moveMutation = useMoveCategory();
 
   const categoryFilters = useMemo(
     () => ({
@@ -207,6 +211,7 @@ export default function AdminCategoriesPage() {
           setDeleteTarget(category);
           setDeleteDisplayName(displayName);
         }}
+        onMove={(node) => setMoveTarget(node)}
       />
 
       {/* Pagination */}
@@ -278,6 +283,24 @@ export default function AdminCategoriesPage() {
         onSuccess={() => showToast(t("deleteSuccess"))}
         onError={showError}
       />
+
+      {moveTarget && (
+        <MoveCategoryModal
+          node={moveTarget}
+          allNodes={allCategories}
+          isLoading={moveMutation.isPending}
+          onCancel={() => setMoveTarget(null)}
+          onConfirm={(targetParentId) => {
+            moveMutation.mutate(
+              { id: moveTarget.id, parentId: targetParentId },
+              {
+                onSuccess: () => { setMoveTarget(null); showToast("ย้ายหมวดหมู่สำเร็จ"); },
+                onError: () => showError("ย้ายหมวดหมู่ไม่สำเร็จ"),
+              }
+            );
+          }}
+        />
+      )}
     </div>
   );
 }

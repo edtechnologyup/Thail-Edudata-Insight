@@ -34,11 +34,15 @@ export type PageContentSection =
   | PageContentWarningSection
   | PageContentRightsSection;
 
+export type DisplayMode = "markdown" | "pdf" | "both";
+
 export type PageContentMock = {
   slug: string;
   titleTh: string;
   titleEn: string;
   updatedAt: string;
+  displayMode: DisplayMode;
+  pdfUrl: string | null;
   sections: PageContentSection[];
 };
 
@@ -65,6 +69,8 @@ export type AdminPageUpdateInput = {
   contentEn: string;
   titleTh?: string;
   titleEn?: string;
+  displayMode?: DisplayMode;
+  pdfUrl?: string | null;
 };
 
 export type HeroImageMock = {

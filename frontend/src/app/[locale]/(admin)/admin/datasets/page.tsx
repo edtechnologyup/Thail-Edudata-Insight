@@ -5,9 +5,12 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AdminDatasetTable from "@/components/admin/AdminDatasetTable";
 import AdminStatsCard from "@/components/admin/AdminStatsCard";
-import type { AdminDatasetsFilters } from "@/types/admin";
+import MoveDatasetCategoryModal from "@/components/dataset/MoveDatasetCategoryModal";
+import type { AdminDataset, AdminDatasetsFilters } from "@/types/admin";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 import { useAdminDatasets } from "@/hooks/useAdminDatasets";
+import { useAdminCategories } from "@/hooks/useAdminCategories";
+import { useMoveDatasetCategory } from "@/hooks/useMoveDatasetCategory";
 
 type StatusFilter = "all" | "published" | "draft";
 
@@ -26,6 +29,9 @@ export default function AdminDatasetsPage() {
   const [page, setPage] = useState(1);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastError, setToastError] = useState<string | null>(null);
+  const [moveTarget, setMoveTarget] = useState<AdminDataset | null>(null);
+  const { data: categoriesData } = useAdminCategories({ page: 1 });
+  const moveMutation = useMoveDatasetCategory();
 
   const { data: agenciesData } = useAdminDatasets({ page: 1 });
   const { data: dashData } = useAdminDashboard();
@@ -200,7 +206,27 @@ export default function AdminDatasetsPage() {
         onPageChange={setPage}
         onSuccess={showToast}
         onError={showError}
+        onMoveCategory={(dataset) => { setMoveTarget(dataset); setToastError(null); }}
       />
+
+      {moveTarget && categoriesData && (
+        <MoveDatasetCategoryModal
+          datasetTitle={moveTarget.title}
+          currentCategoryId={moveTarget.categoryId}
+          allNodes={categoriesData.data}
+          isLoading={moveMutation.isPending}
+          onCancel={() => setMoveTarget(null)}
+          onConfirm={(targetCategoryId) => {
+            moveMutation.mutate(
+              { datasetId: moveTarget.id, categoryId: targetCategoryId },
+              {
+                onSuccess: () => { setMoveTarget(null); showToast("ย้ายหมวดหมู่สำเร็จ"); },
+                onError: () => showError("ย้ายหมวดหมู่ไม่สำเร็จ"),
+              }
+            );
+          }}
+        />
+      )}
 
       {toastMessage ? (
         <div className="fixed bottom-6 right-6 z-[110] rounded-2xl bg-primary-dark px-4 py-3 font-sarabun text-label text-white shadow-lg">

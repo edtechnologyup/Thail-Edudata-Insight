@@ -38,14 +38,6 @@ async function parseBlobError(blob: Blob): Promise<never> {
   throw new Error("ดาวน์โหลดไม่สำเร็จ");
 }
 
-function downloadAuthHeaders(): Record<string, string> {
-  if (typeof window === "undefined") {
-    return {};
-  }
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 async function downloadDataset(
   variables: DownloadDatasetVariables
 ): Promise<Blob> {
@@ -56,7 +48,6 @@ async function downloadDataset(
         params: { purpose: variables.purpose, format: variables.format },
         responseType: "blob",
         timeout: 120000,
-        headers: downloadAuthHeaders(),
       }
     );
 

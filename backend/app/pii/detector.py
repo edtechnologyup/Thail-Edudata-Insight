@@ -25,6 +25,30 @@ NAME_COLUMN_KEYWORDS = (
     "name",
     "fullname",
 )
+NAME_COLUMN_EXCLUDES = (
+    "schoolname",
+    "school_name",
+    "ชื่อโรงเรียน",
+    "ชื่อสถานศึกษา",
+    "agency_name",
+    "agencyname",
+    "ชื่อหน่วยงาน",
+    "category_name",
+    "categoryname",
+    "ชื่อหมวดหมู่",
+    "filename",
+    "file_name",
+    "typename",
+    "type_name",
+    "column_name",
+    "columnname",
+    "tablename",
+    "table_name",
+    "hostname",
+    "host_name",
+    "username",
+    "user_name",
+)
 NAME_VALUE_PREFIXES = ("นาย", "นาง", "นางสาว", "ด.ช.", "ด.ญ.")
 BANK_COLUMN_KEYWORDS = ("บัญชี", "เลขที่บัญชี", "account", "bank_account")
 BIRTH_COLUMN_KEYWORDS = (
@@ -197,7 +221,11 @@ def _detect_emails(series: pd.Series) -> list[str]:
 
 def _detect_names(column_name: str, series: pd.Series) -> list[str]:
     matches: list[str] = []
-    column_matches = _column_name_matches(column_name, NAME_COLUMN_KEYWORDS)
+    column_excluded = _column_name_matches(column_name, NAME_COLUMN_EXCLUDES)
+    column_matches = (
+        _column_name_matches(column_name, NAME_COLUMN_KEYWORDS)
+        and not column_excluded
+    )
 
     for value in _cell_values(series):
         if column_matches:

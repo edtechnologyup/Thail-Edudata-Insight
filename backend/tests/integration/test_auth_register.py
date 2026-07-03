@@ -45,7 +45,7 @@ def test_register_duplicate_email(client):
 @pytest.mark.parametrize(
     ("pdf", "filename", "status", "code"),
     [
-        (b"", "verification.pdf", 400, "VERIFICATION_DOC_REQUIRED"),
+        (b"", "verification.pdf", 201, None),
         (b"not-pdf", "verification.pdf", 415, "INVALID_MIME_TYPE"),
         (VALID_PDF, "doc.txt", 415, "INVALID_MIME_TYPE"),
         (VALID_PDF, "doc.pdf.exe", 415, "INVALID_MIME_TYPE"),
@@ -59,7 +59,8 @@ def test_register_invalid_verification_doc(client, pdf, filename, status, code):
         filename=filename,
     )
     assert response.status_code == status
-    assert error_code(response) == code
+    if code is not None:
+        assert error_code(response) == code
 
 
 def test_register_oversized_pdf(client):
@@ -84,10 +85,10 @@ def test_register_invalid_json(client):
     assert error_code(response) == "VALIDATION_ERROR"
 
 
-def test_register_missing_fields(client):
+def test_register_without_doc(client):
+    """verification_doc เป็น optional — ไม่ส่งก็สมัครได้"""
     response = client.post(
         "/api/v1/auth/register",
-        data={"data": json.dumps(register_metadata(unique_email("register-missing")))},
+        data={"data": json.dumps(register_metadata(unique_email("register-nodoc")))},
     )
-    assert response.status_code == 422
-    assert error_code(response) == "VALIDATION_ERROR"
+    assert response.status_code == 201

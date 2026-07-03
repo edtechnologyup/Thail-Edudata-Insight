@@ -13,6 +13,7 @@ type AdminDatasetTableProps = {
   onPageChange: (page: number) => void;
   onSuccess: (message: string) => void;
   onError: (message: string) => void;
+  onMoveCategory?: (dataset: AdminDataset) => void;
 };
 
 function formatDate(date: string, locale: string): string {
@@ -98,6 +99,7 @@ export default function AdminDatasetTable({
   onPageChange,
   onSuccess,
   onError,
+  onMoveCategory,
 }: AdminDatasetTableProps) {
   const t = useTranslations("admin.datasets");
   const tAdmin = useTranslations("admin");
@@ -201,6 +203,17 @@ export default function AdminDatasetTable({
                           </td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-2">
+                              {onMoveCategory && (
+                                <button
+                                  type="button"
+                                  onClick={() => onMoveCategory(dataset)}
+                                  className="rounded-full p-2 text-text-muted transition-colors hover:bg-blue-50 hover:text-[#1565c0]"
+                                  aria-label="ย้ายหมวดหมู่"
+                                  title="ย้ายหมวดหมู่"
+                                >
+                                  <MoveIcon />
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 onClick={() => handleEdit(dataset.id)}
@@ -321,6 +334,14 @@ function DatasetTablePagination({
         <ChevronRightIcon />
       </button>
     </nav>
+  );
+}
+
+function MoveIcon() {
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z" />
+    </svg>
   );
 }
 

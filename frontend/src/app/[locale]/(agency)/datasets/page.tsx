@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import AgencyDatasetTable from "@/components/dataset/AgencyDatasetTable";
 import DeleteDatasetModal from "@/components/dataset/DeleteDatasetModal";
+import MoveDatasetCategoryModal from "@/components/dataset/MoveDatasetCategoryModal";
 import type { AgencyDatasetRow } from "@/types/dataset";
 import {
   useAgencyDatasets,
@@ -12,6 +13,8 @@ import {
   type AgencyDatasetStatusFilter,
 } from "@/hooks/useAgencyDatasets";
 import { useAgencyDashboard } from "@/hooks/useAgencyDashboard";
+import { useAgencyCategoryTree } from "@/hooks/useAgencyCategories";
+import { useMoveDatasetCategory } from "@/hooks/useMoveDatasetCategory";
 
 export default function AgencyDatasetsPage() {
   const t = useTranslations("agency.datasets");
@@ -28,6 +31,9 @@ export default function AgencyDatasetsPage() {
   );
   const [deleteTitle, setDeleteTitle] = useState("");
   const [toastError, setToastError] = useState<string | null>(null);
+  const [moveTarget, setMoveTarget] = useState<AgencyDatasetRow | null>(null);
+  const { data: categoryTree } = useAgencyCategoryTree();
+  const moveMutation = useMoveDatasetCategory();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -194,6 +200,7 @@ export default function AgencyDatasetsPage() {
         page={page}
         onPageChange={setPage}
         onDelete={handleDeleteRequest}
+        onMoveCategory={(dataset) => { setMoveTarget(dataset); setToastError(null); }}
         search={debouncedSearch || undefined}
         year={selectedYear}
       />
@@ -209,6 +216,25 @@ export default function AgencyDatasetsPage() {
         }}
         onError={(message) => setToastError(message)}
       />
+
+      {moveTarget && categoryTree && (
+        <MoveDatasetCategoryModal
+          datasetTitle={moveTarget.title}
+          currentCategoryId={moveTarget.categoryId}
+          allNodes={categoryTree.tree}
+          isLoading={moveMutation.isPending}
+          onCancel={() => setMoveTarget(null)}
+          onConfirm={(targetCategoryId) => {
+            moveMutation.mutate(
+              { datasetId: moveTarget.id, categoryId: targetCategoryId },
+              {
+                onSuccess: () => setMoveTarget(null),
+                onError: () => setToastError("ย้ายหมวดหมู่ไม่สำเร็จ"),
+              }
+            );
+          }}
+        />
+      )}
     </div>
   );
 }

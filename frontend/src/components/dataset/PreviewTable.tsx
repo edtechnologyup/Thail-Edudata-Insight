@@ -45,18 +45,17 @@ export default function PreviewTable({ columns, rows }: PreviewTableProps) {
     <>
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+          <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
-          <h2 className="font-kanit text-label font-bold" style={{ color: "#1a3a2a" }}>
+          <h2 className="font-kanit text-label font-bold text-primary">
             {t("preview")}
           </h2>
         </div>
         <button
           type="button"
           onClick={() => setFullscreen(!fullscreen)}
-          className="flex items-center gap-1.5 font-sarabun text-caption font-medium transition-colors hover:underline"
-          style={{ color: "#00695c" }}
+          className="flex items-center gap-1.5 font-sarabun text-caption font-medium text-primary-dark transition-colors hover:underline"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
@@ -70,13 +69,13 @@ export default function PreviewTable({ columns, rows }: PreviewTableProps) {
       <div className="overflow-auto rounded-2xl border border-border-default/60 shadow-level-1">
         <table className="w-full min-w-[640px] border-collapse text-left">
           <thead>
-            <tr style={{ backgroundColor: "#1a3a2a" }}>
+            <tr style={{ backgroundColor: "#eef0f3" }}>
               {columns.map((col) => {
                 const label = locale === "th" ? col.labelTh : col.labelEn;
                 return (
                   <th
                     key={col.key}
-                    className="whitespace-nowrap px-5 py-3.5 font-sarabun text-label font-semibold text-white"
+                    className="whitespace-nowrap px-5 py-3.5 font-sarabun text-label font-normal text-text-primary"
                   >
                     <span className="inline-flex items-center gap-1">
                       {label}
@@ -91,7 +90,7 @@ export default function PreviewTable({ columns, rows }: PreviewTableProps) {
             {pagedRows.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={`border-b border-border-default/30 transition-colors hover:bg-green-50/50 ${
+                className={`border-b border-border-default/30 transition-colors hover:bg-primary-light/40 ${
                   rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
                 }`}
               >
@@ -142,7 +141,7 @@ export default function PreviewTable({ columns, rows }: PreviewTableProps) {
                     ? "text-white"
                     : "border border-border-default bg-white text-text-primary hover:bg-surface-container"
                 }`}
-                style={p === page ? { backgroundColor: "#1a3a2a" } : undefined}
+                style={p === page ? { backgroundColor: "#1a237e" } : undefined}
               >
                 {p}
               </button>

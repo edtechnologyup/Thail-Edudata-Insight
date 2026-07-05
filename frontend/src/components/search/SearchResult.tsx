@@ -8,7 +8,7 @@ import { useCategories } from "@/hooks/useCategories";
 import apiClient from "@/services/api";
 import Pagination from "./Pagination";
 import SortDropdown, { type SortOption } from "./SortDropdown";
-import { parseListParam } from "./useSearchParamsUpdate";
+import { parseListParam, useSearchParamsUpdate } from "./useSearchParamsUpdate";
 
 const PAGE_SIZE = 10;
 
@@ -87,15 +87,26 @@ const FORMAT_ICON_COLORS: Record<string, { bg: string; text: string }> = {
   sql: { bg: "#e0f2f1", text: "#00695c" },
 };
 
+const FORMAT_TITLES: Record<string, string> = {
+  csv: "ไฟล์ตารางข้อมูล CSV",
+  excel: "ไฟล์ Excel",
+  xlsx: "ไฟล์ Excel",
+  pdf: "ไฟล์เอกสาร PDF",
+  json: "ไฟล์ข้อมูล JSON",
+  xml: "ไฟล์ข้อมูล XML",
+  sql: "ไฟล์ฐานข้อมูล SQL",
+};
+
 function FileFormatIcon({ format }: { format: string }) {
   const lower = format.toLowerCase();
   const colors = FORMAT_ICON_COLORS[lower] ?? { bg: "#f5f5f5", text: "#616161" };
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-radius-sm px-1.5 py-0.5 text-[11px] font-bold uppercase"
+      title={FORMAT_TITLES[lower] ?? `ไฟล์ ${format.toUpperCase()}`}
+      className="inline-flex cursor-default items-center gap-1.5 rounded-radius-md px-2.5 py-1 text-[13px] font-bold uppercase"
       style={{ backgroundColor: colors.bg, color: colors.text }}
     >
-      <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z" />
       </svg>
       {format}
@@ -125,21 +136,16 @@ function SearchResultCard({
   const format = item.file_format;
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border-default/80 bg-white shadow-level-1 transition-all hover:shadow-level-2 sm:flex-row"
-      style={{ borderLeft: "4px solid #33691e" }}
-    >
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border-default/80 bg-white shadow-level-1 transition-all hover:border-primary/30 hover:shadow-level-2 sm:flex-row">
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-md px-2.5 py-0.5 font-sarabun text-caption font-bold uppercase tracking-wider"
-            style={{ backgroundColor: "#e0f2f1", color: "#00695c" }}>
+          <span className="rounded-md bg-primary-light px-2.5 py-0.5 font-sarabun text-caption font-bold uppercase tracking-wider text-primary-dark">
             {categoryName}
           </span>
-          <span className="rounded-md px-2.5 py-0.5 font-sarabun text-caption font-bold uppercase tracking-wider"
-            style={{ backgroundColor: "#e8f5e9", color: "#2e7d32" }}>
+          <span className="rounded-md bg-status-published-bg px-2.5 py-0.5 font-sarabun text-caption font-bold uppercase tracking-wider text-status-published">
             {licenseBadge(item.license, locale)}
           </span>
-          <span className="flex items-center gap-1 rounded-md px-2 py-0.5 font-sarabun text-caption font-semibold"
-            style={{ backgroundColor: "#e8f5e9", color: "#388e3c" }}>
+          <span className="flex items-center gap-1 rounded-md bg-status-published-bg px-2 py-0.5 font-sarabun text-caption font-semibold text-status-published">
             <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
@@ -149,8 +155,7 @@ function SearchResultCard({
 
         <Link
           href={`/${locale}/datasets/${item.id}`}
-          className="font-kanit text-heading-3-mobile font-bold leading-snug transition-colors hover:underline"
-          style={{ color: "#00695c" }}
+          className="font-kanit text-heading-3-mobile font-bold leading-snug text-primary transition-colors hover:underline"
         >
           {title}
         </Link>
@@ -191,8 +196,7 @@ function SearchResultCard({
       <div className="flex shrink-0 flex-col items-end justify-center gap-3 p-5 sm:w-[180px]">
         <Link
           href={`/${locale}/datasets/${item.id}`}
-          className="rounded-lg border-2 px-5 py-2 text-center font-sarabun text-label font-bold transition-colors hover:bg-[#e0f2f1]"
-          style={{ borderColor: "#00897b", color: "#00897b" }}
+          className="rounded-radius-full bg-gradient-to-b from-primary-hover to-primary-dark px-5 py-2.5 text-center font-sarabun text-label font-bold text-white shadow-level-1 transition-all hover:brightness-110"
         >
           {t("viewDetail")}
         </Link>
@@ -205,6 +209,26 @@ export default function SearchResult(props: SearchResultProps) {
   const t = useTranslations("search");
   const locale = useLocale();
   const { data: categories = [] } = useCategories();
+  const updateParams = useSearchParamsUpdate();
+
+  const mainCategories = useMemo(
+    () => categories.filter((cat) => cat.level === 1),
+    [categories]
+  );
+
+  const activeMainId = useMemo(() => {
+    if (!props.selectedCategory) return null;
+    const parentById = new Map(
+      categories.map((cat) => [String(cat.id), cat.parent_id ? String(cat.parent_id) : null])
+    );
+    let current: string | null = String(props.selectedCategory);
+    for (let i = 0; i < 5 && current; i++) {
+      const parent: string | null = parentById.get(current) ?? null;
+      if (!parent) break;
+      current = parent;
+    }
+    return current;
+  }, [props.selectedCategory, categories]);
 
   const categoryNameMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -296,12 +320,51 @@ export default function SearchResult(props: SearchResultProps) {
 
   const displayKeyword = props.keyword || (locale === "th" ? "ทั้งหมด" : "all");
 
+  const chipClass = (active: boolean) =>
+    `shrink-0 whitespace-nowrap rounded-radius-full border px-4 py-1.5 font-sarabun text-label transition-colors ${
+      active
+        ? "border-primary bg-primary text-white"
+        : "border-border-default bg-white text-text-secondary hover:border-primary hover:text-primary"
+    }`;
+
   return (
     <section className="flex-1 py-spacing-2">
+      {mainCategories.length > 0 && (
+        <div
+          className="mb-4 flex gap-2 overflow-x-auto pb-1"
+          style={{ scrollbarWidth: "thin" }}
+          role="group"
+          aria-label={t("categories", { defaultValue: "หมวดหมู่" })}
+        >
+          <button
+            type="button"
+            onClick={() => updateParams({ category: null, page: null })}
+            className={chipClass(!props.selectedCategory)}
+          >
+            {locale === "th" ? "ทั้งหมด" : "All"}
+          </button>
+          {mainCategories.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() =>
+                updateParams({
+                  category: activeMainId === String(cat.id) ? null : String(cat.id),
+                  page: null,
+                })
+              }
+              className={chipClass(activeMainId === String(cat.id))}
+            >
+              {locale === "th" ? cat.name_th : cat.name_en}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white/80 px-5 py-4 shadow-level-1 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-        <p className="font-sarabun text-body-md font-semibold" style={{ color: "#00695c" }}>
+        <p className="font-sarabun text-body-md font-semibold text-text-primary">
           {t("foundCount", { count: totalCount.toLocaleString(locale) })}{" "}
-          <span className="font-bold" style={{ color: "#33691e" }}>&quot;{displayKeyword}&quot;</span>
+          <span className="font-bold text-primary">&quot;{displayKeyword}&quot;</span>
         </p>
         <SortDropdown value={props.sort} />
       </div>

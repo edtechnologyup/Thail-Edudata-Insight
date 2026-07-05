@@ -19,6 +19,10 @@ from app.schemas.visualization_schema import (
     NewReleasesResponse,
     StatsByCategoryResponse,
     StatsOverviewResponse,
+    TopAgenciesResponse,
+    TopAgencyItem,
+    TopRatedDatasetItem,
+    TopRatedResponse,
     TrendingResponse,
     YearMetricStat,
 )
@@ -27,7 +31,26 @@ from app.schemas.visualization_schema import (
 def _datasets_to_responses(
     db: Session, datasets: list
 ) -> list[DatasetResponse]:
+    from sqlalchemy import func
+
+    from app.models.dataset_rating_model import DatasetRating
     from app.services.dataset_service import _resolve_category_names
+
+    dataset_ids = [dataset.id for dataset in datasets]
+    rating_rows = (
+        db.query(
+            DatasetRating.dataset_id,
+            func.avg(DatasetRating.score).label("rating_avg"),
+            func.count(DatasetRating.id).label("rating_count"),
+        )
+        .filter(DatasetRating.dataset_id.in_(dataset_ids))
+        .group_by(DatasetRating.dataset_id)
+        .all()
+    ) if dataset_ids else []
+    rating_map = {
+        row.dataset_id: (round(float(row.rating_avg), 1), int(row.rating_count))
+        for row in rating_rows
+    }
 
     responses: list[DatasetResponse] = []
     for dataset in datasets:
@@ -43,6 +66,7 @@ def _datasets_to_responses(
         item.file_format = dataset_repo.get_latest_dataset_file_format(
             db, dataset.id
         )
+        item.rating_avg, item.rating_count = rating_map.get(dataset.id, (None, 0))
         responses.append(item)
     return responses
 
@@ -133,3 +157,13 @@ def save_dashboard_layout(
     db.commit()
     db.refresh(record)
     return DashboardLayoutResponse.model_validate(record)
+
+
+def get_top_agencies(db: Session, limit: int = 5) -> TopAgenciesResponse:
+    data = viz_repo.get_top_agencies(db, limit=limit)
+    return TopAgenciesResponse(agencies=[TopAgencyItem(**row) for row in data])
+
+
+def get_top_rated(db: Session, limit: int = 5) -> TopRatedResponse:
+    data = viz_repo.get_top_rated_datasets(db, limit=limit)
+    return TopRatedResponse(datasets=[TopRatedDatasetItem(**row) for row in data])

@@ -7,6 +7,7 @@ export type SearchFileFormat = "csv" | "excel" | "json";
 export type HomeDatasetMock = {
   id: string;
   title: string;
+  description?: string | null;
   category: string;
   agency: string;
   status: DatasetStatus;
@@ -20,6 +21,8 @@ export type HomeDatasetMock = {
   publishedAt?: string | null;
   license: DatasetLicense;
   imageUrl?: string | null;
+  ratingAvg?: number | null;
+  ratingCount?: number;
 };
 
 export type SearchResultMock = {
@@ -216,6 +219,8 @@ export type DatasetDetailView = {
   categoryLabel: string;
   subcategoryLabel: string;
   agencyName: string;
+  yearLabel?: string;
+  province?: string;
   publishedAt: string;
   createdAt: string;
   updatedAt: string;

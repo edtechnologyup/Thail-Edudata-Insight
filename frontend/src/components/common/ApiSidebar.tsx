@@ -105,7 +105,7 @@ function NavLink({
           onNavigate(item.id);
         }}
         className="flex items-center gap-3 rounded-xl px-5 py-3.5 font-kanit text-body-md font-bold text-white transition-all hover:opacity-90"
-        style={{ backgroundColor: "#004d40" }}
+        style={{ backgroundColor: "#1a237e" }}
       >
         <NavIcon id={item.id} />
         {title}
@@ -125,7 +125,7 @@ function NavLink({
           ? "font-bold text-white"
           : "text-text-secondary hover:bg-gray-50"
       }`}
-      style={isActive ? { backgroundColor: "#00695c" } : undefined}
+      style={isActive ? { backgroundColor: "#283593" } : undefined}
     >
       <NavIcon id={item.id} />
       {title}
@@ -145,7 +145,7 @@ export default function ApiSidebar({
     <aside className="hidden w-[340px] shrink-0 md:sticky md:top-20 md:flex md:flex-col" style={{ height: "calc(100vh - 5rem)" }}>
       <div className="overflow-y-auto rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1">
         <div className="mb-5 px-2">
-          <h2 className="font-kanit text-[1.25rem] font-bold" style={{ color: "#1a3a2a" }}>
+          <h2 className="font-kanit text-[1.25rem] font-bold text-primary">
             {title}
           </h2>
           <p className="font-sarabun text-label text-text-muted">
@@ -193,7 +193,7 @@ export function ApiMobileNav({
           className="absolute bottom-20 right-0 w-56 overflow-hidden rounded-2xl border border-border-default/60 bg-white py-4 shadow-level-3"
           onClick={(e) => e.stopPropagation()}
         >
-          <p className="mb-2 border-b border-border-default/40 px-4 pb-2 font-kanit text-label font-bold" style={{ color: "#1a3a2a" }}>
+          <p className="mb-2 border-b border-border-default/40 px-4 pb-2 font-kanit text-label font-bold text-primary">
             {jumpLabel}
           </p>
           {items.map((endpoint) => (
@@ -210,7 +210,7 @@ export function ApiMobileNav({
                   ? "font-bold"
                   : "text-text-secondary"
               }`}
-              style={activeId === endpoint.id ? { color: "#00695c" } : undefined}
+              style={activeId === endpoint.id ? { color: "#1a237e" } : undefined}
             >
               {getLocalizedText(endpoint.title, locale)}
             </a>
@@ -224,7 +224,7 @@ export function ApiMobileNav({
           setOpen((v) => !v);
         }}
         className="flex h-14 w-14 items-center justify-center rounded-full text-white shadow-level-2 transition-transform hover:scale-105 active:scale-95"
-        style={{ backgroundColor: "#004d40" }}
+        style={{ backgroundColor: "#1a237e" }}
         aria-label={jumpLabel}
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

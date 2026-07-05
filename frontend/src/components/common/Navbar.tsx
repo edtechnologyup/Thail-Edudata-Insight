@@ -214,7 +214,7 @@ export default function Navbar({ variant }: NavbarProps) {
             <LanguageSwitcher />
             <Link
               href={`${base}/login`}
-              className="hidden min-h-[40px] items-center rounded-radius-sm bg-primary px-6 font-sarabun text-label font-medium text-white transition-colors hover:bg-primary-hover sm:inline-flex"
+              className="hidden min-h-[40px] items-center rounded-radius-full bg-gradient-to-b from-primary-hover to-primary-dark px-6 font-sarabun text-label font-medium text-white shadow-level-1 transition-all hover:brightness-110 sm:inline-flex"
             >
               {t("login")}
             </Link>
@@ -314,7 +314,7 @@ export default function Navbar({ variant }: NavbarProps) {
               </Link>
               <Link
                 href={`${base}/login`}
-                className="mt-2 inline-flex min-h-[44px] items-center justify-center rounded-radius-sm bg-primary px-4 font-sarabun text-label font-medium text-white"
+                className="mt-2 inline-flex min-h-[44px] items-center justify-center rounded-radius-full bg-gradient-to-b from-primary-hover to-primary-dark px-4 font-sarabun text-label font-medium text-white"
               >
                 {t("login")}
               </Link>

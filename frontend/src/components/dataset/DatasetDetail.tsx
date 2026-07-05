@@ -152,7 +152,7 @@ export default function DatasetDetail({
               {tDetail("breadcrumbCategory")}
             </Link>
             <ChevronRight />
-            <span className="line-clamp-1 font-semibold" style={{ color: "#33691e" }}>{detail.title}</span>
+            <span className="line-clamp-1 font-semibold text-primary-dark">{detail.title}</span>
           </nav>
 
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row">
@@ -166,9 +166,15 @@ export default function DatasetDetail({
                 )}
               </div>
 
-              <h1 className="mb-2 font-kanit text-heading-2 font-bold md:text-heading-1" style={{ color: "#1a3a2a" }}>
+              <h1 className="mb-2 font-kanit text-heading-2 font-bold text-primary md:text-heading-1">
                 {detail.title}
               </h1>
+              <p className="mb-2 flex items-center gap-2 font-sarabun text-label text-text-secondary">
+                <svg className="h-5 w-5 shrink-0 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                {detail.agencyName}
+              </p>
               <p className="font-sarabun text-body-md text-text-muted">
                 {detail.description.length > 120
                   ? `${detail.description.slice(0, 120)}...`
@@ -181,20 +187,29 @@ export default function DatasetDetail({
                 <button
                   type="button"
                   onClick={() => setDownloadOpen(true)}
-                  className="inline-flex min-h-[44px] items-center gap-2 rounded-lg px-6 py-2.5 font-sarabun text-label font-bold text-white shadow-level-1 transition-all hover:opacity-90 active:scale-[0.98]"
-                  style={{ backgroundColor: "#00897b" }}
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-radius-full bg-gradient-to-b from-primary-hover to-primary-dark px-8 py-2.5 font-sarabun text-label font-bold text-white shadow-level-1 transition-all hover:brightness-110 active:scale-[0.98]"
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                   {tDetail("download")}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setApiAccessOpen(true)}
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-radius-full border-2 border-primary px-6 py-2.5 font-sarabun text-label font-bold text-primary transition-all hover:bg-primary hover:text-white"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                  {tDetail("apiAccess")}
+                </button>
                 {canBookmark && (
                   <button
                     type="button"
                     onClick={() => addBookmarkMutation.mutate(datasetId)}
                     disabled={addBookmarkMutation.isPending}
-                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-border-default bg-white p-2.5 text-text-secondary transition-colors hover:bg-surface-container disabled:opacity-50"
+                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-radius-full border border-border-default bg-white p-2.5 text-text-secondary transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
                     aria-label={tDetail("bookmark")}
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -215,85 +230,17 @@ export default function DatasetDetail({
         </div>
       </section>
 
-      {/* 4 Stat Cards */}
-      <section className="bg-surface-page px-4 py-6 md:px-spacing-10">
-        <div className="mx-auto grid max-w-container-max grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="flex items-start gap-3 rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "#e0f2f1" }}>
-              <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-sarabun text-label text-text-muted">{tDetail("agency")}</p>
-              <p className="font-kanit text-body-lg font-bold" style={{ color: "#1a3a2a" }}>{detail.agencyName}</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "#e0f2f1" }}>
-              <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-sarabun text-label text-text-muted">{isUpdated ? tDetail("updatedAt") : tDetail("publishedAt")}</p>
-              <p className="font-kanit text-body-lg font-bold" style={{ color: "#1a3a2a" }} suppressHydrationWarning>{publishedDateLabel}</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "#e0f2f1" }}>
-              <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-sarabun text-label text-text-muted">{tDetail("downloads")}</p>
-              <p className="font-kanit text-body-lg font-bold" style={{ color: "#1a3a2a" }} suppressHydrationWarning>
-                {downloadCountLabel} <span className="text-label font-normal text-text-muted">{tDetail("downloadsUnit")}</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "#e0f2f1" }}>
-              <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <p className="font-sarabun text-label text-text-muted">{tDetail("qualityScore")}</p>
-              <p className="font-kanit text-body-lg font-bold" style={{ color: "#1a3a2a" }}>
-                {detail.qualityScore}/100
-              </p>
-              <div className="mt-1.5 h-2 w-full rounded-full bg-gray-200">
-                <div
-                  className="h-2 rounded-full transition-all"
-                  style={{ width: `${detail.qualityScore}%`, backgroundColor: "#00897b" }}
-                />
-              </div>
-              <p className="mt-1 font-sarabun text-caption text-text-muted">
-                {detail.qualityScore >= 80
-                  ? (locale === "th" ? "ข้อมูลครบถ้วนสมบูรณ์" : "Complete data")
-                  : (locale === "th" ? "ข้อมูลยังไม่ครบ" : "Incomplete data")}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Description + Sidebar */}
       <section className="bg-surface-page px-4 pb-spacing-6 md:px-spacing-10">
         <div className="mx-auto grid max-w-container-max grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Left: Description + File Formats */}
-          <div className="lg:col-span-2">
+          {/* Left: Description + Preview */}
+          <div className="flex flex-col gap-6 lg:col-span-2">
             <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
               <div className="mb-4 flex items-center gap-2">
-                <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <h2 className="font-kanit text-heading-3-mobile font-bold" style={{ color: "#1a3a2a" }}>
+                <h2 className="font-kanit text-heading-3-mobile font-bold text-primary">
                   {tDetail("description")}
                 </h2>
               </div>
@@ -308,95 +255,149 @@ export default function DatasetDetail({
                 ))}
               </div>
             </div>
+
+            <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
+              {previewQuery.isLoading && (
+                <div className="animate-pulse">
+                  <div className="mb-4 h-6 w-48 rounded bg-surface-container" />
+                  <div className="space-y-2">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="h-8 rounded bg-surface-container" />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {previewQuery.isError && (
+                <p className="font-sarabun text-body-md text-status-error" role="alert">
+                  {previewQuery.error?.message ?? tDetail("previewLoadError")}
+                </p>
+              )}
+              {previewQuery.isSuccess && (
+                <PreviewTable columns={previewTable.columns} rows={previewTable.rows} />
+              )}
+            </div>
           </div>
 
-          {/* Right: Tags + Metadata + API Button */}
+          {/* Right: Metadata + Tags + API Button */}
           <div className="flex flex-col gap-6">
             <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
-              <h3 className="mb-3 font-kanit text-label font-bold" style={{ color: "#1a3a2a" }}>
-                {tDetail("tags")}
+              <h3 className="mb-4 flex items-center gap-2 font-kanit text-body-md font-bold text-primary">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {locale === "th" ? "ข้อมูลเมทาดาตา" : "Metadata"}
               </h3>
-              <DatasetTags tags={[]} />
-              {/* Tags are currently empty - will show when tag data is available */}
 
-              <hr className="my-4 border-border-default/60" />
-
-              <div className="flex flex-col gap-3 font-sarabun text-label">
-                <div className="flex items-center justify-between">
-                  <span className="text-text-muted">{locale === "th" ? "สิทธิ์การใช้งาน (License)" : "License"}</span>
-                  <span className="font-bold" style={{ color: "#1a3a2a" }}>
+              <div className="flex flex-col gap-4 font-sarabun">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-caption text-text-muted">{locale === "th" ? "หมวดหมู่" : "Category"}</span>
+                  <span className="text-label font-medium text-text-primary">
+                    {detail.categoryLabel}
+                    {detail.subcategoryLabel ? ` › ${detail.subcategoryLabel}` : ""}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-caption text-text-muted">{locale === "th" ? "ปีข้อมูล" : "Data year"}</span>
+                  <span className="text-label font-medium text-text-primary">{detail.yearLabel ?? "—"}</span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-caption text-text-muted">{locale === "th" ? "จังหวัด" : "Province"}</span>
+                  <span className="text-label font-medium text-text-primary">
+                    {detail.province ?? (locale === "th" ? "ทั่วประเทศ" : "Nationwide")}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-caption text-text-muted">{locale === "th" ? "รูปแบบไฟล์" : "File formats"}</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {availableFormats.map((fmt) => {
+                      const colors = FORMAT_ICON_COLORS[fmt.toLowerCase()] ?? { bg: "#f5f5f5", text: "#616161" };
+                      return (
+                        <span
+                          key={fmt}
+                          className="rounded-md px-2 py-0.5 text-caption font-bold uppercase"
+                          style={{ backgroundColor: colors.bg, color: colors.text }}
+                        >
+                          {DOWNLOAD_FORMAT_LABELS[fmt.toLowerCase() as keyof typeof DOWNLOAD_FORMAT_LABELS] ?? fmt.toUpperCase()}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-caption text-text-muted">{locale === "th" ? "สัญญาอนุญาต" : "License"}</span>
+                  <span className="text-label font-medium text-text-primary">
                     {detail.license === "open"
                       ? "Open Data Commons"
                       : licenseLabel(detail.license, t)}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-text-muted">{locale === "th" ? "หมวดหมู่" : "Category"}</span>
-                  <span className="font-bold" style={{ color: "#1a3a2a" }}>{detail.categoryLabel}</span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-caption text-text-muted">{locale === "th" ? "วันที่เผยแพร่" : "Published"}</span>
+                  <span className="text-label font-medium text-text-primary" suppressHydrationWarning>{publishedDateLabel}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-text-muted">{locale === "th" ? "รหัสชุดข้อมูล" : "Dataset ID"}</span>
-                  <span className="rounded-md border border-border-default px-2 py-0.5 font-mono text-caption font-medium text-text-secondary">
-                    {datasetId.split("-").slice(0, 2).join("-").toUpperCase()}
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-caption text-text-muted">{locale === "th" ? "อัปเดตล่าสุด" : "Last updated"}</span>
+                  <span className="text-label font-medium text-text-primary" suppressHydrationWarning>
+                    {isUpdated
+                      ? new Date(detail.updatedAt).toLocaleDateString(
+                          locale === "th" ? "th-TH" : "en-US",
+                          { year: "numeric", month: "long", day: "numeric" }
+                        )
+                      : publishedDateLabel}
                   </span>
                 </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-caption text-text-muted">{locale === "th" ? "คะแนนคุณภาพ" : "Quality score"}</span>
+                  <span className="text-label font-medium text-text-primary">{detail.qualityScore}/100</span>
+                  <div className="mt-1 h-1.5 w-full rounded-full bg-gray-200">
+                    <div
+                      className="h-1.5 rounded-full bg-primary transition-all"
+                      style={{ width: `${detail.qualityScore}%` }}
+                    />
+                  </div>
+                </div>
+
+                <hr className="border-border-default/60" />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-caption text-text-muted">{locale === "th" ? "จำนวนดาวน์โหลด" : "Downloads"}</span>
+                    <span className="font-kanit text-body-lg font-bold text-primary" suppressHydrationWarning>{downloadCountLabel}</span>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-caption text-text-muted">{locale === "th" ? "จำนวนเข้าชม" : "Views"}</span>
+                    <span className="font-kanit text-body-lg font-bold text-primary">
+                      {(viewCount ?? 0).toLocaleString(locale)}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setApiAccessOpen(true)}
-              className="flex w-full items-center justify-center rounded-2xl py-3.5 font-sarabun text-label font-bold shadow-level-1 transition-all hover:opacity-90"
-              style={{ backgroundColor: "#f9a825", color: "#33691e" }}
-            >
-              {tDetail("apiAccess")}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Preview Table */}
-      <section className="bg-surface-page px-4 pb-spacing-6 md:px-spacing-10">
-        <div className="mx-auto max-w-container-max">
-          {previewQuery.isLoading && (
-            <div className="animate-pulse rounded-2xl border border-border-default bg-white p-8">
-              <div className="mb-4 h-6 w-48 rounded bg-surface-container" />
-              <div className="space-y-2">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-8 rounded bg-surface-container" />
-                ))}
-              </div>
+            <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
+              <h3 className="mb-3 font-kanit text-label font-bold text-primary-dark">
+                {tDetail("tags")}
+              </h3>
+              <DatasetTags tags={[]} />
+              {/* Tags are currently empty - will show when tag data is available */}
             </div>
-          )}
-          {previewQuery.isError && (
-            <p className="font-sarabun text-body-md text-status-error" role="alert">
-              {previewQuery.error?.message ?? tDetail("previewLoadError")}
-            </p>
-          )}
-          {previewQuery.isSuccess && (
-            <PreviewTable columns={previewTable.columns} rows={previewTable.rows} />
-          )}
-        </div>
-      </section>
 
-      {/* Citation */}
-      <section className="bg-surface-page px-4 pb-spacing-6 md:px-spacing-10">
-        <div className="mx-auto max-w-container-max">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="font-kanit text-heading-3-mobile font-bold" style={{ color: "#1a3a2a" }}>
-              {tDetail("tabCitation")}
-            </span>
+            <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
+              <h3 className="mb-3 font-kanit text-label font-bold text-primary-dark">
+                {tDetail("tabCitation")}
+              </h3>
+              <CitationBox
+                apa={citationQuery.data?.apa ?? ""}
+                vancouver={citationQuery.data?.vancouver ?? ""}
+                isLoading={citationQuery.isLoading}
+                errorMessage={
+                  citationQuery.isError
+                    ? citationQuery.error?.message ?? tDetail("citationLoadError")
+                    : null
+                }
+              />
+            </div>
           </div>
-          <CitationBox
-            apa={citationQuery.data?.apa ?? ""}
-            vancouver={citationQuery.data?.vancouver ?? ""}
-            isLoading={citationQuery.isLoading}
-            errorMessage={
-              citationQuery.isError
-                ? citationQuery.error?.message ?? tDetail("citationLoadError")
-                : null
-            }
-          />
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 import AnnouncementBanner from "@/components/common/AnnouncementBanner";
 import HeroSearch from "@/components/common/HeroSearch";
 import StatsOverview from "@/components/common/StatsOverview";
+import HomeCategorySection from "@/components/home/HomeCategorySection";
 import HomeCtaSection from "@/components/home/HomeCtaSection";
 import HomeDatasetSectionClient from "@/components/home/HomeDatasetSectionClient";
 import HomeScholarshipSectionClient from "@/components/home/HomeScholarshipSectionClient";
@@ -16,11 +17,14 @@ export default function HomePage({ params }: HomePageProps) {
     <>
       <AnnouncementBanner />
       <HeroSearch />
-      <section className="py-10 md:py-14">
-        <div className="mx-auto flex max-w-container-max justify-center px-4 md:px-10">
-          <StatsOverview />
+      <section className="relative z-10 -mt-14 pb-4 md:-mt-16">
+        <div className="mx-auto max-w-container-max px-4 md:px-10">
+          <div className="flex justify-center rounded-2xl bg-surface-card px-6 py-8 shadow-level-2 md:px-10">
+            <StatsOverview />
+          </div>
         </div>
       </section>
+      <HomeCategorySection locale={locale} />
       <HomeDatasetSectionClient locale={locale} variant="popular" />
       <section className="py-12 md:py-20">
         <div className="mx-auto max-w-container-max px-4 md:px-10">

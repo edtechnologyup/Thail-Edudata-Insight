@@ -90,9 +90,9 @@ function CategoryDetail({
         </div>
       </div>
 
-      {item.id && (
+      {item.id && item.id !== "__others__" && (
         <Link
-          href={`${base}/search?category_id=${item.id}`}
+          href={`${base}/search?category=${item.id}`}
           className="inline-flex items-center justify-center gap-2 rounded-radius-md bg-primary px-4 py-2 font-sarabun text-caption font-medium text-white transition-colors hover:bg-primary-hover"
         >
           {t("viewAllDatasets")}
@@ -111,7 +111,9 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
   const isTh = locale === "th";
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  const chartData: ChartItem[] = data
+  const TOP_CATEGORY_LIMIT = 6;
+
+  const sortedData: ChartItem[] = data
     .filter((item) => item.count > 0)
     .map((item) => ({
       id: item.id,
@@ -122,6 +124,33 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
     }))
     .sort((a, b) => b.value - a.value);
 
+  const chartData: ChartItem[] =
+    sortedData.length > TOP_CATEGORY_LIMIT + 1
+      ? [
+          ...sortedData.slice(0, TOP_CATEGORY_LIMIT),
+          sortedData.slice(TOP_CATEGORY_LIMIT).reduce(
+            (acc, item) => ({
+              ...acc,
+              value: acc.value + item.value,
+              download_count: acc.download_count + item.download_count,
+              view_count: acc.view_count + item.view_count,
+            }),
+            {
+              id: "__others__",
+              name: isTh ? "อื่นๆ" : "Others",
+              value: 0,
+              download_count: 0,
+              view_count: 0,
+            } as ChartItem
+          ),
+        ]
+      : sortedData;
+
+  const pieColor = (item: ChartItem, index: number) =>
+    item.id === "__others__"
+      ? "#9e9e9e"
+      : CHART_COLORS.pie[index % CHART_COLORS.pie.length];
+
   const total = chartData.reduce((sum, item) => sum + item.value, 0);
 
   const toggleDetail = useCallback((_: any, index: number) => {
@@ -129,18 +158,16 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
   }, []);
 
   const selectedItem = activeIndex !== null ? chartData[activeIndex] : null;
-  const selectedColor = activeIndex !== null
-    ? CHART_COLORS.pie[activeIndex % CHART_COLORS.pie.length]
-    : "";
+  const selectedColor = selectedItem ? pieColor(selectedItem, activeIndex ?? 0) : "";
 
   return (
     <div className="rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1 md:p-6">
       <div className="mb-4 flex items-center gap-2">
-        <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
         </svg>
-        <h2 className="font-kanit text-heading-3-mobile font-bold md:text-heading-3" style={{ color: "#1a3a2a" }}>
+        <h2 className="font-kanit text-heading-3-mobile font-bold text-primary md:text-heading-3">
           {t("datasetByCategory")}
         </h2>
       </div>
@@ -168,7 +195,7 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
                   onClick={toggleDetail}
                 >
                   {chartData.map((item, index) => {
-                    const color = CHART_COLORS.pie[index % CHART_COLORS.pie.length];
+                    const color = pieColor(item, index);
                     const dimmed = activeIndex !== null && activeIndex !== index;
                     return (
                       <Cell
@@ -205,7 +232,7 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
               <ul className="flex flex-col gap-0.5 md:max-h-72 md:overflow-y-auto md:pr-1">
                 {chartData.map((item, index) => {
                   const percent = Math.round((item.value / total) * 100);
-                  const color = CHART_COLORS.pie[index % CHART_COLORS.pie.length];
+                  const color = pieColor(item, index);
                   return (
                     <li key={item.name}>
                       <button

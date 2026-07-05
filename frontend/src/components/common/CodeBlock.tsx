@@ -30,33 +30,51 @@ export default function CodeBlock({
   return (
     <div className="min-w-0 overflow-hidden rounded-xl border border-border-default/40 shadow-level-1">
       {showHeader && (
-        <div className="flex items-center justify-between border-b border-blue-100 px-5 py-3" style={{ backgroundColor: "#e3f2fd" }}>
-          <span className="font-sarabun text-label font-bold uppercase" style={{ color: "#1565c0" }}>
+        <div className="flex items-center justify-between border-b border-border-default/60 px-5 py-2.5" style={{ backgroundColor: "#e9ebee" }}>
+          <span className="font-sarabun text-label font-normal uppercase text-text-secondary">
             {t("response")}
           </span>
-          <span className="font-sarabun text-label font-semibold" style={{ color: "#1976d2" }}>
-            {label}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="font-sarabun text-label font-normal text-text-muted">
+              {label}
+            </span>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="flex items-center gap-1 rounded-lg border px-3 py-1 font-sarabun text-caption font-normal transition-colors"
+              style={{
+                color: copied ? "#0f6e56" : "#1a237e",
+                borderColor: copied ? "#0f6e56" : "#c5cae9",
+                backgroundColor: copied ? "#e1f5ee" : "#ffffff",
+              }}
+              aria-label={t("copy")}
+            >
+              <CopyIcon />
+              <span>{copied ? t("copied") : t("copy")}</span>
+            </button>
+          </div>
         </div>
       )}
-      <div className="relative px-5 py-5" style={{ backgroundColor: "#f5f9ff", minHeight: "80px" }}>
-        <pre className="overflow-x-auto font-mono text-body-lg leading-loose" style={{ color: "#1a3a2a" }}>
+      <div className="relative px-5 py-5" style={{ backgroundColor: "#f3f4f6", minHeight: "120px" }}>
+        <pre className="overflow-x-auto font-mono text-body-lg font-normal leading-loose" style={{ color: "#1f2328" }}>
           <code>{code}</code>
         </pre>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="absolute right-4 top-3 flex items-center gap-1 rounded-lg border px-3 py-1.5 font-sarabun text-caption font-semibold transition-colors"
-          style={{
-            color: copied ? "#00695c" : "#1565c0",
-            borderColor: copied ? "#00695c" : "#90caf9",
-            backgroundColor: copied ? "#e8f5e9" : "#ffffff",
-          }}
-          aria-label={t("copy")}
-        >
-          <CopyIcon />
-          <span>{copied ? t("copied") : t("copy")}</span>
-        </button>
+        {!showHeader && (
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="absolute right-4 top-3 flex items-center gap-1 rounded-lg border px-3 py-1.5 font-sarabun text-caption font-normal transition-colors"
+            style={{
+              color: copied ? "#0f6e56" : "#1a237e",
+              borderColor: copied ? "#0f6e56" : "#c5cae9",
+              backgroundColor: copied ? "#e1f5ee" : "#ffffff",
+            }}
+            aria-label={t("copy")}
+          >
+            <CopyIcon />
+            <span>{copied ? t("copied") : t("copy")}</span>
+          </button>
+        )}
       </div>
     </div>
   );

@@ -60,22 +60,22 @@ export default function ScholarshipPageClient({
 
   return (
     <>
-      <section className="relative overflow-hidden px-4 py-10 md:px-spacing-10 md:py-14" style={{ backgroundColor: "#00695c" }}>
+      <section className="relative overflow-hidden px-4 py-12 md:px-spacing-10 md:py-16" style={{ backgroundColor: "#1a237e" }}>
         {heroImg?.imageUrl && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={heroImg.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden />
-            <div className="absolute inset-0" style={{ backgroundColor: "rgba(0,105,92,0.75)" }} aria-hidden />
+            <div className="absolute inset-0" style={{ backgroundColor: "rgba(26,35,126,0.78)" }} aria-hidden />
           </>
         )}
-        <div className="relative z-10 mx-auto max-w-container-max">
+        <div className="relative z-10 mx-auto max-w-container-max text-center">
           <h1 className="mb-3 font-kanit text-[2rem] font-bold text-white md:text-[2.5rem]">
             {t("title")}
           </h1>
-          <p className="mb-8 max-w-2xl font-sarabun text-body-md leading-relaxed text-white/90">
+          <p className="mx-auto mb-8 max-w-2xl font-sarabun text-body-md leading-relaxed text-white/90">
             {t("subtitle")}
           </p>
-          <SearchBar syncUrl className="max-w-[600px]" />
+          <SearchBar syncUrl className="mx-auto max-w-[640px]" />
         </div>
       </section>
 

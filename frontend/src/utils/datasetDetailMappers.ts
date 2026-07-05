@@ -47,6 +47,19 @@ export function buildDatasetDetailView(
 ): DatasetDetailView {
   const cats = resolveCategoryLabels(dataset.category_id, categories, locale);
 
+  const meta = (dataset.metadata ?? {}) as Record<string, unknown>;
+  const yearStart = typeof meta.year_start === "number" ? meta.year_start : null;
+  const yearEnd = typeof meta.year_end === "number" ? meta.year_end : null;
+  const yearLabel = yearStart
+    ? yearEnd && yearEnd !== yearStart
+      ? `${yearStart}–${yearEnd}`
+      : `${yearStart}`
+    : undefined;
+  const province =
+    typeof meta.province === "string" && meta.province.trim()
+      ? meta.province
+      : undefined;
+
   return {
     id: dataset.id,
     title: dataset.title,
@@ -54,6 +67,8 @@ export function buildDatasetDetailView(
     categoryLabel: cats.categoryLabel,
     subcategoryLabel: cats.subcategoryLabel,
     agencyName: agencyName ?? "—",
+    yearLabel,
+    province,
     publishedAt:
       dataset.published_at ?? dataset.created_at ?? new Date().toISOString(),
     createdAt: dataset.created_at ?? new Date().toISOString(),

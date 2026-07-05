@@ -26,13 +26,13 @@ export default function QuickStart({
   return (
     <section id="quick-start" className="scroll-mt-28">
       <div className="mb-5 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: "#e8f5e9", color: "#00695c" }}>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-light text-primary">
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
         <div>
-          <h2 className="font-kanit text-[1.5rem] font-bold" style={{ color: "#1a3a2a" }}>
+          <h2 className="font-kanit text-[1.5rem] font-bold text-primary">
             {title}
           </h2>
           <p className="font-sarabun text-body-md text-text-secondary">
@@ -51,15 +51,15 @@ export default function QuickStart({
             <div
               key={step.id}
               className="flex min-w-0 flex-col rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1 md:p-8"
-              style={{ borderTopWidth: 3, borderTopColor: "#00695c" }}
+              style={{ borderTopWidth: 3, borderTopColor: "#1a237e" }}
             >
               <span
                 className="mb-4 flex h-12 w-12 items-center justify-center rounded-full font-kanit text-body-md font-bold text-white"
-                style={{ backgroundColor: "#004d40" }}
+                style={{ backgroundColor: "#1a237e" }}
               >
                 {globalIndex + 1}
               </span>
-              <h3 className="font-kanit text-body-lg font-bold md:text-[1.25rem]" style={{ color: "#1a3a2a" }}>
+              <h3 className="font-kanit text-body-lg font-bold text-text-primary md:text-[1.25rem]">
                 {stepTitle}
               </h3>
               <p className="mt-3 flex-1 font-sarabun text-body-md leading-relaxed text-text-secondary">
@@ -98,7 +98,7 @@ export default function QuickStart({
                 className={`h-2.5 rounded-full transition-all ${
                   i === page ? "w-8" : "w-2.5"
                 }`}
-                style={{ backgroundColor: i === page ? "#00695c" : "#c8e6c9" }}
+                style={{ backgroundColor: i === page ? "#1a237e" : "#c5cae9" }}
                 aria-label={`Page ${i + 1}`}
               />
             ))}

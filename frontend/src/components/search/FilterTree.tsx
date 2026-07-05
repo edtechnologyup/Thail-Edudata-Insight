@@ -140,6 +140,14 @@ export default function FilterTree({ selectedCategory }: FilterTreeProps) {
     [filterOptions?.categories]
   );
 
+  const selectedRoot = useMemo(() => {
+    if (!selectedCategory) return null;
+    const containsSelected = (node: FilterCategoryNode): boolean =>
+      node.id === selectedCategory ||
+      node.children.some((child) => containsSelected(child as FilterCategoryNode));
+    return tree.find(containsSelected) ?? null;
+  }, [tree, selectedCategory]);
+
   if (tree.length === 0) {
     return null;
   }
@@ -156,23 +164,85 @@ export default function FilterTree({ selectedCategory }: FilterTreeProps) {
     }
   }
 
+  function clearCategory() {
+    updateParams({ category: null, page: null });
+  }
+
+  if (selectedRoot) {
+    const rootLabel = locale === "th" ? selectedRoot.name_th : selectedRoot.name_en;
+    const isRootActive = selectedCategory === selectedRoot.id;
+
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="mb-1 flex items-center justify-between font-sarabun text-label font-bold text-primary-dark">
+          <span>{t("categories")}</span>
+        </div>
+
+        <div className="flex items-center justify-between gap-2 rounded-radius-md border border-primary/30 bg-primary-light px-3 py-2">
+          <span className="truncate font-sarabun text-label font-bold text-primary-dark">
+            {rootLabel}
+          </span>
+          <button
+            type="button"
+            onClick={clearCategory}
+            className="shrink-0 text-primary-dark transition-colors hover:text-status-error"
+            aria-label={t("clearFilter")}
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="flex max-h-[300px] flex-col gap-1 overflow-y-auto">
+          <button
+            type="button"
+            onClick={() => selectCategory(selectedRoot.id)}
+            className={`w-full rounded-radius-md px-2 py-1.5 text-left font-sarabun text-label font-medium transition-colors hover:bg-surface-container ${
+              isRootActive
+                ? "border-l-[3px] border-primary-dark bg-primary-light text-primary-dark"
+                : "text-text-secondary"
+            }`}
+          >
+            {locale === "th" ? "ทั้งหมดในหมวดนี้" : "All in this category"}
+          </button>
+          {selectedRoot.children.map((child) => (
+            <FilterTreeNodeRow
+              key={child.id}
+              node={child as FilterCategoryNode}
+              depth={0}
+              expanded={expanded}
+              selectedCategory={selectedCategory}
+              locale={locale}
+              onToggle={toggleExpand}
+              onSelect={selectCategory}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2">
-      <div className="mb-1 flex items-center justify-between font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
+      <div className="mb-1 flex items-center justify-between font-sarabun text-label font-bold text-primary-dark">
         <span>{t("categories")}</span>
       </div>
       <div className="flex max-h-[300px] flex-col gap-1 overflow-y-auto">
         {tree.map((node) => (
-          <FilterTreeNodeRow
+          <button
             key={node.id}
-            node={node}
-            depth={0}
-            expanded={expanded}
-            selectedCategory={selectedCategory}
-            locale={locale}
-            onToggle={toggleExpand}
-            onSelect={selectCategory}
-          />
+            type="button"
+            onClick={() => selectCategory(node.id)}
+            className="flex w-full items-center justify-between gap-2 rounded-radius-md px-2 py-1.5 text-left font-sarabun text-label font-medium text-text-secondary transition-colors hover:bg-surface-container hover:text-primary-dark"
+          >
+            <span className="truncate">
+              {locale === "th" ? node.name_th : node.name_en}
+            </span>
+            <svg className="h-4 w-4 shrink-0 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         ))}
       </div>
     </div>

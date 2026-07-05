@@ -105,17 +105,17 @@ export default function ScholarshipFilter() {
   return (
     <div className="rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1">
       <div className="mb-5 flex items-center gap-2">
-        <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
         </svg>
-        <h3 className="font-kanit text-body-md font-bold" style={{ color: "#1a3a2a" }}>
+        <h3 className="font-kanit text-body-md font-bold text-primary">
           {tFilter("title")}
         </h3>
       </div>
 
       {/* ระดับการศึกษา */}
       <div className="mb-5">
-        <p className="mb-3 font-sarabun text-label font-bold" style={{ color: "#1a3a2a" }}>
+        <p className="mb-3 font-sarabun text-label font-bold text-primary-dark">
           {tFilter("level")}
         </p>
         <div className="flex flex-col gap-2">
@@ -141,7 +141,7 @@ export default function ScholarshipFilter() {
 
       {/* ประเภททุน */}
       <div className="mb-5">
-        <p className="mb-3 font-sarabun text-label font-bold" style={{ color: "#1a3a2a" }}>
+        <p className="mb-3 font-sarabun text-label font-bold text-primary-dark">
           {tFilter("type")}
         </p>
         <select
@@ -164,7 +164,7 @@ export default function ScholarshipFilter() {
 
       {/* สถานะ */}
       <div className="mb-6">
-        <p className="mb-3 font-sarabun text-label font-bold" style={{ color: "#1a3a2a" }}>
+        <p className="mb-3 font-sarabun text-label font-bold text-primary-dark">
           {tFilter("applicationStatus")}
         </p>
         <div className="flex flex-wrap gap-2">
@@ -181,7 +181,7 @@ export default function ScholarshipFilter() {
                 className="rounded-full px-4 py-2 font-sarabun text-caption font-bold transition-all"
                 style={
                   active
-                    ? { backgroundColor: isOpen ? "#00695c" : "#c41411", color: "#ffffff" }
+                    ? { backgroundColor: isOpen ? "#10b981" : "#c41411", color: "#ffffff" }
                     : { backgroundColor: "#f5f5f5", color: "#6b7280" }
                 }
               >
@@ -197,8 +197,7 @@ export default function ScholarshipFilter() {
         type="button"
         onClick={handleClearAll}
         disabled={!hasAnyFilter}
-        className="w-full rounded-2xl border-2 py-2.5 font-sarabun text-label font-bold transition-all hover:opacity-80 disabled:opacity-40"
-        style={{ borderColor: "#00897b", color: "#0d5302" }}
+        className="w-full rounded-radius-full border-2 border-primary py-2.5 font-sarabun text-label font-bold text-primary transition-all hover:bg-primary hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-primary"
       >
         {tFilter("clearAll")}
       </button>

@@ -31,10 +31,10 @@ function DomainIcon() {
   );
 }
 
-function DownloadIcon() {
+function DownloadIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg
-      className="h-4 w-4"
+      className={className}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -58,15 +58,26 @@ const FORMAT_ICON_COLORS: Record<string, { bg: string; text: string }> = {
   json: { bg: "#fff3e0", text: "#e65100" },
 };
 
+const FORMAT_TITLES: Record<string, string> = {
+  csv: "ไฟล์ตารางข้อมูล CSV",
+  excel: "ไฟล์ Excel",
+  xlsx: "ไฟล์ Excel",
+  pdf: "ไฟล์เอกสาร PDF",
+  json: "ไฟล์ข้อมูล JSON",
+  xml: "ไฟล์ข้อมูล XML",
+  sql: "ไฟล์ฐานข้อมูล SQL",
+};
+
 function FileFormatIcon({ format }: { format: string }) {
   const lower = format.toLowerCase();
   const colors = FORMAT_ICON_COLORS[lower] ?? { bg: "#f5f5f5", text: "#616161" };
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-radius-sm px-1.5 py-0.5 text-[11px] font-bold uppercase"
+      title={FORMAT_TITLES[lower] ?? `ไฟล์ ${format.toUpperCase()}`}
+      className="inline-flex cursor-default items-center gap-1.5 rounded-radius-md px-2.5 py-1 text-[13px] font-bold uppercase"
       style={{ backgroundColor: colors.bg, color: colors.text }}
     >
-      <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z" />
       </svg>
       {format}
@@ -146,6 +157,7 @@ function statusLabel(
 export default function DatasetCard({
   id,
   title,
+  description,
   category,
   agency,
   status,
@@ -161,6 +173,8 @@ export default function DatasetCard({
   variant = "popular",
   index = 0,
   imageUrl,
+  ratingAvg = null,
+  ratingCount = 0,
 }: DatasetCardProps) {
   const t = useTranslations("dataset");
   const tCommon = useTranslations("notifications");
@@ -176,9 +190,9 @@ export default function DatasetCard({
 
   if (variant === "latest") {
     const latestBg = "white";
-    const latestText = "#1a2e1a";
-    const latestSub = "#4a6a4a";
-    const latestMuted = "#6a8a6a";
+    const latestText = "#191c1e";
+    const latestSub = "#3c4946";
+    const latestMuted = "#6c7a76";
     return (
       <Link
         href={`/${locale}/datasets/${id}`}
@@ -221,11 +235,11 @@ export default function DatasetCard({
   return (
     <Link
       href={`/${locale}/datasets/${id}`}
-      className="group flex w-full shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border-default bg-surface-card shadow-level-1 transition-all hover:shadow-level-2"
+      className="group flex w-full shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border-default bg-surface-card shadow-level-1 transition-all hover:-translate-y-1 hover:shadow-level-2"
     >
       <div
         className="relative w-full overflow-hidden rounded-t-radius-xl"
-        style={{ height: "350px", backgroundColor: index % 2 === 0 ? "#33691e" : "#e1f5ee" }}
+        style={{ height: "192px", backgroundColor: index % 2 === 0 ? "var(--color-primary)" : "var(--color-primary-light)" }}
       >
         {imageUrl && (
           <img
@@ -238,7 +252,7 @@ export default function DatasetCard({
 
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-2 flex min-w-0 items-center gap-2">
-          <span className="truncate font-sarabun text-caption font-semibold text-primary-dark">
+          <span className="truncate rounded-radius-md bg-primary-light px-2 py-0.5 font-sarabun text-caption font-semibold text-primary-dark">
             {category}
           </span>
           {isPublished && (
@@ -258,37 +272,44 @@ export default function DatasetCard({
           {title}
         </h3>
 
-        <p className="mb-3 font-sarabun text-body-sm text-text-secondary line-clamp-1">
+        <p className="mb-2 font-sarabun text-body-sm text-text-secondary line-clamp-1">
           {t("agency")}: {agency}
         </p>
 
-        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border-default/60 pt-3 font-sarabun text-caption text-text-muted">
-          <span className="flex items-center gap-1">
-            <DownloadIcon />
+        {description && (
+          <p className="mb-3 line-clamp-2 font-sarabun text-body-sm text-text-muted">
+            {description}
+          </p>
+        )}
+
+        <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border-default/60 pt-3 font-sarabun text-label text-text-secondary">
+          <span className="flex items-center gap-1.5">
+            <DownloadIcon className="h-5 w-5" />
             {formatDownloadCount(downloadCount, locale)}
           </span>
-          {qualityScore != null && (
-            <span className="flex items-center gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => {
-                const filled = i < Math.round((qualityScore / 100) * 5);
-                return (
-                  <svg key={i} className="h-3.5 w-3.5" fill={filled ? "#ffeb3b" : "#e0e0e0"} viewBox="0 0 24 24" aria-hidden>
-                    <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                  </svg>
-                );
-              })}
-              <span className="ml-1">{qualityScore}</span>
-            </span>
-          )}
-          {viewCount > 0 && (
-            <span className="flex items-center gap-1">
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              {formatDownloadCount(viewCount, locale)}
-            </span>
-          )}
+          <span className="flex items-center gap-1.5">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            {formatDownloadCount(viewCount, locale)}
+          </span>
+          <span className="flex items-center gap-0.5">
+            {Array.from({ length: 5 }).map((_, i) => {
+              const filled = ratingAvg != null && i < Math.round(ratingAvg);
+              return (
+                <svg key={i} className="h-5 w-5" fill={filled ? "#f9a825" : "#e0e0e0"} viewBox="0 0 24 24" aria-hidden>
+                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+              );
+            })}
+            {ratingAvg != null && ratingCount > 0 && (
+              <span className="ml-1.5 font-bold" style={{ color: "#ba7517" }}>
+                {ratingAvg.toFixed(1)}{" "}
+                <span className="font-normal text-text-muted">({ratingCount})</span>
+              </span>
+            )}
+          </span>
         </div>
       </div>
     </Link>

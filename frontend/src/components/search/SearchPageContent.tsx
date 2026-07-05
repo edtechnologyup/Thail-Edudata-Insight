@@ -40,10 +40,10 @@ export default function SearchPageContent() {
   );
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden" style={{ backgroundColor: "#e1f5fe" }}>
+    <div className="relative min-h-screen overflow-x-hidden" style={{ backgroundColor: "#f8f9fb" }}>
     <div className="relative mx-auto max-w-container-max px-4 py-spacing-4 md:px-spacing-10">
       <div className="mb-8">
-        <h1 className="mb-4 font-kanit text-[2rem] font-bold md:text-[2.5rem]" style={{ color: "#33691e" }}>
+        <h1 className="mb-4 font-kanit text-[2rem] font-bold text-primary md:text-[2.5rem]">
           {t("pageTitle")}
         </h1>
         <div className="max-w-[600px]">

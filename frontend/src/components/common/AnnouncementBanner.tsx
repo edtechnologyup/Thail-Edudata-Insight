@@ -79,7 +79,7 @@ export default function AnnouncementBanner() {
 
   return (
     <div
-      className="border-b-4 border-[#991b1b] bg-gradient-to-r from-status-error to-[#dc2626] px-4 py-5 shadow-level-2 md:px-10 md:py-6"
+      className="border-b-4 border-primary-dark bg-gradient-to-r from-primary-dark to-primary px-4 py-5 shadow-level-2 md:px-10 md:py-6"
       role="alert"
       aria-live="polite"
     >
@@ -89,8 +89,8 @@ export default function AnnouncementBanner() {
         </div>
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-radius-full bg-white px-3 py-1 font-sarabun text-caption font-bold uppercase tracking-wide text-status-error">
-              <span className="h-2 w-2 animate-pulse rounded-radius-full bg-status-error" />
+            <span className="inline-flex items-center gap-1.5 rounded-radius-full bg-white px-3 py-1 font-sarabun text-caption font-bold uppercase tracking-wide text-primary-dark">
+              <span className="h-2 w-2 animate-pulse rounded-radius-full bg-primary" />
               {t("badge")}
             </span>
             <span className="font-sarabun text-caption font-medium text-white/90">

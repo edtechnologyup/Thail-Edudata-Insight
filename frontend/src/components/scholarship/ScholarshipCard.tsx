@@ -36,43 +36,54 @@ export default function ScholarshipCard({ scholarship }: ScholarshipCardProps) {
     : null;
 
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1 transition-all hover:shadow-level-2">
-      {/* Tags */}
-      <div className="mb-2 flex items-center gap-2">
+    <article
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl border border-border-default/60 bg-white shadow-level-1 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-level-2 ${
+        closed ? "opacity-80" : ""
+      }`}
+    >
+      {/* Image + Status badge */}
+      <div className={`relative h-40 w-full shrink-0 overflow-hidden ${closed ? "grayscale" : ""}`}>
+        {scholarship.image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={scholarship.image_url}
+            alt=""
+            className="h-full w-full object-cover"
+            aria-hidden
+          />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-primary-light to-surface-container" aria-hidden />
+        )}
         <span
-          className="rounded-full border px-3 py-1 font-sarabun text-caption font-semibold"
-          style={{ borderColor: "#00897b", color: "#00695c" }}
+          className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-3 py-1 font-sarabun text-caption font-bold text-white shadow-level-1 ${
+            closed ? "bg-text-muted" : ""
+          }`}
+          style={closed ? undefined : { backgroundColor: "#10b981" }}
         >
+          {!closed && (
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+          {closed
+            ? t("filter.applicationStatus_closed")
+            : t("filter.applicationStatus_open")}
+        </span>
+      </div>
+
+      <div className="flex flex-1 flex-col p-5">
+      {/* Tags */}
+      <div className="mb-3 flex items-center gap-2">
+        <span className="rounded-full border border-primary/30 bg-primary-light/60 px-3 py-1 font-sarabun text-caption font-semibold text-primary-dark">
           {tTypes(scholarship.scholarship_type)}
         </span>
         <span className="rounded-full border border-border-default px-3 py-1 font-sarabun text-caption font-medium text-text-secondary">
           {tLevels(scholarship.target_level)}
         </span>
       </div>
-      {/* Status */}
-      <div className="mb-3">
-        {!closed ? (
-          <span
-            className="inline-flex items-center gap-1 rounded-full px-3 py-1 font-sarabun text-caption font-bold text-white"
-            style={{ backgroundColor: "#00695c" }}
-          >
-            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-            </svg>
-            {t("filter.applicationStatus_open")}
-          </span>
-        ) : (
-          <span
-            className="inline-flex items-center gap-1 rounded-full border px-3 py-1 font-sarabun text-caption font-bold"
-            style={{ borderColor: "#c41411", color: "#c41411" }}
-          >
-            {t("filter.applicationStatus_closed")}
-          </span>
-        )}
-      </div>
 
       {/* Title */}
-      <h2 className="mb-2 line-clamp-2 font-kanit text-body-lg font-bold" style={{ color: "#1a3a2a" }}>
+      <h2 className="mb-2 line-clamp-2 font-kanit text-body-lg font-bold text-text-primary transition-colors group-hover:text-primary-dark">
         {scholarship.title}
       </h2>
 
@@ -84,13 +95,10 @@ export default function ScholarshipCard({ scholarship }: ScholarshipCardProps) {
       {/* Amount + Close Date */}
       <div className="mt-auto">
         {amountFormatted && (
-          <div className="mb-3">
-            <p className="font-sarabun text-caption text-text-muted">
-              {locale === "th" ? "มูลค่าทุนสูงสุด" : "Max amount"}
-            </p>
-            <p className="font-kanit text-[1.5rem] font-bold" style={{ color: "#00695c" }}>
-              {amountFormatted}{" "}
-              <span className="text-label font-normal text-text-muted">{t("common.currency")}</span>
+          <div className="mb-3 rounded-xl border border-primary/15 bg-primary-light/50 px-3 py-2">
+            <p className="font-sarabun text-label font-bold text-primary-dark">
+              {locale === "th" ? "มูลค่าทุนสูงสุด" : "Max amount"}: {amountFormatted}{" "}
+              <span className="font-normal text-text-secondary">{t("common.currency")}</span>
             </p>
           </div>
         )}
@@ -112,11 +120,15 @@ export default function ScholarshipCard({ scholarship }: ScholarshipCardProps) {
 
         <Link
           href={`/${locale}/scholarship/${scholarship.id}`}
-          className="flex min-h-[44px] w-full items-center justify-center rounded-xl font-sarabun text-label font-bold text-white transition-all hover:opacity-90"
-          style={{ backgroundColor: "#004d40" }}
+          className={`flex min-h-[44px] w-full items-center justify-center rounded-radius-full font-sarabun text-label font-bold transition-all ${
+            closed
+              ? "bg-surface-container text-text-muted hover:bg-border-default/60"
+              : "bg-gradient-to-b from-primary-hover to-primary-dark text-white shadow-level-1 hover:brightness-110"
+          }`}
         >
           {tCard("viewDetail")}
         </Link>
+      </div>
       </div>
     </article>
   );

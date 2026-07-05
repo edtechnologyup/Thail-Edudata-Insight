@@ -66,6 +66,32 @@ def stats_new_releases(
     return success_response(result.model_dump(mode="json"))
 
 
+@router.get("/stats/top-agencies", status_code=status.HTTP_200_OK)
+def stats_top_agencies(
+    limit: int = Query(5, ge=1, le=20),
+    db: Session = Depends(get_db),
+):
+    """
+    หน่วยงานที่เผยแพร่ Dataset มากที่สุด
+    - Auth ❌
+    """
+    result = visualization_service.get_top_agencies(db, limit=limit)
+    return success_response(result.model_dump(mode="json"))
+
+
+@router.get("/stats/top-rated", status_code=status.HTTP_200_OK)
+def stats_top_rated(
+    limit: int = Query(5, ge=1, le=20),
+    db: Session = Depends(get_db),
+):
+    """
+    Dataset คะแนนรีวิวเฉลี่ยสูงสุด
+    - Auth ❌
+    """
+    result = visualization_service.get_top_rated(db, limit=limit)
+    return success_response(result.model_dump(mode="json"))
+
+
 @router.get("/stats/compare", status_code=status.HTTP_200_OK)
 def stats_compare(
     ids: list[uuid.UUID] = Query(default=[]),

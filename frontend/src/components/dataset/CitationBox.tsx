@@ -29,7 +29,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/30 bg-white/10 text-white/70 transition-colors hover:bg-white/20 hover:text-white"
+      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border-default bg-white text-text-muted transition-colors hover:border-primary hover:text-primary"
       aria-label={copied ? tStyles("copied") : tStyles("copy")}
     >
       {copied ? (
@@ -73,28 +73,28 @@ export default function CitationBox({
   return (
     <div className="flex flex-col gap-4">
       {apa && (
-        <div className="rounded-2xl p-5 shadow-level-1" style={{ backgroundColor: "#004d40" }}>
+        <div className="rounded-2xl border border-border-default/60 p-5" style={{ backgroundColor: "#f3f4f6" }}>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="font-kanit text-label font-bold" style={{ color: "#f9a825" }}>
+            <h3 className="font-kanit text-label font-bold text-primary-dark">
               {tStyles("apa")}
             </h3>
             <CopyButton text={apa} />
           </div>
-          <p className="font-sarabun text-body-sm leading-relaxed text-white">
+          <p className="font-sarabun text-body-sm font-normal leading-relaxed" style={{ color: "#1f2328" }}>
             {apa}
           </p>
         </div>
       )}
 
       {vancouver && (
-        <div className="rounded-2xl p-5 shadow-level-1" style={{ backgroundColor: "#004d40" }}>
+        <div className="rounded-2xl border border-border-default/60 p-5" style={{ backgroundColor: "#f3f4f6" }}>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="font-kanit text-label font-bold" style={{ color: "#f9a825" }}>
+            <h3 className="font-kanit text-label font-bold text-primary-dark">
               {tStyles("vancouver")}
             </h3>
             <CopyButton text={vancouver} />
           </div>
-          <p className="font-sarabun text-body-sm leading-relaxed text-white">
+          <p className="font-sarabun text-body-sm font-normal leading-relaxed" style={{ color: "#1f2328" }}>
             {vancouver}
           </p>
         </div>

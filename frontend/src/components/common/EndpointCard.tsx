@@ -7,8 +7,8 @@ import CodeBlock from "@/components/common/CodeBlock";
 import PermissionBadge from "@/components/common/PermissionBadge";
 
 const METHOD_COLORS: Record<ApiHttpMethod, { bg: string; text: string }> = {
-  GET: { bg: "#e8f5e9", text: "#00695c" },
-  POST: { bg: "#e8f5e9", text: "#004d40" },
+  GET: { bg: "#e8f5e9", text: "#2e7d32" },
+  POST: { bg: "#e3f2fd", text: "#1565c0" },
   PUT: { bg: "#fff8e1", text: "#f57f17" },
   PATCH: { bg: "#fff8e1", text: "#f57f17" },
   DELETE: { bg: "#fef2f2", text: "#c41411" },
@@ -56,12 +56,12 @@ export default function EndpointCard({
               >
                 {endpoint.method}
               </span>
-              <code className="break-all rounded-lg px-3 py-1.5 font-mono text-body-md" style={{ backgroundColor: "#f5f5f5", color: "#00695c" }}>
+              <code className="break-all rounded-lg px-3 py-1.5 font-mono text-body-md font-normal" style={{ backgroundColor: "#f3f4f6", color: "#1f2328" }}>
                 {endpoint.path}
               </code>
             </div>
             <div>
-              <h3 className="font-kanit text-body-lg font-bold" style={{ color: "#1a3a2a" }}>
+              <h3 className="font-kanit text-body-lg font-bold text-text-primary">
                 {title}
               </h3>
               <p className="mt-1 font-sarabun text-body-md text-text-secondary">
@@ -76,7 +76,7 @@ export default function EndpointCard({
           </div>
         </div>
 
-        <span className="inline-flex items-center gap-2 self-start font-sarabun text-label font-bold" style={{ color: "#00695c" }}>
+        <span className="inline-flex items-center gap-2 self-start font-sarabun text-label font-bold text-primary-dark">
           {open ? collapseLabel : expandLabel}
           <ChevronIcon open={open} />
         </span>
@@ -85,13 +85,13 @@ export default function EndpointCard({
       {open && (
         <div className="grid gap-5 border-t border-border-default/40 p-6 md:grid-cols-2 md:p-8" style={{ backgroundColor: "#fafafa" }}>
           <div>
-            <h4 className="mb-3 font-kanit text-label font-bold" style={{ color: "#1a3a2a" }}>
+            <h4 className="mb-3 font-kanit text-label font-bold text-primary-dark">
               {requestLabel}
             </h4>
             <CodeBlock code={endpoint.requestExample} label="REQUEST" />
           </div>
           <div>
-            <h4 className="mb-3 font-kanit text-label font-bold" style={{ color: "#1a3a2a" }}>
+            <h4 className="mb-3 font-kanit text-label font-bold text-primary-dark">
               {responseLabel}
             </h4>
             <CodeBlock code={endpoint.responseExample} label="JSON" />

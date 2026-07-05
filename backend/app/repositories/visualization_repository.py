@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.models.category_model import Category
 from app.models.dashboard_layout_model import DashboardLayout
 from app.models.dataset_model import Dataset
+from app.models.dataset_rating_model import DatasetRating
 from app.models.download_log_model import DownloadLog
 from app.models.user_model import User
 
@@ -411,6 +412,66 @@ def get_new_releases(db: Session, limit: int) -> list[Dataset]:
         .limit(limit)
         .all()
     )
+
+
+def get_top_agencies(db: Session, limit: int) -> list[dict[str, Any]]:
+    rows = (
+        db.query(
+            User.agency_name,
+            User.agency_name_en,
+            func.count(Dataset.id).label("dataset_count"),
+        )
+        .join(Dataset, Dataset.user_id == User.id)
+        .filter(
+            Dataset.is_deleted.is_(False),
+            Dataset.status == "published",
+            User.is_deleted.is_(False),
+        )
+        .group_by(User.id, User.agency_name, User.agency_name_en)
+        .order_by(func.count(Dataset.id).desc())
+        .limit(limit)
+        .all()
+    )
+    return [
+        {
+            "agency_name": row.agency_name,
+            "agency_name_en": row.agency_name_en,
+            "dataset_count": int(row.dataset_count),
+        }
+        for row in rows
+    ]
+
+
+def get_top_rated_datasets(db: Session, limit: int) -> list[dict[str, Any]]:
+    rows = (
+        db.query(
+            Dataset.id,
+            Dataset.title,
+            func.avg(DatasetRating.score).label("average_score"),
+            func.count(DatasetRating.id).label("rating_count"),
+        )
+        .join(DatasetRating, DatasetRating.dataset_id == Dataset.id)
+        .filter(
+            Dataset.is_deleted.is_(False),
+            Dataset.status == "published",
+        )
+        .group_by(Dataset.id, Dataset.title)
+        .order_by(
+            func.avg(DatasetRating.score).desc(),
+            func.count(DatasetRating.id).desc(),
+        )
+        .limit(limit)
+        .all()
+    )
+    return [
+        {
+            "id": str(row.id),
+            "title": row.title,
+            "average_score": round(float(row.average_score), 1),
+            "rating_count": int(row.rating_count),
+        }
+        for row in rows
+    ]
 
 
 def get_datasets_for_compare(

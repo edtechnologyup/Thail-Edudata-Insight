@@ -83,7 +83,7 @@ export default function HeroSearch() {
 
         <form
           onSubmit={handleSearch}
-          className="mt-8 flex w-full max-w-2xl flex-col gap-2 rounded-2xl bg-surface-card p-2 shadow-level-3 sm:flex-row"
+          className="mt-8 flex w-full max-w-2xl flex-col gap-2 rounded-2xl bg-surface-card p-2 shadow-level-3 sm:flex-row sm:rounded-radius-full"
         >
           <input
             type="search"
@@ -95,8 +95,7 @@ export default function HeroSearch() {
           />
           <button
             type="submit"
-            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-8 font-sarabun text-label font-bold transition-colors"
-            style={{ backgroundColor: "#f9a825", color: "#33691e" }}
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-radius-full bg-gradient-to-b from-primary-hover to-primary-dark px-8 font-sarabun text-label font-bold text-white shadow-level-1 transition-all hover:brightness-110"
           >
             <SearchIcon />
             {t("searchButton")}

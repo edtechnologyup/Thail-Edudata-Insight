@@ -81,25 +81,25 @@ export default function ApiDocsPage() {
       <div className="bg-surface-card px-4 pb-6 pt-4 md:px-spacing-10">
         <div className="mx-auto max-w-container-max">
           <nav className="mb-4 flex items-center gap-1.5 font-sarabun text-caption text-text-muted">
-            <Link href={`/${locale}`} className="transition-colors" style={{ color: "#00695c" }}>
+            <Link href={`/${locale}`} className="text-primary-dark transition-colors">
               {t("breadcrumbHome")}
             </Link>
             <span>{">"}</span>
-            <span style={{ color: "#00695c" }}>
+            <span className="text-primary-dark">
               {t("breadcrumbCurrent")}
             </span>
           </nav>
 
-          <div className="relative overflow-hidden rounded-2xl p-8 md:p-10" style={{ backgroundColor: "#004d40" }}>
+          <div className="relative overflow-hidden rounded-2xl p-8 md:p-10" style={{ backgroundColor: "#1a237e" }}>
             {heroImg?.imageUrl && (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={heroImg.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden />
-                <div className="absolute inset-0" style={{ backgroundColor: "rgba(0,77,64,0.75)" }} aria-hidden />
+                <div className="absolute inset-0" style={{ backgroundColor: "rgba(26,35,126,0.78)" }} aria-hidden />
               </>
             )}
             <div className="relative">
-              <p className="mb-3 inline-flex rounded-full px-4 py-1 font-sarabun text-caption font-semibold uppercase tracking-[0.18em]" style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "#a5d6a7" }}>
+              <p className="mb-3 inline-flex rounded-full px-4 py-1 font-sarabun text-caption font-semibold uppercase tracking-[0.18em]" style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "#c5cae9" }}>
                 {t("portalEyebrow")}
               </p>
               <h1 className="mb-3 font-kanit text-[2rem] font-bold text-white md:text-[2.5rem]">
@@ -117,7 +117,7 @@ export default function ApiDocsPage() {
             <p className="font-sarabun text-label font-bold uppercase tracking-wider text-text-muted">
               {t("baseUrl")}
             </p>
-            <code className="flex-1 break-all rounded-xl bg-gray-50 px-4 py-2.5 font-mono text-body-md" style={{ color: "#1a3a2a" }}>
+            <code className="flex-1 break-all rounded-xl bg-gray-100 px-4 py-2.5 font-mono text-body-md font-normal text-text-primary">
               {docs?.baseUrl ?? "http://127.0.0.1:8000/api/v1"}
             </code>
             <div className="flex items-center gap-3">
@@ -125,7 +125,7 @@ export default function ApiDocsPage() {
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#00c853" }} />
                 Server Status: Online
               </span>
-              <span className="rounded-full border px-3 py-1 font-mono text-caption font-semibold" style={{ borderColor: "#00897b", color: "#00695c" }}>
+              <span className="rounded-full border border-primary/40 px-3 py-1 font-mono text-caption font-semibold text-primary-dark">
                 {version} stable
               </span>
             </div>
@@ -171,13 +171,13 @@ export default function ApiDocsPage() {
               >
                 <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1 md:p-8">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: "#e8f5e9", color: "#00695c" }}>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-light text-primary">
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                       </svg>
                     </div>
                     <div>
-                      <h2 className="font-kanit text-[1.5rem] font-bold" style={{ color: "#1a3a2a" }}>
+                      <h2 className="font-kanit text-[1.5rem] font-bold text-primary">
                         {getLocalizedText(group.title, locale)}
                       </h2>
                       <p className="mt-1 max-w-2xl font-sarabun text-body-md text-text-secondary">

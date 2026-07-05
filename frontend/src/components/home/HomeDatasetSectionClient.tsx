@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import DatasetCard from "@/components/dataset/DatasetCard";
 import { useCategories } from "@/hooks/useCategories";
@@ -14,79 +13,6 @@ type HomeDatasetSectionClientProps = {
   variant: "popular" | "latest";
   embedded?: boolean;
 };
-
-function PopularCarousel({ datasets }: { datasets: ReturnType<typeof mapApiDatasetToHomeCard>[] }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [activePage, setActivePage] = useState(0);
-  const cardsPerPage = 3;
-  const totalPages = Math.ceil(datasets.length / cardsPerPage);
-
-  const updateActivePage = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const scrollLeft = el.scrollLeft;
-    const cardWidth = el.scrollWidth / datasets.length;
-    const page = Math.round(scrollLeft / (cardWidth * cardsPerPage));
-    setActivePage(Math.min(page, totalPages - 1));
-  }, [datasets.length, cardsPerPage, totalPages]);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", updateActivePage, { passive: true });
-    const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        el.scrollLeft += e.deltaY;
-      }
-    };
-    el.addEventListener("wheel", handleWheel, { passive: false });
-    return () => {
-      el.removeEventListener("scroll", updateActivePage);
-      el.removeEventListener("wheel", handleWheel);
-    };
-  }, [updateActivePage]);
-
-  const scrollToPage = (page: number) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const cardWidth = el.scrollWidth / datasets.length;
-    el.scrollTo({ left: cardWidth * cardsPerPage * page, behavior: "smooth" });
-  };
-
-  return (
-    <div>
-      <div
-        ref={scrollRef}
-        className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 scrollbar-hide"
-        style={{ scrollbarWidth: "none" }}
-      >
-        {datasets.map((dataset, i) => (
-          <div key={dataset.id} className="w-[calc((100%-3rem)/3)] min-w-[280px] shrink-0">
-            <DatasetCard {...dataset} variant="popular" index={i} imageUrl={dataset.imageUrl} />
-          </div>
-        ))}
-      </div>
-      {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-2">
-          {Array.from({ length: totalPages }).map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => scrollToPage(i)}
-              className={`h-2.5 rounded-radius-full transition-all ${
-                i === activePage
-                  ? "w-8 bg-primary"
-                  : "w-2.5 bg-border-default hover:bg-text-muted"
-              }`}
-              aria-label={`Page ${i + 1}`}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function DatasetCardSkeleton() {
   return (
@@ -129,13 +55,23 @@ export default function HomeDatasetSectionClient({
       </div>
       <Link
         href={`/${locale}/search`}
-        className="relative inline-flex shrink-0 items-center gap-1 py-2 pl-5 pr-7 font-sarabun text-label font-normal text-white"
-        style={{
-          backgroundColor: "#33691e",
-          clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)",
-        }}
+        className="inline-flex shrink-0 items-center gap-1 py-2 font-sarabun text-label font-bold text-primary-dark hover:underline"
       >
         {t("viewAll")}
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
       </Link>
     </div>
   );
@@ -151,7 +87,7 @@ export default function HomeDatasetSectionClient({
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <DatasetCardSkeleton key={i} />
             ))}
           </div>
@@ -178,7 +114,11 @@ export default function HomeDatasetSectionClient({
             ))}
           </div>
         ) : (
-          <PopularCarousel datasets={datasets} />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {datasets.slice(0, 6).map((dataset, i) => (
+              <DatasetCard key={dataset.id} {...dataset} variant="popular" index={i} imageUrl={dataset.imageUrl} />
+            ))}
+          </div>
         )
       )}
     </>

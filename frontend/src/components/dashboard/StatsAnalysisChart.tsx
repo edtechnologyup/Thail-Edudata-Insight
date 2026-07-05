@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Bar,
@@ -13,12 +13,99 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { CHART_COLORS } from "@/constants/chartColors";
 import { useStatsByCategory } from "@/hooks/useStatsByCategory";
 import type { CategoryStatItem } from "@/hooks/useStatsByCategory";
 
 type Metric = "datasets" | "downloads" | "views";
 type ChartType = "bar" | "line";
+
+function CategoryDropdown({
+  value,
+  options,
+  onChange,
+  allLabel,
+}: {
+  value: string;
+  options: { id: string; label: string }[];
+  onChange: (value: string | null) => void;
+  allLabel: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedLabel = options.find((o) => o.id === value)?.label ?? allLabel;
+
+  const optionClass = (active: boolean) =>
+    `block w-full rounded-xl px-4 py-2 text-left font-sarabun text-label font-normal transition-colors ${
+      active ? "bg-primary text-white" : "text-text-primary hover:bg-primary-light"
+    }`;
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-2 rounded-full border border-border-default/60 bg-gray-50 px-4 py-2 font-sarabun text-label font-normal text-text-primary transition-colors hover:border-primary focus:border-primary focus:outline-none"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        {selectedLabel}
+        <svg
+          className={`h-4 w-4 text-text-muted transition-transform ${open ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <ul
+          role="listbox"
+          className="absolute z-20 mt-2 max-h-72 w-max min-w-full overflow-auto rounded-2xl border border-border-default/60 bg-white p-1.5 shadow-level-2"
+        >
+          <li role="option" aria-selected={value === ""}>
+            <button
+              type="button"
+              onClick={() => {
+                onChange(null);
+                setOpen(false);
+              }}
+              className={optionClass(value === "")}
+            >
+              {allLabel}
+            </button>
+          </li>
+          {options.map((option) => (
+            <li key={option.id} role="option" aria-selected={value === option.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  onChange(option.id);
+                  setOpen(false);
+                }}
+                className={optionClass(value === option.id)}
+              >
+                {option.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 function FilterButton({
   active,
@@ -33,10 +120,10 @@ function FilterButton({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-full px-4 py-1.5 font-sarabun text-label font-bold transition-all"
+      className="rounded-full px-4 py-1.5 font-sarabun text-label font-normal transition-all"
       style={
         active
-          ? { backgroundColor: "#1a3a2a", color: "#ffffff" }
+          ? { backgroundColor: "var(--color-primary)", color: "#ffffff" }
           : { backgroundColor: "transparent", color: "#6b7280" }
       }
     >
@@ -60,7 +147,7 @@ function ChartTooltipContent({
   return (
     <div className="rounded-xl border border-border-default/60 bg-white px-4 py-2.5 shadow-level-2">
       <p className="font-sarabun text-caption font-medium text-text-muted">{label}</p>
-      <p className="font-kanit text-label font-bold" style={{ color: "#1a3a2a" }}>
+      <p className="font-kanit text-label font-bold text-primary">
         {payload[0].value.toLocaleString()} {metricLabel}
       </p>
     </div>
@@ -97,15 +184,20 @@ export default function StatsAnalysisChart() {
     views: t("metricViews"),
   };
 
-  const chartColor = CHART_COLORS.pie[0];
+  const METRIC_COLORS: Record<Metric, string> = {
+    datasets: "#1a237e",
+    downloads: "#00897b",
+    views: "#f9a825",
+  };
+  const chartColor = METRIC_COLORS[metric];
 
   return (
     <div className="rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1 md:p-6">
       <div className="mb-5 flex items-center gap-2">
-        <svg className="h-5 w-5" style={{ color: "#00695c" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+        <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
-        <h2 className="font-kanit text-heading-3-mobile font-bold md:text-heading-3" style={{ color: "#1a3a2a" }}>
+        <h2 className="font-kanit text-heading-3-mobile font-bold text-primary md:text-heading-3">
           {t("analysisTitle")}
         </h2>
       </div>
@@ -120,18 +212,15 @@ export default function StatsAnalysisChart() {
           ))}
         </div>
 
-        <select
+        <CategoryDropdown
           value={selectedCategoryId ?? ""}
-          onChange={(e) => setSelectedCategoryId(e.target.value || null)}
-          className="rounded-full border border-border-default/60 bg-gray-50 px-4 py-2 font-sarabun text-label text-text-primary transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-        >
-          <option value="">{t("allCategories")}</option>
-          {categories.map((cat) => (
-            <option key={cat.id ?? "uncategorized"} value={cat.id ?? ""}>
-              {isTh ? cat.name_th : cat.name_en}
-            </option>
-          ))}
-        </select>
+          allLabel={t("allCategories")}
+          options={categories.map((cat) => ({
+            id: cat.id ?? "",
+            label: isTh ? cat.name_th : cat.name_en,
+          }))}
+          onChange={setSelectedCategoryId}
+        />
 
         <div className="flex items-center gap-1 rounded-full border border-border-default/60 bg-gray-50 p-1">
           <FilterButton active={chartType === "bar"} onClick={() => setChartType("bar")}>

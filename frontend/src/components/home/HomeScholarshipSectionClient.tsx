@@ -89,7 +89,7 @@ export default function HomeScholarshipSectionClient({
 
   if (embedded) {
     return (
-      <div className="rounded-2xl p-6 shadow-level-1" style={{ backgroundColor: "#f2f4f6" }}>
+      <div className="rounded-2xl border border-primary-light p-6 shadow-level-1" style={{ backgroundColor: "#f3f4fb" }}>
         <h2 className="mb-1 font-kanit text-heading-3 text-text-primary">
           {t("title")}
         </h2>
@@ -125,13 +125,23 @@ export default function HomeScholarshipSectionClient({
 
         <Link
           href={`/${locale}/scholarship`}
-          className="relative mt-6 inline-flex items-center gap-1 py-2 pl-5 pr-7 font-sarabun text-label font-normal text-white"
-          style={{
-            backgroundColor: "#33691e",
-            clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)",
-          }}
+          className="mt-6 inline-flex items-center gap-1 py-2 font-sarabun text-label font-bold text-primary-dark hover:underline"
         >
           {t("viewAll")}
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 8l4 4m0 0l-4 4m4-4H3"
+            />
+          </svg>
         </Link>
       </div>
     );

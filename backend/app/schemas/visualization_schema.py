@@ -80,3 +80,24 @@ class DashboardLayoutResponse(BaseModel):
 
 class DashboardLayoutRequest(BaseModel):
     layout: dict[str, Any]
+
+
+class TopAgencyItem(BaseModel):
+    agency_name: str | None = None
+    agency_name_en: str | None = None
+    dataset_count: int
+
+
+class TopAgenciesResponse(BaseModel):
+    agencies: list[TopAgencyItem]
+
+
+class TopRatedDatasetItem(BaseModel):
+    id: str
+    title: str
+    average_score: float
+    rating_count: int
+
+
+class TopRatedResponse(BaseModel):
+    datasets: list[TopRatedDatasetItem]

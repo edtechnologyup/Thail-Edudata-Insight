@@ -43,6 +43,7 @@ export function mapApiDatasetToHomeCard(
   return {
     id: dataset.id,
     title: dataset.title,
+    description: dataset.description ?? null,
     category: categoryLabel(dataset.category_id, categories, locale),
     agency: agencyLabel(
       dataset.agency_name,
@@ -64,5 +65,7 @@ export function mapApiDatasetToHomeCard(
     publishedAt: dataset.published_at ?? dataset.created_at,
     license: dataset.license as DatasetLicense,
     imageUrl: dataset.image_url ?? null,
+    ratingAvg: dataset.rating_avg ?? null,
+    ratingCount: dataset.rating_count ?? 0,
   };
 }

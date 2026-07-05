@@ -85,6 +85,8 @@ class DatasetResponse(BaseModel):
     file_format: str | None = None
     tag_names: list[str] = Field(default_factory=list)
     file_info: dict[str, Any] | None = None
+    rating_avg: float | None = None
+    rating_count: int = 0
 
     model_config = {"from_attributes": True, "populate_by_name": True}
 

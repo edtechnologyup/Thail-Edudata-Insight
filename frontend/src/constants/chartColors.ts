@@ -6,5 +6,5 @@ export const CHART_COLORS = {
   downloadWeb: "#f57c00",
   downloadApi: "#2a36b1",
   grid: "#eceef0",
-  pie: ["#e84e40", "#ec407a", "#ab47bc", "#29b6f6", "#8bc34a", "#ffca28"],
+  pie: ["#1a237e", "#00897b", "#f9a825", "#7c4dff", "#5c6bc0", "#26a69a"],
 } as const;

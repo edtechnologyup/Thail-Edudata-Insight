@@ -34,7 +34,7 @@ export default function HomeCtaSection({ locale }: HomeCtaSectionProps) {
   return (
     <section className="px-4 py-12 md:px-10 md:py-16">
       <div className="mx-auto grid max-w-container-max grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="relative overflow-hidden rounded-2xl bg-surface-navy p-8 md:p-10">
+        <div className="relative overflow-hidden rounded-2xl bg-surface-navy p-8 shadow-level-2 md:p-10">
           <div
             className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-radius-full bg-primary/20 blur-3xl"
             aria-hidden
@@ -48,8 +48,8 @@ export default function HomeCtaSection({ locale }: HomeCtaSectionProps) {
             </p>
             <Link
               href={`/${locale}/register`}
-              className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-lg px-8 font-sarabun text-label font-bold transition-colors"
-              style={{ backgroundColor: "white", color: "#33691e" }}
+              className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-radius-full px-8 font-sarabun text-label font-bold shadow-level-1 transition-all hover:brightness-95"
+              style={{ backgroundColor: "white", color: "var(--color-primary)" }}
             >
               {t("register")}
             </Link>
@@ -57,8 +57,8 @@ export default function HomeCtaSection({ locale }: HomeCtaSectionProps) {
         </div>
 
         <div
-          className="relative overflow-hidden rounded-2xl p-8 md:p-10"
-          style={{ backgroundColor: "#f5f5f5" }}
+          className="relative overflow-hidden rounded-2xl p-8 shadow-level-2 md:p-10"
+          style={{ backgroundColor: "#ffffff" }}
         >
           {guideImageUrl && (
             <>
@@ -81,8 +81,7 @@ export default function HomeCtaSection({ locale }: HomeCtaSectionProps) {
             </p>
             <Link
               href={`/${locale}/api-docs`}
-              className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-lg px-8 font-sarabun text-label font-bold text-white transition-colors"
-              style={{ backgroundColor: "#33691e" }}
+              className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-radius-full bg-gradient-to-b from-primary-hover to-primary-dark px-8 font-sarabun text-label font-bold text-white shadow-level-1 transition-all hover:brightness-110"
             >
               {t("manual")}
             </Link>

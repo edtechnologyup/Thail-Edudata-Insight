@@ -202,7 +202,7 @@ export default function SearchFilter({
       {showAgencyFilter ? (
         <>
           <div className="flex flex-col gap-3">
-            <span className="font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
+            <span className="font-sarabun text-label font-bold text-primary-dark">
               {t("agency")}
             </span>
             {agencyOptions.map((agency) => {
@@ -241,7 +241,7 @@ export default function SearchFilter({
           <hr className="border-border-default/60" />
 
           <div className="flex flex-col gap-3">
-            <span className="font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
+            <span className="font-sarabun text-label font-bold text-primary-dark">
               {t("academicYear")}
             </span>
             {yearOptions.map((year) => {
@@ -273,7 +273,7 @@ export default function SearchFilter({
           <hr className="border-border-default/60" />
 
           <div className="flex flex-col gap-3">
-            <span className="font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
+            <span className="font-sarabun text-label font-bold text-primary-dark">
               {t("fileFormat")}
             </span>
             <div className="flex flex-wrap gap-2">
@@ -304,7 +304,7 @@ export default function SearchFilter({
           <hr className="border-border-default/60" />
 
           <div className="flex flex-col gap-3">
-            <span className="font-sarabun text-label font-bold" style={{ color: "#0d5302" }}>
+            <span className="font-sarabun text-label font-bold text-primary-dark">
               {t("province")}
             </span>
             {selectedProvince ? (
@@ -364,8 +364,7 @@ export default function SearchFilter({
         <button
           type="button"
           onClick={clearAll}
-          className="w-full py-2.5 font-sarabun text-label font-semibold transition-colors hover:underline"
-          style={{ color: "#0d5302" }}
+          className="w-full py-2.5 font-sarabun text-label font-semibold text-primary-dark transition-colors hover:underline"
         >
           {t("clearFilter")}
         </button>

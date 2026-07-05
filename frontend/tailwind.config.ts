@@ -12,7 +12,7 @@ const config: Config = {
         "surface-page": "#f7f9fb",
         "surface-card": "#ffffff",
         "surface-container": "#eceef0",
-        "surface-navy": "#053b50",
+        "surface-navy": "#1a237e",
         "text-primary": "#191c1e",
         "text-secondary": "#3c4946",
         "text-muted": "#6c7a76",
@@ -69,9 +69,9 @@ const config: Config = {
       },
       boxShadow: {
         "level-0": "none",
-        "level-1": "0px 4px 12px rgba(5, 59, 80, 0.05)",
-        "level-2": "0px 8px 24px rgba(5, 59, 80, 0.10)",
-        "level-3": "0px 16px 48px rgba(5, 59, 80, 0.15)",
+        "level-1": "0px 4px 12px rgba(26, 35, 126, 0.05)",
+        "level-2": "0px 8px 24px rgba(26, 35, 126, 0.10)",
+        "level-3": "0px 16px 48px rgba(26, 35, 126, 0.15)",
       },
       maxWidth: {
         "container-max": "1280px",

@@ -123,7 +123,7 @@ export default function SearchBar({
 
   return (
     <form onSubmit={handleSubmit} className={`w-full ${className}`}>
-      <div className="flex items-center gap-2 rounded-2xl bg-white p-2 shadow-level-2">
+      <div className="flex items-center gap-2 rounded-radius-full bg-white p-2 shadow-level-2">
         <div ref={wrapperRef} className="relative min-w-0 flex-1">
           <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -175,8 +175,7 @@ export default function SearchBar({
         </div>
         <button
           type="submit"
-          className="shrink-0 rounded-lg px-6 font-sarabun text-label font-bold transition-colors min-h-[44px] md:min-h-[40px]"
-          style={{ backgroundColor: "#f9a825", color: "#33691e" }}
+          className="min-h-[44px] shrink-0 rounded-radius-full bg-gradient-to-b from-primary-hover to-primary-dark px-6 font-sarabun text-label font-bold text-white shadow-level-1 transition-all hover:brightness-110 md:min-h-[40px]"
         >
           {t("submit", { defaultValue: "ค้นหา" })}
         </button>

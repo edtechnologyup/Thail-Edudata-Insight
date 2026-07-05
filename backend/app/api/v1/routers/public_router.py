@@ -177,6 +177,40 @@ def public_list_agencies(db: Session = Depends(get_db)):
     return success_response([i.model_dump(mode="json") for i in items])
 
 
+@router.get("/agencies/{agency_id}", status_code=200)
+def public_get_agency(
+    agency_id: uuid.UUID,
+    db: Session = Depends(get_db),
+):
+    """
+    ดึงรายละเอียดหน่วยงาน Agency
+    - Auth ❌
+    """
+    result = public_service.get_agency_detail(db, agency_id)
+    return success_response(result.model_dump(mode="json"))
+
+
+@router.get("/agencies/{agency_id}/datasets", status_code=200)
+def public_list_agency_datasets(
+    agency_id: uuid.UUID,
+    pagination: PaginationParams = Depends(get_pagination_params),
+    db: Session = Depends(get_db),
+):
+    """
+    รายการ Dataset ที่เผยแพร่แล้วของหน่วยงาน
+    - Auth ❌
+    """
+    items, total = public_service.list_agency_published_datasets(
+        db, agency_id, pagination
+    )
+    return list_response(
+        data=[i.model_dump(mode="json") for i in items],
+        page=pagination.page,
+        page_size=pagination.page_size,
+        total_items=total,
+    )
+
+
 @router.get("/announcements", status_code=200)
 def public_list_announcements(db: Session = Depends(get_db)):
     """

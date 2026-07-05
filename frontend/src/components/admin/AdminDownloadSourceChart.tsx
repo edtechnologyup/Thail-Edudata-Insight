@@ -154,33 +154,35 @@ export default function AdminDownloadSourceChart({
     source === "web" ? CHART_COLORS.downloadWeb : CHART_COLORS.downloadApi;
 
   const toggleClass = (active: boolean) =>
-    `min-h-[36px] rounded-full px-4 font-sarabun text-caption font-medium transition-all ${
+    `min-h-[36px] rounded-lg px-4 font-sarabun text-caption font-bold transition-all ${
       active
-        ? "bg-primary-dark text-white shadow-md"
-        : "bg-gray-100 text-text-secondary hover:bg-gray-200 hover:text-primary-dark"
+        ? "bg-white text-[#0081A7] shadow-sm"
+        : "text-text-secondary hover:text-[#053F5C]"
     }`;
 
   return (
-    <section className="rounded-2xl border border-white/80 bg-white p-6 shadow-md">
+    <section className="rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow" style={{ background: "rgba(255,255,255,0.9)", backdropFilter: "blur(8px)", border: "1px solid rgba(0,129,167,0.08)" }}>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="font-kanit text-heading-3 font-semibold text-text-primary">
+        <h2 className="font-kanit text-heading-3 font-bold text-[#053F5C]">
           {source === "web" ? t("webDownloadChart") : t("apiDownloadChart")}
         </h2>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setGranularity("month")}
-            className={toggleClass(granularity === "month")}
-          >
-            {t("monthlyToggle")}
-          </button>
-          <button
-            type="button"
-            onClick={() => setGranularity("year")}
-            className={toggleClass(granularity === "year")}
-          >
-            {t("yearlyToggle")}
-          </button>
+          <div className="flex rounded-xl bg-gray-100 p-1">
+            <button
+              type="button"
+              onClick={() => setGranularity("month")}
+              className={toggleClass(granularity === "month")}
+            >
+              {t("monthlyToggle")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setGranularity("year")}
+              className={toggleClass(granularity === "year")}
+            >
+              {t("yearlyToggle")}
+            </button>
+          </div>
           {granularity === "month" && (
             <YearDropdown
               value={selectedYear}

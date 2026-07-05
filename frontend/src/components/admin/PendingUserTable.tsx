@@ -97,9 +97,9 @@ export default function PendingUserTable({
 
   return (
     <>
-      <section className="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-md">
+      <section className="overflow-hidden rounded-2xl shadow-sm" style={{ background: "rgba(255,255,255,0.9)", backdropFilter: "blur(8px)", border: "1px solid rgba(0,129,167,0.08)" }}>
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
-          <h2 className="font-kanit text-heading-3 font-semibold text-text-primary">
+          <h2 className="font-kanit text-heading-3 font-bold text-[#053F5C]">
             {t("pendingTitle")}
           </h2>
           <Link
@@ -114,7 +114,7 @@ export default function PendingUserTable({
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-left">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/80 font-sarabun text-label font-medium text-text-muted">
+              <tr className="border-b border-gray-100 bg-gray-50/80 font-sarabun text-[11px] font-bold uppercase tracking-widest text-text-muted">
                 <th className="px-6 py-4">{t("agencyColumn")}</th>
                 <th className="px-6 py-4">{t("emailColumn")}</th>
                 <th className="px-6 py-4">{t("dateColumn")}</th>
@@ -160,7 +160,7 @@ export default function PendingUserTable({
                           type="button"
                           onClick={() => handleApprove(user.id)}
                           disabled={approveMutation.isPending}
-                          className="rounded-full bg-emerald-500 px-4 py-1.5 font-sarabun text-caption font-bold text-white shadow-sm transition-all hover:bg-emerald-600 hover:shadow-md disabled:opacity-50"
+                          className="h-9 rounded-lg bg-[#0081A7] px-4 font-sarabun text-caption font-bold text-white shadow-sm transition-all hover:bg-[#053F5C] active:scale-95 disabled:opacity-50"
                         >
                           {t("approve")}
                         </button>
@@ -168,7 +168,7 @@ export default function PendingUserTable({
                           type="button"
                           onClick={() => openRejectModal(user)}
                           disabled={rejectMutation.isPending}
-                          className="rounded-full border border-gray-300 bg-white px-4 py-1.5 font-sarabun text-caption font-bold text-gray-600 transition-all hover:border-status-error hover:text-status-error disabled:opacity-50"
+                          className="h-9 rounded-lg border border-status-error px-4 font-sarabun text-caption font-bold text-status-error transition-all hover:bg-status-error/5 active:scale-95 disabled:opacity-50"
                         >
                           {t("reject")}
                         </button>

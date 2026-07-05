@@ -2,7 +2,9 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import AdminDatasetMonthlyChart from "@/components/admin/AdminDatasetMonthlyChart";
 import AdminDownloadSourceChart from "@/components/admin/AdminDownloadSourceChart";
+import AdminRecentActivity from "@/components/admin/AdminRecentActivity";
 import AdminStatsCard from "@/components/admin/AdminStatsCard";
 import PendingUserTable from "@/components/admin/PendingUserTable";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
@@ -76,7 +78,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="mx-auto max-w-container-max space-y-spacing-8 pb-24">
       <header>
-        <h1 className="font-kanit text-[32px] font-bold leading-tight text-text-primary">
+        <h1 className="font-kanit text-[32px] font-bold leading-tight text-[#053F5C]">
           {t("title")}
         </h1>
         <p className="mt-1 font-sarabun text-body-md text-text-muted">
@@ -93,9 +95,9 @@ export default function AdminDashboardPage() {
               label={t("totalUsers")}
               value={data.totalUsers.toLocaleString(numberLocale)}
               icon={<UsersIcon />}
-              iconClassName="bg-surface-container text-status-draft"
+              variant="highlight"
               badge={
-                <span className="rounded-radius-sm bg-status-published-bg px-2 py-1 font-sarabun text-caption font-bold text-status-published">
+                <span className="rounded-radius-sm bg-white/20 px-2 py-1 font-sarabun text-caption font-bold text-white">
                   +{data.userTrendPercent}%
                 </span>
               }
@@ -116,7 +118,7 @@ export default function AdminDashboardPage() {
               value={data.pendingUsers.toLocaleString(numberLocale)}
               icon={<HourglassIcon />}
               variant="warning"
-              badge={<span className="h-2 w-2 animate-pulse rounded-radius-full bg-status-error" />}
+              badge={data.pendingUsers > 0 ? <span className="h-3 w-3 animate-pulse rounded-full bg-red-500" /> : undefined}
             />
             <AdminStatsCard
               label={t("todayDownloads")}
@@ -134,6 +136,13 @@ export default function AdminDashboardPage() {
           <section className="grid grid-cols-1 gap-spacing-6 lg:grid-cols-2">
             <AdminDownloadSourceChart source="web" />
             <AdminDownloadSourceChart source="api" />
+          </section>
+
+          <section className="grid grid-cols-1 gap-spacing-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <AdminDatasetMonthlyChart />
+            </div>
+            <AdminRecentActivity />
           </section>
 
           <PendingUserTable

@@ -114,7 +114,7 @@ function SidebarNav({
   const t = useTranslations("admin.nav");
 
   return (
-    <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
+    <nav className="flex flex-1 flex-col gap-1 px-4 py-3">
       {items.map((item) => {
         const active = item.match(pathname);
         return (
@@ -122,19 +122,15 @@ function SidebarNav({
             key={item.href}
             href={item.href}
             onClick={onNavigate}
-            className={`flex min-h-[44px] items-center gap-3 rounded-xl px-4 py-2.5 font-sarabun text-label text-white transition-all ${
+            className={`flex h-[48px] items-center gap-3 px-4 py-2.5 font-sarabun text-label transition-all ${
               active
-                ? "font-medium"
-                : "hover:bg-white/[0.10]"
+                ? "-mr-4 rounded-l-xl rounded-r-none bg-white font-medium text-[#053F5C]"
+                : "rounded-xl text-white/60 hover:bg-white/[0.05] hover:text-white"
             }`}
-            style={active ? {
-              background: "linear-gradient(135deg, rgba(129,212,250,0.35) 0%, rgba(255,255,255,0.18) 100%)",
-              boxShadow: "0 4px 16px 0 rgba(0,69,188,0.25), inset 0 1px 0 0 rgba(255,255,255,0.3)",
-              border: "1px solid rgba(255,255,255,0.25)",
-              backdropFilter: "blur(8px)",
-            } : undefined}
           >
-            <NavIcon name={item.icon} />
+            <span className={active ? "text-[#0081A7]" : ""}>
+              <NavIcon name={item.icon} />
+            </span>
             {t(item.labelKey)}
           </Link>
         );
@@ -161,11 +157,11 @@ function SidebarFooter({ onNavigate }: { onNavigate?: () => void }) {
   };
 
   return (
-    <div className="border-t border-white/15 px-3 py-4">
+    <div className="border-t border-white/10 px-4 py-6">
       <button
         type="button"
         onClick={handleLogout}
-        className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl bg-red-600 px-4 py-2.5 font-sarabun text-label font-normal text-yellow-300 transition-colors hover:bg-red-700"
+        className="flex h-[48px] w-full items-center justify-center gap-3 rounded-xl px-4 py-2.5 font-sarabun text-label font-normal text-white/80 transition-colors hover:bg-white/[0.10] hover:text-white"
       >
         <LogoutIcon />
         {tNav("logout")}
@@ -258,18 +254,18 @@ export default function AdminSidebar() {
       <button
         type="button"
         onClick={toggleSidebar}
-        className="fixed bottom-6 left-4 z-40 flex h-11 w-11 items-center justify-center rounded-lg text-white shadow-lg lg:hidden"
-        style={{ background: "#0045bc" }}
+        className="fixed bottom-6 left-4 z-40 flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-lg lg:hidden"
+        style={{ background: "linear-gradient(135deg, #053F5C, #0081A7)" }}
         aria-label={t("menu")}
       >
         <MenuIcon />
       </button>
 
       <aside
-        className="sticky top-20 hidden h-[calc(100vh-5rem)] w-[240px] shrink-0 flex-col lg:flex"
+        className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col rounded-r-[24px] lg:flex"
         style={{
-          background: "#0045bc",
-          boxShadow: "4px 0 32px 0 rgba(60,100,255,0.3)",
+          background: "linear-gradient(180deg, #053F5C 0%, #0081A7 100%)",
+          boxShadow: "0 0 12px rgba(5,63,92,0.3)",
         }}
       >
         {sidebarHeader}
@@ -285,8 +281,8 @@ export default function AdminSidebar() {
             onClick={closeDrawer}
             aria-label={t("closeMenu")}
           />
-          <aside className="absolute left-0 top-0 flex h-full w-[280px] flex-col shadow-2xl" style={{ background: "#0045bc" }}>
-            <div className="flex items-center justify-between border-b border-white/15 px-4 py-4">
+          <aside className="absolute left-0 top-0 flex h-full w-[280px] flex-col rounded-r-[24px] shadow-2xl" style={{ background: "linear-gradient(180deg, #053F5C 0%, #0081A7 100%)" }}>
+            <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
               <span className="font-kanit text-label font-semibold text-white">
                 {t("menu")}
               </span>

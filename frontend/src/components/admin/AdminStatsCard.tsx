@@ -7,9 +7,13 @@ type AdminStatsCardProps = {
   value: string;
   icon: ReactNode;
   iconClassName?: string;
-  variant?: "default" | "warning";
+  variant?: "default" | "warning" | "highlight";
   badge?: ReactNode;
 };
+
+const waveSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Ccircle cx='250' cy='-20' r='120' fill='rgba(0,129,167,0.04)'/%3E%3Ccircle cx='280' cy='160' r='80' fill='rgba(0,175,185,0.03)'/%3E%3C/svg%3E")`;
+
+const highlightWaveSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Ccircle cx='250' cy='-20' r='120' fill='rgba(255,255,255,0.08)'/%3E%3Ccircle cx='280' cy='160' r='80' fill='rgba(255,255,255,0.05)'/%3E%3C/svg%3E")`;
 
 export default function AdminStatsCard({
   label,
@@ -20,19 +24,48 @@ export default function AdminStatsCard({
   badge,
 }: AdminStatsCardProps) {
   const isWarning = variant === "warning";
+  const isHighlight = variant === "highlight";
 
   return (
     <div
-      className={`rounded-2xl border p-6 transition-all hover:-translate-y-1 ${
+      className={`rounded-2xl border p-6 transition-all hover:shadow-md ${
         isWarning
-          ? "border-status-warning/10 bg-status-warning-bg shadow-md"
-          : "border-white/80 bg-white shadow-md hover:shadow-lg"
+          ? "border-[#ef6c00]/10 shadow-sm"
+          : isHighlight
+            ? "border-transparent shadow-sm"
+            : "shadow-sm"
       }`}
+      style={
+        isHighlight
+          ? {
+              background: `linear-gradient(135deg, #053F5C 0%, #0081A7 100%)`,
+              backgroundImage: `${highlightWaveSvg}, linear-gradient(135deg, #053F5C 0%, #0081A7 100%)`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right top",
+            }
+          : isWarning
+            ? {
+                background: "#ef6c0010",
+                border: "1px solid rgba(239,108,0,0.1)",
+              }
+            : {
+                background: "rgba(255,255,255,0.9)",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(0,129,167,0.08)",
+                backgroundImage: waveSvg,
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "right top",
+              }
+      }
     >
       <div className="mb-5 flex items-start justify-between">
         <div
-          className={`flex h-14 w-14 items-center justify-center rounded-full ${
-            isWarning ? "bg-surface-card/50 text-status-warning" : iconClassName
+          className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
+            isHighlight
+              ? "bg-white/15 text-white"
+              : isWarning
+                ? "bg-surface-card/50 text-[#ef6c00]"
+                : iconClassName
           }`}
         >
           {icon}
@@ -40,17 +73,23 @@ export default function AdminStatsCard({
         {badge}
       </div>
       <p
-        className={`mb-1 font-sarabun text-label ${
-          isWarning ? "text-status-warning" : "text-text-muted"
+        className={`mb-1 font-sarabun text-sm font-medium ${
+          isHighlight
+            ? "text-white/70"
+            : isWarning
+              ? "text-[#ef6c00]"
+              : "text-text-muted"
         }`}
       >
         {label}
       </p>
       <p
-        className={`font-kanit text-[36px] font-bold leading-tight ${
-          isWarning
-            ? "text-status-warning"
-            : "text-primary-dark"
+        className={`font-kanit text-[30px] font-bold leading-tight ${
+          isHighlight
+            ? "text-white"
+            : isWarning
+              ? "text-[#ef6c00]"
+              : "text-[#053F5C]"
         }`}
       >
         {value}

@@ -95,7 +95,7 @@ export default function AuditLogTable({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[900px] text-left">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50/80 font-kanit text-[13px] font-bold uppercase tracking-wider text-text-secondary">
+            <tr className="bg-[#f3f4f5] font-sarabun text-[15px] font-bold text-text-muted">
               <th className="px-6 py-4">{t("colTimestamp")}</th>
               <th className="px-6 py-4">{t("colUser")}</th>
               <th className="px-6 py-4">{t("colAction")}</th>

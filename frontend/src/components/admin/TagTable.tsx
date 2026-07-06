@@ -63,15 +63,15 @@ export default function TagTable({
     <>
       <div className="overflow-hidden rounded-radius-lg border border-border-default bg-surface-card shadow-level-1">
         <table className="w-full text-left">
-          <thead className="border-b border-border-default/30 bg-surface-container-low">
+          <thead className="bg-[#f3f4f5]">
             <tr>
-              <th className="px-6 py-4 font-kanit text-[13px] font-bold uppercase text-text-muted">
+              <th className="px-6 py-4 font-sarabun text-[15px] font-bold text-text-muted">
                 {t("colName")}
               </th>
-              <th className="px-6 py-4 text-center font-kanit text-[13px] font-bold uppercase text-text-muted">
+              <th className="px-6 py-4 text-center font-sarabun text-[15px] font-bold text-text-muted">
                 {t("colDatasets")}
               </th>
-              <th className="px-6 py-4 text-right font-kanit text-[13px] font-bold uppercase text-text-muted">
+              <th className="px-6 py-4 text-right font-sarabun text-[15px] font-bold text-text-muted">
                 {t("colAction")}
               </th>
             </tr>

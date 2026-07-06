@@ -232,7 +232,7 @@ function AdminScholarshipsContent() {
                 {columnHeaders.map((heading) => (
                   <th
                     key={heading}
-                    className="px-6 py-4 text-left font-sarabun text-[10px] font-bold uppercase tracking-wider text-text-muted"
+                    className="px-6 py-4 text-left font-sarabun text-[15px] font-bold text-text-muted"
                   >
                     {heading}
                   </th>

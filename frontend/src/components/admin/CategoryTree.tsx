@@ -201,7 +201,7 @@ export default function CategoryTree({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[700px] text-left">
           <thead>
-            <tr className="border-b border-gray-200 bg-[#f3f4f5] font-sarabun text-[10px] font-bold uppercase tracking-wider text-[#053F5C]">
+            <tr className="bg-[#f3f4f5] font-sarabun text-[15px] font-bold text-text-muted">
               <th className="px-6 py-4">
                 <span className="flex items-center gap-1">
                   {t("colName")} / {t("colSlug")}

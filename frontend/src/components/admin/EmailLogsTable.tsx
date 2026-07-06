@@ -93,7 +93,7 @@ export default function EmailLogsTable({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[960px] text-left">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50/80 font-kanit text-[13px] font-bold uppercase tracking-wider text-text-secondary">
+            <tr className="bg-[#f3f4f5] font-sarabun text-[15px] font-bold text-text-muted">
               <th className="px-6 py-4">{t("colTemplate")}</th>
               <th className="px-6 py-4">{t("colEmail")}</th>
               <th className="px-6 py-4">{t("colSubject")}</th>

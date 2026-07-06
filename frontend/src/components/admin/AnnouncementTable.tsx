@@ -105,7 +105,7 @@ export default function AnnouncementTable({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[800px] text-left">
           <thead>
-            <tr className="border-b border-gray-200 bg-[#e7e8e9] font-sarabun text-[10px] font-bold uppercase tracking-wider text-[#3f484e]">
+            <tr className="bg-[#f3f4f5] font-sarabun text-[15px] font-bold text-text-muted">
               <th className="px-6 py-4">{t("colTitle")}</th>
               <th className="px-6 py-4">{t("colContent")}</th>
               <th className="px-6 py-4">{t("colCategory")}</th>

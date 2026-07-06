@@ -92,7 +92,7 @@ export default function MoveCategoryModal({
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="rounded-xl border border-border-input px-6 py-2 font-sarabun text-label text-text-muted hover:bg-surface-container disabled:opacity-50"
+            className="rounded-full border-2 border-gray-200 px-6 py-2.5 font-sarabun text-label font-semibold text-text-secondary transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             {locale === "th" ? "ยกเลิก" : "Cancel"}
           </button>
@@ -100,7 +100,7 @@ export default function MoveCategoryModal({
             type="button"
             onClick={() => onConfirm(selected)}
             disabled={isLoading || selected === node.parentId}
-            className="rounded-xl bg-primary-dark px-6 py-2 font-sarabun text-label font-medium text-white hover:opacity-90 disabled:opacity-50"
+            className="rounded-full bg-gradient-to-r from-[#053F5C] to-[#0081A7] px-6 py-2.5 font-sarabun text-label font-bold text-white shadow-lg transition-all hover:brightness-110 active:scale-95 disabled:opacity-50"
           >
             {isLoading
               ? locale === "th" ? "กำลังย้าย..." : "Moving..."

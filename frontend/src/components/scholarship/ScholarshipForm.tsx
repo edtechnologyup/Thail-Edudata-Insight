@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import AdminDatePicker from "@/components/admin/AdminDatePicker";
 import apiClient from "@/services/api";
 import {
   SCHOLARSHIP_TYPE_VALUES,
@@ -43,7 +44,7 @@ type ScholarshipFormProps = {
 };
 
 const inputClass =
-  "w-full rounded-full border border-border-input bg-surface-page px-5 py-3 font-sarabun text-label text-text-primary outline-none transition-all focus:border-primary-dark focus:ring-2 focus:ring-primary-dark/20";
+  "w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3 font-sarabun text-label text-text-primary outline-none transition-all hover:border-gray-300 focus:border-[#0081A7] focus:bg-white focus:ring-2 focus:ring-[#0081A7]/20";
 
 const labelClass =
   "mb-2 block font-sarabun text-label font-medium text-text-primary";
@@ -98,7 +99,7 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-5 flex items-center gap-3">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-dark font-sarabun text-label font-bold text-white">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#053F5C] font-sarabun text-label font-bold text-white">
         {number}
       </span>
       <h2 className="font-kanit text-body-lg font-semibold text-text-primary">
@@ -141,6 +142,7 @@ export default function ScholarshipForm({
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
   const isPublished = initialData?.status === "published";
 
+  const [eligibilityExpanded, setEligibilityExpanded] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -173,6 +175,8 @@ export default function ScholarshipForm({
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<ScholarshipFormValues>({
     resolver: zodResolver(schema),
@@ -250,17 +254,23 @@ export default function ScholarshipForm({
   return (
     <div className="mx-auto max-w-3xl space-y-6 pb-24">
       {/* Header */}
-      <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <h1 className="font-kanit text-[28px] font-bold text-text-primary">
+      <header>
+        <nav className="mb-2 flex font-sarabun text-body-sm text-text-muted">
+          <Link href={`${base}/admin`} className="hover:text-[#0081A7]">
+            Admin
+          </Link>
+          <span className="mx-2">&gt;</span>
+          <Link href={redirectUrl ?? `${base}/manage/scholarships`} className="hover:text-[#0081A7]">
+            จัดการทุนการศึกษา
+          </Link>
+          <span className="mx-2">&gt;</span>
+          <span className="font-semibold text-[#053F5C]">
+            {mode === "create" ? tForm("createTitle") : tForm("editTitle")}
+          </span>
+        </nav>
+        <h1 className="font-kanit text-[28px] font-bold text-[#053F5C]">
           {mode === "create" ? tForm("createTitle") : tForm("editTitle")}
         </h1>
-        <Link
-          href={redirectUrl ?? `${base}/manage/scholarships`}
-          className="inline-flex items-center gap-2 font-sarabun text-label font-medium text-primary-dark transition-opacity hover:opacity-80"
-        >
-          <BackIcon />
-          กลับไปที่หน้าจัดการ
-        </Link>
       </header>
 
       <form
@@ -294,39 +304,25 @@ export default function ScholarshipForm({
             </div>
 
             <div className="grid gap-5 md:grid-cols-2">
-              <div>
-                <label htmlFor="scholarship_type" className={labelClass}>
-                  {tForm("type")} *
-                </label>
-                <select
-                  id="scholarship_type"
-                  className={inputClass}
-                  {...register("scholarship_type")}
-                >
-                  {SCHOLARSHIP_TYPE_VALUES.map((value) => (
-                    <option key={value} value={value}>
-                      {tTypes(value)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <FormDropdown
+                label={`${tForm("type")} *`}
+                value={watch("scholarship_type")}
+                onChange={(v) => setValue("scholarship_type", v as (typeof SCHOLARSHIP_TYPE_VALUES)[number], { shouldValidate: true })}
+                options={SCHOLARSHIP_TYPE_VALUES.map((value) => ({
+                  value,
+                  label: tTypes(value),
+                }))}
+              />
 
-              <div>
-                <label htmlFor="target_level" className={labelClass}>
-                  {tForm("level")} *
-                </label>
-                <select
-                  id="target_level"
-                  className={inputClass}
-                  {...register("target_level")}
-                >
-                  {TARGET_LEVEL_VALUES.map((value) => (
-                    <option key={value} value={value}>
-                      {tLevels(value)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <FormDropdown
+                label={`${tForm("level")} *`}
+                value={watch("target_level")}
+                onChange={(v) => setValue("target_level", v as (typeof TARGET_LEVEL_VALUES)[number], { shouldValidate: true })}
+                options={TARGET_LEVEL_VALUES.map((value) => ({
+                  value,
+                  label: tLevels(value),
+                }))}
+              />
             </div>
           </div>
         </section>
@@ -341,11 +337,30 @@ export default function ScholarshipForm({
             </label>
             <textarea
               id="eligibility"
-              rows={6}
-              className={`${inputClass} !rounded-2xl min-h-[160px] resize-y`}
+              rows={eligibilityExpanded ? 16 : 6}
+              className={`${inputClass} !rounded-2xl ${eligibilityExpanded ? "min-h-[400px]" : "min-h-[160px]"} resize-y transition-all`}
               {...register("eligibility")}
             />
-            <FieldError message={errors.eligibility?.message} />
+            <div className="mt-1.5 flex items-center justify-between">
+              <FieldError message={errors.eligibility?.message} />
+              <button
+                type="button"
+                onClick={() => setEligibilityExpanded(!eligibilityExpanded)}
+                className="inline-flex items-center gap-1 font-sarabun text-caption font-medium text-[#0081A7] transition-opacity hover:opacity-70"
+              >
+                {eligibilityExpanded ? (
+                  <>
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
+                    ย่อ
+                  </>
+                ) : (
+                  <>
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    ขยาย
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </section>
 
@@ -359,11 +374,12 @@ export default function ScholarshipForm({
                 <label htmlFor="open_date" className={labelClass}>
                   {tForm("openDate")} *
                 </label>
-                <input
+                <AdminDatePicker
                   id="open_date"
-                  type="date"
-                  className={inputClass}
-                  {...register("open_date")}
+                  value={watch("open_date")}
+                  onChange={(v) => setValue("open_date", v, { shouldValidate: true })}
+                  locale={locale}
+                  placeholder="วันที่เปิดรับ"
                 />
                 <FieldError message={errors.open_date?.message} />
               </div>
@@ -372,11 +388,12 @@ export default function ScholarshipForm({
                 <label htmlFor="close_date" className={labelClass}>
                   {tForm("closeDate")} *
                 </label>
-                <input
+                <AdminDatePicker
                   id="close_date"
-                  type="date"
-                  className={inputClass}
-                  {...register("close_date")}
+                  value={watch("close_date")}
+                  onChange={(v) => setValue("close_date", v, { shouldValidate: true })}
+                  locale={locale}
+                  placeholder="วันที่ปิดรับ"
                 />
                 <FieldError message={errors.close_date?.message} />
               </div>
@@ -488,7 +505,7 @@ export default function ScholarshipForm({
                 <button
                   type="button"
                   onClick={() => imageInputRef.current?.click()}
-                  className="font-sarabun text-label text-primary-dark hover:underline"
+                  className="font-sarabun text-label text-[#0081A7] hover:underline"
                 >
                   เปลี่ยนรูป
                 </button>
@@ -496,9 +513,9 @@ export default function ScholarshipForm({
             ) : (
               <div
                 onClick={() => imageInputRef.current?.click()}
-                className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border-input bg-surface-page px-6 py-10 text-center transition-colors hover:border-primary-dark/40 hover:bg-surface-container"
+                className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#0081A7]/30 bg-gray-50/50 px-6 py-10 text-center transition-colors hover:border-[#0081A7]/50 hover:bg-[#0081A7]/5"
               >
-                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-light text-primary-dark">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#0081A7]/10 text-[#0081A7]">
                   <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
                   </svg>
@@ -528,14 +545,16 @@ export default function ScholarshipForm({
         <section className="rounded-2xl border border-border-default/60 bg-surface-card p-6 shadow-level-1">
           <SectionHeader number={6} title="สถานะเริ่มต้น" />
 
-          <div>
-            <label htmlFor="status" className={labelClass}>
-              {tForm("status")} *
-            </label>
-            <select id="status" className={inputClass} {...register("status")}>
-              {!isPublished && <option value="draft">{tForm("draft")}</option>}
-              <option value="published">{tForm("published")}</option>
-            </select>
+          <div className="md:w-1/2">
+            <FormDropdown
+              label={`${tForm("status")} *`}
+              value={watch("status")}
+              onChange={(v) => setValue("status", v as "draft" | "published", { shouldValidate: true })}
+              options={[
+                ...(!isPublished ? [{ value: "draft", label: tForm("draft") }] : []),
+                { value: "published", label: tForm("published") },
+              ]}
+            />
           </div>
         </section>
 
@@ -543,14 +562,14 @@ export default function ScholarshipForm({
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Link
             href={redirectUrl ?? `${base}/manage/scholarships`}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-border-input px-8 font-sarabun text-label font-medium text-text-primary transition-colors hover:bg-surface-container"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full border-2 border-gray-200 px-8 font-sarabun text-label font-semibold text-text-secondary transition-colors hover:bg-gray-50"
           >
             {tForm("cancel")}
           </Link>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-primary-dark px-8 font-sarabun text-label font-semibold text-white shadow-level-1 transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#053F5C] to-[#0081A7] px-8 font-sarabun text-label font-bold text-white shadow-lg transition-all hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <SaveIcon />
             {tForm("save")}
@@ -574,5 +593,78 @@ function SaveIcon() {
     <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
     </svg>
+  );
+}
+
+function FormDropdown({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedLabel =
+    options.find((o) => o.value === value)?.label ?? options[0]?.label;
+
+  return (
+    <div>
+      <span className={labelClass}>{label}</span>
+      <div ref={ref} className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className="flex w-full items-center justify-between rounded-full border border-gray-200 bg-gray-50 px-5 py-3 font-sarabun text-label text-text-primary transition-all hover:border-gray-300 focus:border-[#0081A7] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0081A7]/20"
+        >
+          <span className="truncate">{selectedLabel}</span>
+          <svg
+            className={`h-4 w-4 shrink-0 text-text-muted transition-transform ${open ? "rotate-180" : ""}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {open && (
+          <ul className="absolute z-20 mt-2 max-h-60 w-full overflow-y-auto rounded-2xl border border-white/80 bg-white py-1 shadow-lg">
+            {options.map((opt) => (
+              <li key={opt.value}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }}
+                  className={`flex w-full px-5 py-2.5 text-left font-sarabun text-label transition-colors ${
+                    value === opt.value
+                      ? "bg-[#053F5C]/10 font-bold text-[#053F5C]"
+                      : "text-text-primary hover:bg-gray-50"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }

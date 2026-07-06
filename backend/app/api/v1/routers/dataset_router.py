@@ -5,6 +5,7 @@ import io
 import uuid
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, Query, Request, UploadFile, status
+from typing import Optional
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
@@ -51,7 +52,7 @@ def _get_es():
 def upload_dataset(
     request: Request,
     background_tasks: BackgroundTasks,
-    file: UploadFile = File(...),
+    files: list[UploadFile] = File(..., alias="file"),
     title: str = Form(...),
     description: str | None = Form(None),
     license: str = Form(...),
@@ -65,15 +66,18 @@ def upload_dataset(
     db: Session = Depends(get_db),
 ):
     """
-    อัปโหลด Dataset (multipart/form-data) ตาม #20
+    อัปโหลด Dataset (multipart/form-data) — รับได้หลายไฟล์
     - Auth ✅ Agency/Admin
     - PII Scan → Mask → MinIO → Transaction → ES Index ตาม #29
     """
     import json
 
-    content = file.file.read()
-    dataset_service._validate_file(file, content)
-    file.file.seek(0)
+    validated_files: list[tuple[UploadFile, bytes]] = []
+    for f in files:
+        content = f.file.read()
+        dataset_service._validate_file(f, content)
+        f.file.seek(0)
+        validated_files.append((f, content))
 
     cat_id = uuid.UUID(category_id) if category_id else None
 
@@ -137,7 +141,7 @@ def upload_dataset(
         minio_client=_get_minio(),
         es_client=_get_es(),
         background_tasks=background_tasks,
-        file=file,
+        files=validated_files,
         request=req,
         current_user=payload,
         ip_address=get_client_ip(request),
@@ -461,6 +465,47 @@ def rate_dataset(
 
     stats = rating_repo.get_rating_stats(db, dataset_id)
     return success_response(data=stats)
+
+
+@router.post("/datasets/{dataset_id}/files", status_code=status.HTTP_201_CREATED)
+def add_files_to_dataset(
+    dataset_id: uuid.UUID,
+    request: Request,
+    background_tasks: BackgroundTasks,
+    files: list[UploadFile] = File(..., alias="file"),
+    payload: dict = Depends(require_roles("agency", "admin")),
+    db: Session = Depends(get_db),
+):
+    """เพิ่มไฟล์เข้า Dataset ที่มีอยู่แล้ว"""
+    result = dataset_service.add_files_to_dataset(
+        db=db,
+        minio_client=_get_minio(),
+        dataset_id=dataset_id,
+        files=files,
+        current_user=payload,
+        ip_address=get_client_ip(request),
+        background_tasks=background_tasks,
+    )
+    return success_response(data=result.model_dump(mode="json"))
+
+
+@router.delete("/datasets/{dataset_id}/files/{file_id}", status_code=status.HTTP_200_OK)
+def remove_file_from_dataset(
+    dataset_id: uuid.UUID,
+    file_id: uuid.UUID,
+    request: Request,
+    payload: dict = Depends(require_roles("agency", "admin")),
+    db: Session = Depends(get_db),
+):
+    """ลบไฟล์ออกจาก Dataset (ต้องเหลืออย่างน้อย 1 ไฟล์)"""
+    result = dataset_service.remove_file_from_dataset(
+        db=db,
+        dataset_id=dataset_id,
+        file_id=file_id,
+        current_user=payload,
+        ip_address=get_client_ip(request),
+    )
+    return success_response(data=result.model_dump(mode="json"))
 
 
 @router.post("/datasets/{dataset_id}/image", status_code=status.HTTP_200_OK)

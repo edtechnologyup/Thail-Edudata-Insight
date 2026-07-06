@@ -174,6 +174,7 @@ export default function AdminSidebar() {
   const t = useTranslations("admin.nav");
   const locale = useLocale();
   const pathname = usePathname();
+  const router = useRouter();
   const base = `/${locale}`;
   const { sidebarOpen, toggleSidebar, setSidebarOpen } = useUIStore();
 
@@ -240,12 +241,42 @@ export default function AdminSidebar() {
 
   const closeDrawer = () => setSidebarOpen(false);
 
+  const switchLocale = (target: string) => {
+    const newPath = pathname.replace(`/${locale}`, `/${target}`);
+    router.push(newPath);
+  };
+
   const sidebarHeader = (
     <div className="px-4 py-6">
       <h2 className="font-kanit text-xl font-bold text-white">
         Thai EduData
       </h2>
       <p className="font-sarabun text-body-sm text-white/60">{t("portal")}</p>
+      <div className="mt-2 flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => switchLocale("th")}
+          className={`rounded-full px-3 py-1 font-sarabun text-caption font-semibold transition-all ${
+            locale === "th"
+              ? "bg-white text-[#053F5C]"
+              : "text-white/60 hover:text-white"
+          }`}
+        >
+          TH
+        </button>
+        <span className="text-white/30">|</span>
+        <button
+          type="button"
+          onClick={() => switchLocale("en")}
+          className={`rounded-full px-3 py-1 font-sarabun text-caption font-semibold transition-all ${
+            locale === "en"
+              ? "bg-white text-[#053F5C]"
+              : "text-white/60 hover:text-white"
+          }`}
+        >
+          EN
+        </button>
+      </div>
     </div>
   );
 

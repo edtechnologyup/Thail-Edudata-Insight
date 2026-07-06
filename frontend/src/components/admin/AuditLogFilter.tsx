@@ -14,13 +14,11 @@ export type AuditLogFilterValues = {
 type AuditLogFilterProps = {
   values: AuditLogFilterValues;
   onChange: (values: AuditLogFilterValues) => void;
-  onSearch: () => void;
 };
 
 export default function AuditLogFilter({
   values,
   onChange,
-  onSearch,
 }: AuditLogFilterProps) {
   const t = useTranslations("admin.auditLogs");
   const locale = useLocale();
@@ -41,11 +39,6 @@ export default function AuditLogFilter({
     onChange({ ...values, ...patch });
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    onSearch();
-  };
-
   const actionOptions = [
     { value: "all", label: t("filterActionAll") },
     { value: "LOGIN", label: t("actions.login") },
@@ -61,9 +54,8 @@ export default function AuditLogFilter({
 
   return (
     <section className="rounded-2xl border border-white/80 bg-white p-6 shadow-md">
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 items-end gap-5 md:grid-cols-12"
+      <div
+        className="grid grid-cols-1 items-end gap-5 md:grid-cols-10"
       >
         {/* Date From */}
         <div className="space-y-1.5 md:col-span-2">
@@ -167,17 +159,7 @@ export default function AuditLogFilter({
             />
           </div>
         </div>
-
-        {/* Search button */}
-        <div className="md:col-span-2">
-          <button
-            type="submit"
-            className="h-11 w-full rounded-full bg-gradient-to-r from-[#053F5C] to-[#0081A7] font-sarabun text-body-md font-bold text-white shadow-lg transition-all hover:brightness-110 active:scale-95"
-          >
-            {t("search")}
-          </button>
-        </div>
-      </form>
+      </div>
     </section>
   );
 }

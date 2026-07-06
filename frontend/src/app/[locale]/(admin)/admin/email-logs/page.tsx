@@ -69,7 +69,7 @@ export default function AdminEmailLogsPage() {
   };
 
   return (
-    <div className="space-y-8 pb-24">
+    <div className="mx-auto max-w-container-max space-y-6 pb-24">
       {/* Header */}
       <header>
         <nav className="mb-2 flex font-sarabun text-body-sm text-text-muted">

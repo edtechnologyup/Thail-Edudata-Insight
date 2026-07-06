@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import {
   useAdminPageContent,
@@ -147,7 +147,7 @@ export default function AdminPageEditorPage() {
   const pageTitle = locale === "th" ? page.titleTh : page.titleEn;
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="mx-auto max-w-container-max space-y-6 pb-24">
       {/* Breadcrumb */}
       <nav className="flex font-sarabun text-body-sm text-text-muted">
         <Link href={`${base}/admin`} className="hover:text-[#0081A7]">
@@ -161,124 +161,117 @@ export default function AdminPageEditorPage() {
         <span className="font-semibold text-[#053F5C]">Edit /{slug}</span>
       </nav>
 
-      {/* Header card */}
-      <header className="rounded-2xl border border-white/80 bg-white px-8 py-6 shadow-md">
-        <p className="font-mono text-body-sm uppercase tracking-wide text-text-muted">
-          SLUG: /{slug}
-        </p>
-        <h1 className="mt-1 font-kanit text-[28px] font-bold text-[#053F5C]">
-          {t("editTitle", { title: pageTitle })}
-        </h1>
-      </header>
+      <div className="space-y-6 rounded-3xl bg-[#f0f2f5] p-6 shadow-xl">
+        {/* Header card */}
+        <header className="rounded-2xl border border-white/80 bg-white px-8 py-6 shadow-md">
+          <p className="font-mono text-body-sm uppercase tracking-wide text-text-muted">
+            SLUG: /{slug}
+          </p>
+          <h1 className="mt-1 font-kanit text-[28px] font-bold text-[#053F5C]">
+            {t("editTitle", { title: pageTitle })}
+          </h1>
+        </header>
 
-      {/* Display mode selector */}
-      <div className="rounded-2xl border border-white/80 bg-white px-8 py-5 shadow-md">
-        <label className="mb-2 block font-sarabun text-body-sm font-medium text-text-secondary">
-          รูปแบบการแสดงผล
-        </label>
-        <select
-          value={displayMode}
-          onChange={(e) => setDisplayMode(e.target.value as DisplayMode)}
-          className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 font-sarabun text-body-md text-text-primary shadow-sm focus:border-[#0081A7] focus:outline-none focus:ring-1 focus:ring-[#0081A7]/20"
-        >
-          <option value="markdown">Markdown</option>
-          <option value="pdf">PDF</option>
-          <option value="both">ทั้ง 2 แบบ (Markdown + PDF)</option>
-        </select>
-      </div>
+        {/* Display mode selector */}
+        <div className="rounded-2xl border border-white/80 bg-white px-8 py-5 shadow-md">
+          <label className="mb-2 block font-sarabun text-body-sm font-medium text-text-secondary">
+            รูปแบบการแสดงผล
+          </label>
+          <DisplayModeDropdown value={displayMode} onChange={(v) => setDisplayMode(v as DisplayMode)} />
+        </div>
 
-      {/* Editor — show when markdown or both */}
-      {(displayMode === "markdown" || displayMode === "both") && (
-        <RichTextEditor
-          contentTh={contentTh}
-          contentEn={contentEn}
-          onChangeTh={setContentTh}
-          onChangeEn={setContentEn}
-          disabled={updateMutation.isPending}
-        />
-      )}
+        {/* Editor — show when markdown or both */}
+        {(displayMode === "markdown" || displayMode === "both") && (
+          <RichTextEditor
+            contentTh={contentTh}
+            contentEn={contentEn}
+            onChangeTh={setContentTh}
+            onChangeEn={setContentEn}
+            disabled={updateMutation.isPending}
+          />
+        )}
 
-      {/* PDF upload — show when pdf or both */}
-      {(displayMode === "pdf" || displayMode === "both") && (
-        <div className="rounded-2xl border border-white/80 bg-white px-8 py-6 shadow-md">
-          <h3 className="mb-4 font-kanit text-lg font-bold text-[#053F5C]">
-            ไฟล์ PDF
-          </h3>
+        {/* PDF upload — show when pdf or both */}
+        {(displayMode === "pdf" || displayMode === "both") && (
+          <div className="rounded-2xl border border-white/80 bg-white px-8 py-6 shadow-md">
+            <h3 className="mb-4 font-kanit text-lg font-bold text-[#053F5C]">
+              ไฟล์ PDF
+            </h3>
 
-          {pdfUrl ? (
-            <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 px-5 py-4">
-              <svg className="h-8 w-8 shrink-0 text-red-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zm-2.5 9.5a1 1 0 011-1h1a1 1 0 010 2h-1a1 1 0 01-1-1z" />
-              </svg>
-              <div className="flex-1">
-                <p className="font-sarabun text-body-md font-medium text-text-primary">
-                  document.pdf
-                </p>
-                <p className="font-sarabun text-body-sm text-text-muted">
-                  อัปโหลดแล้ว
-                </p>
+            {pdfUrl ? (
+              <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 px-5 py-4">
+                <svg className="h-8 w-8 shrink-0 text-red-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zm-2.5 9.5a1 1 0 011-1h1a1 1 0 010 2h-1a1 1 0 01-1-1z" />
+                </svg>
+                <div className="flex-1">
+                  <p className="font-sarabun text-body-md font-medium text-text-primary">
+                    document.pdf
+                  </p>
+                  <p className="font-sarabun text-body-sm text-text-muted">
+                    อัปโหลดแล้ว
+                  </p>
+                </div>
+                <a
+                  href={`${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1${pdfUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-lg border border-[#0081A7]/30 px-3 py-1.5 font-sarabun text-body-sm font-medium text-[#0081A7] hover:bg-[#0081A7]/5"
+                >
+                  ดูไฟล์
+                </a>
+                <button
+                  type="button"
+                  onClick={handleDeletePdf}
+                  className="rounded-lg border border-red-200 px-3 py-1.5 font-sarabun text-body-sm font-medium text-red-600 hover:bg-red-50"
+                >
+                  ลบ
+                </button>
               </div>
-              <a
-                href={`${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1${pdfUrl}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg border border-[#0081A7]/30 px-3 py-1.5 font-sarabun text-body-sm font-medium text-[#0081A7] hover:bg-[#0081A7]/5"
-              >
-                ดูไฟล์
-              </a>
-              <button
-                type="button"
-                onClick={handleDeletePdf}
-                className="rounded-lg border border-red-200 px-3 py-1.5 font-sarabun text-body-sm font-medium text-red-600 hover:bg-red-50"
-              >
-                ลบ
-              </button>
-            </div>
-          ) : (
-            <div
-              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-              onDrop={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const file = e.dataTransfer.files[0];
-                if (file) handleUploadPdf(file);
-              }}
-              className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#0081A7]/30 bg-gray-50/50 px-6 py-10 transition-colors hover:border-[#0081A7]/50"
-            >
-              <svg className="mb-3 h-10 w-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-              <p className="mb-1 font-sarabun text-body-md font-medium text-text-primary">
-                อัปโหลดไฟล์ PDF
-              </p>
-              <p className="mb-4 font-sarabun text-body-sm text-text-muted">
-                ลากไฟล์มาวาง หรือคลิกเพื่อเลือกไฟล์ (สูงสุด 10MB)
-              </p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
+            ) : (
+              <div
+                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const file = e.dataTransfer.files[0];
                   if (file) handleUploadPdf(file);
                 }}
-              />
-              <button
-                type="button"
-                disabled={uploading}
-                onClick={() => fileInputRef.current?.click()}
-                className="rounded-full border border-gray-200 bg-white px-5 py-2 font-sarabun text-body-sm font-medium text-text-secondary shadow-sm hover:bg-gray-50 disabled:opacity-60"
+                className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#0081A7]/30 bg-gray-50/50 px-6 py-10 transition-colors hover:border-[#0081A7]/50"
               >
-                {uploading ? "กำลังอัปโหลด..." : "เลือกไฟล์"}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+                <svg className="mb-3 h-10 w-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <p className="mb-1 font-sarabun text-body-md font-medium text-text-primary">
+                  อัปโหลดไฟล์ PDF
+                </p>
+                <p className="mb-4 font-sarabun text-body-sm text-text-muted">
+                  ลากไฟล์มาวาง หรือคลิกเพื่อเลือกไฟล์ (สูงสุด 10MB)
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleUploadPdf(file);
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="rounded-full border border-gray-200 bg-white px-5 py-2 font-sarabun text-body-sm font-medium text-text-secondary shadow-sm hover:bg-gray-50 disabled:opacity-60"
+                >
+                  {uploading ? "กำลังอัปโหลด..." : "เลือกไฟล์"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
-      {/* Footer actions */}
-      <div className="flex items-center justify-between">
+        {/* Footer actions */}
+        <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-text-muted">
           {lastSaved && (
             <>
@@ -309,6 +302,7 @@ export default function AdminPageEditorPage() {
           </button>
         </div>
       </div>
+      </div>
 
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-[110] rounded-2xl bg-gradient-to-r from-[#053F5C] to-[#0081A7] px-4 py-3 font-sarabun text-label text-white shadow-lg">
@@ -337,5 +331,60 @@ function SaveIcon() {
     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
     </svg>
+  );
+}
+
+function DisplayModeDropdown({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const options = [
+    { value: "markdown", label: "Markdown" },
+    { value: "pdf", label: "PDF" },
+    { value: "both", label: "ทั้ง 2 แบบ (Markdown + PDF)" },
+  ];
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const selected = options.find((o) => o.value === value);
+
+  return (
+    <div ref={ref} className="relative w-full sm:w-72">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex h-11 w-full items-center justify-between rounded-full border border-gray-200 bg-gray-50 px-4 font-sarabun text-body-md text-text-primary shadow-sm transition-all hover:border-gray-300 hover:shadow-md"
+      >
+        <span className="truncate">{selected?.label ?? "—"}</span>
+        <svg className={`h-4 w-4 shrink-0 text-text-muted transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-30 mt-1.5 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white py-1 shadow-lg">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => { onChange(opt.value); setOpen(false); }}
+              className={`flex w-full px-4 py-2.5 font-sarabun text-label transition-colors ${
+                opt.value === value
+                  ? "bg-[#053F5C]/10 font-bold text-[#053F5C]"
+                  : "text-text-primary hover:bg-gray-50"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

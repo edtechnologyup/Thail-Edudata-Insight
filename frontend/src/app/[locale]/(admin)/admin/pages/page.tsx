@@ -59,7 +59,7 @@ export default function AdminPagesPage() {
   };
 
   return (
-    <div className="space-y-8 pb-24">
+    <div className="mx-auto max-w-container-max space-y-6 pb-24">
       {/* Header + Breadcrumb */}
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -97,26 +97,28 @@ export default function AdminPagesPage() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {pages.map((page) => (
-              <StaticPageCard key={page.slug} page={page} />
-            ))}
-            {/* Add New Page card */}
-            <button
-              type="button"
-              onClick={() => setCreateOpen(true)}
-              className="group flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-[#00AFB9]/40 bg-[#00AFB9]/5 p-8 transition-all hover:border-[#00AFB9] hover:bg-[#00AFB9]/10 hover:shadow-md"
-            >
-              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-md text-[#00AFB9] transition-transform group-hover:scale-110 group-active:scale-95">
-                <svg className="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
-              </span>
-              <span className="font-kanit text-xl font-bold text-[#00AFB9]">
-                {t("addNewPage")}
-              </span>
-              <span className="max-w-[200px] text-center font-sarabun text-sm text-text-muted">
-                {t("addNewPageDesc")}
-              </span>
-            </button>
+          <div className="rounded-3xl bg-[#f0f2f5] p-6 shadow-xl">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {pages.map((page) => (
+                <StaticPageCard key={page.slug} page={page} />
+              ))}
+              {/* Add New Page card */}
+              <button
+                type="button"
+                onClick={() => setCreateOpen(true)}
+                className="group flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-[#00AFB9]/40 bg-[#00AFB9]/5 p-8 transition-all hover:border-[#00AFB9] hover:bg-[#00AFB9]/10 hover:shadow-md"
+              >
+                <span className="flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-md text-[#00AFB9] transition-transform group-hover:scale-110 group-active:scale-95">
+                  <svg className="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+                </span>
+                <span className="font-kanit text-xl font-bold text-[#00AFB9]">
+                  {t("addNewPage")}
+                </span>
+                <span className="max-w-[200px] text-center font-sarabun text-sm text-text-muted">
+                  {t("addNewPageDesc")}
+                </span>
+              </button>
+            </div>
           </div>
         )}
       </section>

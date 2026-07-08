@@ -120,35 +120,31 @@ export default function AgencyActivityPage() {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
-      <nav className="flex flex-wrap items-center gap-2 font-sarabun text-caption uppercase tracking-wider text-text-muted">
-        <Link href={`${base}/dashboard`} className="hover:text-primary-dark">
-          Main Dashboard
-        </Link>
-        <span>›</span>
-        <span className="font-semibold text-text-primary">
-          ประวัติการทำงาน
-        </span>
-      </nav>
-
-      <header className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
-        <div>
-          <h1 className="font-kanit text-[28px] font-bold text-text-primary">
-            {t("title")}
-          </h1>
-          <p className="mt-1 font-sarabun text-body-md text-text-muted">
-            {t("subtitle")}
-          </p>
+      <header
+        className="relative overflow-hidden rounded-2xl p-6 lg:p-7"
+        style={{ background: "linear-gradient(135deg, #01579b 0%, #0277bd 60%, #0288d1 100%)" }}
+      >
+        <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="font-kanit text-xl font-bold text-white">
+              {t("title")}
+            </h1>
+            <p className="mt-1 font-sarabun text-sm text-white/70">
+              {t("subtitle")}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => items.length > 0 && exportCsv(items)}
+            disabled={items.length === 0}
+            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 font-sarabun text-label font-medium text-[#01579b] shadow-sm transition-all hover:bg-white/90 active:scale-[0.97] disabled:opacity-50"
+          >
+            <ExportIcon />
+            ส่งออก CSV
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => items.length > 0 && exportCsv(items)}
-          disabled={items.length === 0}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#0d5302] px-5 py-2.5 font-sarabun text-label font-medium text-white shadow-level-1 transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
-          <ExportIcon />
-          ส่งออก CSV
-        </button>
+        <div className="absolute -right-5 -top-5 h-28 w-28 rounded-full bg-white/[0.06]" />
+        <div className="absolute right-16 -bottom-8 h-20 w-20 rounded-full bg-white/[0.04]" />
       </header>
 
       {/* Filter tabs */}
@@ -163,7 +159,7 @@ export default function AgencyActivityPage() {
             }}
             className={`rounded-full px-5 py-2 font-sarabun text-label font-medium transition-colors ${
               activeTab === tab.key
-                ? "bg-[#0d5302] text-white shadow-level-1"
+                ? "bg-[#01579b] text-white shadow-sm"
                 : "border border-border-input bg-surface-card text-text-muted hover:bg-surface-container hover:text-text-primary"
             }`}
           >
@@ -271,13 +267,13 @@ export default function AgencyActivityPage() {
                           {detailHref ? (
                             <Link
                               href={detailHref}
-                              className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-container hover:text-primary-dark"
+                              className="flex h-7 w-7 items-center justify-center rounded-full text-[#01579b] transition-colors hover:bg-[#e1f5fe]"
                               title="ดูรายละเอียด"
                             >
                               <EyeIcon />
                             </Link>
                           ) : (
-                            <span className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted/40">
+                            <span className="flex h-7 w-7 items-center justify-center rounded-full text-text-muted/40">
                               <EyeIcon />
                             </span>
                           )}
@@ -294,7 +290,7 @@ export default function AgencyActivityPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-sarabun text-label text-text-muted">
             {t("paginationSummary", { from, to, total: totalItems })}
           </p>
@@ -306,7 +302,7 @@ export default function AgencyActivityPage() {
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border-input text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-surface-container disabled:opacity-30"
               aria-label={t("prevPage")}
             >
               <ChevronLeftIcon />
@@ -315,7 +311,7 @@ export default function AgencyActivityPage() {
               pageNum === "ellipsis" ? (
                 <span
                   key={`ellipsis-${index}`}
-                  className="px-2 font-sarabun text-label text-text-muted"
+                  className="px-1 font-sarabun text-label text-text-muted"
                 >
                   ...
                 </span>
@@ -324,10 +320,10 @@ export default function AgencyActivityPage() {
                   key={pageNum}
                   type="button"
                   onClick={() => setPage(pageNum)}
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl font-sarabun text-label font-bold transition-colors ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg font-sarabun text-caption font-bold transition-colors ${
                     pageNum === currentPage
-                      ? "bg-[#0d5302] text-white shadow-level-1"
-                      : "border border-border-input text-text-primary hover:bg-surface-container"
+                      ? "bg-[#01579b] text-white"
+                      : "text-text-primary hover:bg-surface-container"
                   }`}
                   aria-current={pageNum === currentPage ? "page" : undefined}
                 >
@@ -339,7 +335,7 @@ export default function AgencyActivityPage() {
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border-input text-text-muted transition-colors hover:bg-surface-container disabled:opacity-40"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-surface-container disabled:opacity-30"
               aria-label={t("nextPage")}
             >
               <ChevronRightIcon />

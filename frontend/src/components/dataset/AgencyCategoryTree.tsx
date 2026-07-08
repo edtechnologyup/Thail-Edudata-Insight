@@ -17,10 +17,13 @@ type AgencyCategoryTreeProps = {
 };
 
 function CategoryIcon({ level }: { level: number }) {
-  const colors =
-    level === 1
-      ? "bg-[#e1f5fe] text-[#03a9f4]"
-      : "bg-[#e1f5fe] text-[#03a9f4]";
+  const colorMap: Record<number, string> = {
+    1: "bg-[#6A4C93]/10 text-[#6A4C93]",
+    2: "bg-[#8AC926]/15 text-[#6d9e1e]",
+    3: "bg-[#FFCA3A]/15 text-[#d4a017]",
+    4: "bg-[#FF595E]/10 text-[#FF595E]",
+  };
+  const colors = colorMap[level] ?? colorMap[1];
   return (
     <div
       className={`flex h-9 w-9 items-center justify-center rounded-xl ${colors}`}
@@ -110,7 +113,7 @@ function TreeRow({
               <button
                 type="button"
                 onClick={() => onAddChild(node)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e8f5e9] text-[#43a047] transition-colors hover:bg-[#c8e6c9]"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-[#43a047] transition-colors hover:bg-[#e8f5e9]"
                 aria-label={t("addChild")}
                 title={t("addChild")}
               >
@@ -121,7 +124,7 @@ function TreeRow({
               <button
                 type="button"
                 onClick={() => onMove(node)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-[#e3f2fd] hover:text-[#1565c0]"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-[#2baf2b] transition-colors hover:bg-[#e8f5e9]"
                 aria-label="ย้ายหมวดหมู่"
                 title="ย้ายหมวดหมู่"
               >
@@ -131,7 +134,7 @@ function TreeRow({
             <button
               type="button"
               onClick={() => onEdit(node)}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-container hover:text-primary-dark"
+              className="flex h-7 w-7 items-center justify-center rounded-full text-[#01579b] transition-colors hover:bg-[#e1f5fe]"
               aria-label={t("formTitleEdit")}
               title={t("formTitleEdit")}
             >
@@ -140,7 +143,7 @@ function TreeRow({
             <button
               type="button"
               onClick={() => onDelete(node, label)}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-[#ffdad6] hover:text-status-error"
+              className="flex h-7 w-7 items-center justify-center rounded-full text-[#d01716] transition-colors hover:bg-[#ffdad6]"
               aria-label={t("confirmDelete")}
               title={t("confirmDelete")}
             >

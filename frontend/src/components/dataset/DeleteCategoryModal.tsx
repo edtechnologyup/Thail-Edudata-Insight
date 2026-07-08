@@ -94,7 +94,7 @@ export default function DeleteCategoryModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full rounded-radius-lg bg-primary py-3 font-sarabun text-label font-medium text-surface-card transition-opacity hover:opacity-90"
+                className="w-full rounded-radius-lg bg-[#01579b] py-3 font-sarabun text-label font-medium text-white transition-opacity hover:opacity-90"
               >
                 {t("close")}
               </button>

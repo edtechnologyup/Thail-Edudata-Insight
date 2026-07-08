@@ -89,34 +89,32 @@ export default function AgencyCategoriesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
-      <nav className="flex flex-wrap items-center gap-2 font-sarabun text-caption uppercase tracking-wider text-text-muted">
-        <Link href={`${base}/dashboard`} className="hover:text-primary-dark">
-          หน้าหลัก
-        </Link>
-        <span>›</span>
-        <span className="font-semibold text-text-primary">จัดการหมวดหมู่</span>
-      </nav>
-
-      <header className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
-        <div>
-          <h1 className="font-kanit text-[28px] font-bold text-text-primary">
-            {t("title")}
-          </h1>
-          <p className="mt-1 font-sarabun text-body-md text-text-muted">
-            {t("subtitle", {
-              agency: user?.agency_name ?? tDashboard("agencyFallback"),
-            })}
-          </p>
+      <header
+        className="relative overflow-hidden rounded-2xl p-6 lg:p-7"
+        style={{ background: "linear-gradient(135deg, #01579b 0%, #0277bd 60%, #0288d1 100%)" }}
+      >
+        <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="font-kanit text-xl font-bold text-white">
+              {t("title")}
+            </h1>
+            <p className="mt-1 font-sarabun text-sm text-white/70">
+              {t("subtitle", {
+                agency: user?.agency_name ?? tDashboard("agencyFallback"),
+              })}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={openCreateRoot}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2 font-sarabun text-label font-medium text-[#01579b] shadow-sm transition-all hover:bg-white/90 active:scale-[0.97]"
+          >
+            <PlusIcon />
+            {t("addRoot")}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={openCreateRoot}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0d5302] px-6 py-2.5 font-sarabun text-label font-bold text-white shadow-level-1 transition-opacity hover:opacity-90"
-        >
-          <PlusIcon />
-          {t("addRoot")}
-        </button>
+        <div className="absolute -right-5 -top-5 h-28 w-28 rounded-full bg-white/[0.06]" />
+        <div className="absolute right-16 -bottom-8 h-20 w-20 rounded-full bg-white/[0.04]" />
       </header>
 
       {/* Summary cards */}
@@ -158,7 +156,7 @@ export default function AgencyCategoriesPage() {
             onClick={() => setActiveLevel(lvl)}
             className={`rounded-t-lg border-b-2 px-5 py-2.5 font-sarabun text-label font-medium transition-all ${
               activeLevel === lvl
-                ? "border-b-[#0d5302] text-[#0d5302]"
+                ? "border-b-[#01579b] text-[#01579b]"
                 : "border-b-transparent text-text-muted hover:border-b-border-default hover:text-text-secondary"
             }`}
           >

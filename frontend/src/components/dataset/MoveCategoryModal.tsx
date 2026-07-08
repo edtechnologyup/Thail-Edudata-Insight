@@ -100,7 +100,7 @@ export default function MoveCategoryModal({
             type="button"
             onClick={() => onConfirm(selected)}
             disabled={isLoading || selected === node.parentId}
-            className="rounded-full bg-gradient-to-r from-[#053F5C] to-[#0081A7] px-6 py-2.5 font-sarabun text-label font-bold text-white shadow-lg transition-all hover:brightness-110 active:scale-95 disabled:opacity-50"
+            className="rounded-full bg-gradient-to-r from-[#01579b] to-[#0288d1] px-6 py-2.5 font-sarabun text-label font-bold text-white shadow-lg transition-all hover:brightness-110 active:scale-95 disabled:opacity-50"
           >
             {isLoading
               ? locale === "th" ? "กำลังย้าย..." : "Moving..."

@@ -12,6 +12,7 @@ type MoveDatasetCategoryModalProps = {
   onConfirm: (targetCategoryId: string) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  theme?: "agency";
 };
 
 export default function MoveDatasetCategoryModal({
@@ -21,7 +22,9 @@ export default function MoveDatasetCategoryModal({
   onConfirm,
   onCancel,
   isLoading,
+  theme,
 }: MoveDatasetCategoryModalProps) {
+  const isAgency = theme === "agency";
   const locale = useLocale();
   const [selected, setSelected] = useState<string | null>(currentCategoryId);
 
@@ -86,7 +89,7 @@ export default function MoveDatasetCategoryModal({
             type="button"
             onClick={() => selected && onConfirm(selected)}
             disabled={isLoading || !selected || selected === currentCategoryId}
-            className="rounded-xl bg-primary-dark px-6 py-2 font-sarabun text-label font-medium text-white hover:opacity-90 disabled:opacity-50"
+            className={`rounded-xl px-6 py-2 font-sarabun text-label font-medium text-white hover:opacity-90 disabled:opacity-50 ${isAgency ? "bg-[#01579b]" : "bg-primary-dark"}`}
           >
             {isLoading
               ? locale === "th" ? "กำลังย้าย..." : "Moving..."

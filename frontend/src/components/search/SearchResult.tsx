@@ -329,37 +329,6 @@ export default function SearchResult(props: SearchResultProps) {
 
   return (
     <section className="flex-1 py-spacing-2">
-      {mainCategories.length > 0 && (
-        <div
-          className="mb-4 flex gap-2 overflow-x-auto pb-1"
-          style={{ scrollbarWidth: "thin" }}
-          role="group"
-          aria-label={t("categories", { defaultValue: "หมวดหมู่" })}
-        >
-          <button
-            type="button"
-            onClick={() => updateParams({ category: null, page: null })}
-            className={chipClass(!props.selectedCategory)}
-          >
-            {locale === "th" ? "ทั้งหมด" : "All"}
-          </button>
-          {mainCategories.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() =>
-                updateParams({
-                  category: activeMainId === String(cat.id) ? null : String(cat.id),
-                  page: null,
-                })
-              }
-              className={chipClass(activeMainId === String(cat.id))}
-            >
-              {locale === "th" ? cat.name_th : cat.name_en}
-            </button>
-          ))}
-        </div>
-      )}
 
       <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white/80 px-5 py-4 shadow-level-1 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
         <p className="font-sarabun text-body-md font-semibold text-text-primary">

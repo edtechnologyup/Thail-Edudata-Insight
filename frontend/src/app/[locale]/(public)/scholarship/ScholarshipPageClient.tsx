@@ -38,7 +38,7 @@ export default function ScholarshipPageClient({
   const tFilter = useTranslations("scholarship.filter");
   const tList = useTranslations("scholarship.list");
   const locale = useLocale();
-  const { page, q, scholarship_type, target_level, application_status } =
+  const { page, q, scholarship_type, target_level, application_status, created_by } =
     parseScholarshipFilterParams(searchParams);
 
   const { data: heroImg } = useSettingImage("scholarship_hero_image");
@@ -48,6 +48,7 @@ export default function ScholarshipPageClient({
     scholarship_type: scholarship_type || undefined,
     target_level: target_level || undefined,
     application_status: application_status || undefined,
+    created_by: created_by || undefined,
     page,
     page_size: 20,
   });
@@ -60,12 +61,12 @@ export default function ScholarshipPageClient({
 
   return (
     <>
-      <section className="relative overflow-hidden px-4 py-12 md:px-spacing-10 md:py-16" style={{ backgroundColor: "#1a237e" }}>
+      <section className="relative overflow-hidden px-4 py-12 md:px-spacing-10 md:py-16" style={{ backgroundColor: "#3a3f4b" }}>
         {heroImg?.imageUrl && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={heroImg.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden />
-            <div className="absolute inset-0" style={{ backgroundColor: "rgba(26,35,126,0.78)" }} aria-hidden />
+            <div className="absolute inset-0" style={{ backgroundColor: "rgba(55,60,72,0.65)" }} aria-hidden />
           </>
         )}
         <div className="relative z-10 mx-auto max-w-container-max text-center">

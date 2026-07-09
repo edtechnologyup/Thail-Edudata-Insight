@@ -185,6 +185,8 @@
       "type": "Scholarship type",
       "allTypes": "All types",
       "level": "Education level",
+      "agency": "Agency",
+      "allAgencies": "All agencies",
       "applicationStatus": "Status",
       "applicationStatus_open": "Open",
       "applicationStatus_closed": "Closed",

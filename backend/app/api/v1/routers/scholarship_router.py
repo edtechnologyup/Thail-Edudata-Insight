@@ -394,12 +394,35 @@ def _list_scholarships_sql(
     return items, total
 
 
+@router.get("/scholarship/agencies", status_code=status.HTTP_200_OK)
+def list_scholarship_agencies(
+    db: Session = Depends(get_db),
+):
+    """หน่วยงานที่มีทุนการศึกษา (published) — ใช้แสดงใน dropdown กรอง"""
+    rows = (
+        db.query(User.id, User.agency_name)
+        .join(Scholarship, Scholarship.created_by == User.id)
+        .filter(
+            Scholarship.is_deleted.is_(False),
+            Scholarship.status == "published",
+            User.is_deleted.is_(False),
+        )
+        .distinct()
+        .order_by(User.agency_name)
+        .all()
+    )
+    return success_response(
+        data=[{"id": str(r.id), "name": r.agency_name or str(r.id)} for r in rows]
+    )
+
+
 @router.get("/scholarship", status_code=status.HTTP_200_OK)
 def list_scholarships(
     q: str | None = Query(default=None),
     scholarship_type: str | None = Query(default=None),
     target_level: str | None = Query(default=None),
     application_status: str | None = Query(default=None),
+    created_by: str | None = Query(default=None),
     updated_within_days: int | None = Query(default=None, ge=1, le=30),
     current_month_only: bool = Query(default=False),
     pagination: PaginationParams = Depends(get_pagination_params),
@@ -449,12 +472,20 @@ def list_scholarships(
             total_items=total,
         )
 
+    created_by_uuid = None
+    if created_by:
+        try:
+            created_by_uuid = uuid.UUID(created_by)
+        except ValueError:
+            pass
+
     items, total = _list_scholarships_sql(
         db,
         pagination,
         scholarship_type=scholarship_type,
         target_level=target_level,
         application_status=application_status,
+        created_by=created_by_uuid,
         published_only=True,
         updated_within_days=updated_within_days,
         current_month_only=current_month_only,

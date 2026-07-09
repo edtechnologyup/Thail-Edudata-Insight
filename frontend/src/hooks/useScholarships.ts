@@ -55,6 +55,7 @@ export type ScholarshipListParams = {
   scholarship_type?: string;
   target_level?: string;
   application_status?: ScholarshipApplicationStatus;
+  created_by?: string;
   updated_within_days?: number;
   current_month_only?: boolean;
   sort?: string;
@@ -90,6 +91,7 @@ export function useScholarships(params: ScholarshipListParams) {
           scholarship_type: params.scholarship_type || undefined,
           target_level: params.target_level || undefined,
           application_status: params.application_status || undefined,
+          created_by: params.created_by || undefined,
           updated_within_days: params.updated_within_days ?? undefined,
           current_month_only: params.current_month_only || undefined,
           sort: params.sort || undefined,
@@ -110,6 +112,20 @@ export function useScholarships(params: ScholarshipListParams) {
       };
     },
     staleTime: STALE_TIME_MS,
+    retry: 1,
+  });
+}
+
+export type ScholarshipAgency = { id: string; name: string };
+
+export function useScholarshipAgencies() {
+  return useQuery<ScholarshipAgency[], Error>({
+    queryKey: ["scholarship-agencies"],
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: ScholarshipAgency[] }>("/scholarship/agencies");
+      return res.data.data ?? [];
+    },
+    staleTime: 60_000,
     retry: 1,
   });
 }

@@ -90,12 +90,12 @@ export default function ApiDocsPage() {
             </span>
           </nav>
 
-          <div className="relative overflow-hidden rounded-2xl p-8 md:p-10" style={{ backgroundColor: "#1a237e" }}>
+          <div className="relative overflow-hidden rounded-2xl p-8 md:p-10" style={{ backgroundColor: "#3a3f4b" }}>
             {heroImg?.imageUrl && (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={heroImg.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden />
-                <div className="absolute inset-0" style={{ backgroundColor: "rgba(26,35,126,0.78)" }} aria-hidden />
+                <div className="absolute inset-0" style={{ backgroundColor: "rgba(55,60,72,0.65)" }} aria-hidden />
               </>
             )}
             <div className="relative">

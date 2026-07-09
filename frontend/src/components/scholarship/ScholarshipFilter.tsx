@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useSearchParamsUpdate } from "@/components/search/useSearchParamsUpdate";
 import type { EducationLevel, ScholarshipType } from "@/hooks/useScholarships";
+import { useScholarshipAgencies } from "@/hooks/useScholarships";
 
 export const SCHOLARSHIP_TYPE_VALUES = [
   "government",
@@ -33,6 +34,7 @@ type ScholarshipFilterParams = {
   scholarship_type: string;
   target_level: string;
   application_status: ScholarshipApplicationStatus | "";
+  created_by: string;
 };
 
 function readParam(
@@ -63,6 +65,7 @@ export function parseScholarshipFilterParams(
     ? (applicationStatusRaw as ScholarshipApplicationStatus)
     : "";
   const q = readParam(searchParams, "q");
+  const createdBy = readParam(searchParams, "created_by");
 
   return {
     page,
@@ -70,6 +73,7 @@ export function parseScholarshipFilterParams(
     scholarship_type: scholarshipType,
     target_level: targetLevel,
     application_status: applicationStatus,
+    created_by: createdBy,
   };
 }
 
@@ -87,8 +91,10 @@ export default function ScholarshipFilter() {
   const searchParams = useSearchParams();
   const updateParams = useSearchParamsUpdate();
 
-  const { scholarship_type, target_level, application_status } =
+  const { scholarship_type, target_level, application_status, created_by } =
     parseScholarshipFilterParams(searchParams);
+
+  const { data: agencies } = useScholarshipAgencies();
 
   const handleClearAll = () => {
     updateParams({
@@ -96,11 +102,12 @@ export default function ScholarshipFilter() {
       scholarship_type: null,
       target_level: null,
       application_status: null,
+      created_by: null,
       page: null,
     });
   };
 
-  const hasAnyFilter = scholarship_type || target_level || application_status;
+  const hasAnyFilter = scholarship_type || target_level || application_status || created_by;
 
   return (
     <div className="rounded-2xl border border-border-default/60 bg-white p-5 shadow-level-1">
@@ -161,6 +168,33 @@ export default function ScholarshipFilter() {
       </div>
 
       <hr className="mb-5 border-border-default/40" />
+
+      {/* หน่วยงาน */}
+      {agencies && agencies.length > 0 && (
+        <>
+          <div className="mb-5">
+            <p className="mb-3 font-sarabun text-label font-bold text-primary-dark">
+              {tFilter("agency") ?? "หน่วยงาน"}
+            </p>
+            <select
+              value={created_by}
+              onChange={(e) =>
+                updateParams({ created_by: e.target.value || null, page: null })
+              }
+              className="w-full rounded-xl border border-border-default/60 bg-white px-3 py-2.5 font-sarabun text-label text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            >
+              <option value="">{tFilter("allAgencies") ?? "ทุกหน่วยงาน"}</option>
+              {agencies.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <hr className="mb-5 border-border-default/40" />
+        </>
+      )}
 
       {/* สถานะ */}
       <div className="mb-6">

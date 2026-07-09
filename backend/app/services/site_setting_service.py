@@ -74,9 +74,11 @@ def get_all_settings(db: Session) -> list[SiteSettingResponse]:
 def update_setting(db: Session, key: str, data: SiteSettingUpdateRequest) -> SiteSettingResponse:
     setting = _get_setting(db, key)
     if not setting:
-        raise_app_error("NOT_FOUND", f"Setting '{key}' not found")
-    setting.enabled = data.enabled
-    setting.value = data.value
+        setting = SiteSetting(key=key, value=data.value, enabled=data.enabled)
+        db.add(setting)
+    else:
+        setting.enabled = data.enabled
+        setting.value = data.value
     db.commit()
     db.refresh(setting)
     return SiteSettingResponse.model_validate(setting)
@@ -93,7 +95,7 @@ def _ribbon_image_url(minio_client) -> str | None:
         return None
 
 
-def upload_ribbon_image(minio_client, file: UploadFile) -> str:
+def upload_ribbon_image(minio_client, file: UploadFile, db: Session | None = None) -> str:
     content = file.file.read()
     if len(content) > MAX_IMAGE_BYTES:
         raise_app_error("FILE_TOO_LARGE", "ไฟล์ใหญ่เกิน 2MB")
@@ -110,7 +112,16 @@ def upload_ribbon_image(minio_client, file: UploadFile) -> str:
             length=len(content),
             content_type=content_type,
         )
-        return _ribbon_image_url(minio_client) or ""
+        url = _ribbon_image_url(minio_client) or ""
+        if db is not None:
+            row = _get_setting(db, "ribbon_image_url")
+            if row:
+                row.value = url
+                row.enabled = True
+            else:
+                db.add(SiteSetting(key="ribbon_image_url", value=url, enabled=True))
+            db.commit()
+        return url
     except Exception as exc:
         log_request(logger, logging.ERROR, f"Upload ribbon failed: {exc}", error_code="FILE_UPLOAD_FAILED")
         raise_app_error("FILE_UPLOAD_FAILED")
@@ -176,7 +187,9 @@ def upload_setting_image(db: Session, minio_client, key: str, file: UploadFile) 
         if row:
             row.value = url
             row.enabled = True
-            db.commit()
+        else:
+            db.add(SiteSetting(key=key, value=url, enabled=True))
+        db.commit()
         return url
     except Exception as exc:
         log_request(logger, logging.ERROR, f"Upload {key} failed: {exc}", error_code="FILE_UPLOAD_FAILED")

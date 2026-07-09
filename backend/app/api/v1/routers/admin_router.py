@@ -619,12 +619,13 @@ def admin_update_site_setting(
 def admin_upload_ribbon_image(
     image: UploadFile = File(...),
     payload: dict = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
 ):
     """
     อัปโหลดรูป ribbon มุมขวา
     - Auth ✅ Admin
     """
-    url = site_setting_service.upload_ribbon_image(_get_minio(), image)
+    url = site_setting_service.upload_ribbon_image(_get_minio(), image, db=db)
     return success_response({"image_url": url})
 
 

@@ -6,10 +6,7 @@
 
 ## Screenshots
 
-<!-- เพิ่มภาพ screenshot ที่ docs/screenshots/ แล้ว uncomment -->
-<!-- ![หน้าแรก](docs/screenshots/home.png) -->
-<!-- ![ค้นหา](docs/screenshots/search.png) -->
-<!-- ![Dashboard](docs/screenshots/dashboard.png) -->
+![หน้าแรก](docs/screenshots/home.webp)
 
 ## Features
 

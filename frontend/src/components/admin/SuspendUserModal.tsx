@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type { AdminUser } from "@/types/admin";
 import { useSuspendUser } from "@/hooks/useSuspendUser";
@@ -22,21 +23,32 @@ export default function SuspendUserModal({
   const t = useTranslations("admin.users");
   const locale = useLocale();
   const suspendMutation = useSuspendUser();
+  const [reason, setReason] = useState("");
 
   if (!open || !user) {
     return null;
   }
 
   const agencyName = locale === "th" ? user.agencyName : user.agencyNameEn;
+  const isValid = reason.trim().length >= 10;
 
   const handleSuspend = async () => {
     try {
-      await suspendMutation.mutateAsync(user.id);
+      await suspendMutation.mutateAsync({ userId: user.id, reason: reason.trim() });
+      setReason("");
       onClose();
       onSuccess();
-    } catch {
-      onError(t("suspendAdminError"));
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+        || t("suspendAdminError");
+      onError(msg);
     }
+  };
+
+  const handleClose = () => {
+    setReason("");
+    onClose();
   };
 
   return (
@@ -49,7 +61,7 @@ export default function SuspendUserModal({
       <button
         type="button"
         className="absolute inset-0 bg-surface-overlay backdrop-blur-sm"
-        onClick={onClose}
+        onClick={handleClose}
         aria-label={t("cancel")}
       />
       <div className="relative w-full max-w-md rounded-radius-lg bg-surface-card p-6 shadow-level-3">
@@ -63,13 +75,25 @@ export default function SuspendUserModal({
           >
             {t("suspendTitle")}
           </h2>
-          <p className="mb-8 font-sarabun text-body-md text-text-secondary">
+          <p className="mb-4 font-sarabun text-body-md text-text-secondary">
             {t("suspendMsg", { agency: agencyName })}
           </p>
+          <textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder={t("suspendReasonPlaceholder")}
+            rows={3}
+            className="mb-2 w-full rounded-radius-md border border-border-default p-3 font-sarabun text-body-md text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+          {reason.length > 0 && !isValid && (
+            <p className="mb-2 w-full text-left font-sarabun text-caption text-error">
+              {t("suspendReasonMinLength")}
+            </p>
+          )}
           <div className="flex w-full gap-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={suspendMutation.isPending}
               className="flex-1 rounded-radius-lg border border-border-default py-3 font-sarabun text-label font-medium text-text-secondary hover:bg-surface-container disabled:opacity-50"
             >
@@ -78,7 +102,7 @@ export default function SuspendUserModal({
             <button
               type="button"
               onClick={handleSuspend}
-              disabled={suspendMutation.isPending}
+              disabled={suspendMutation.isPending || !isValid}
               className="flex-1 rounded-radius-lg bg-surface-container py-3 font-sarabun text-label font-medium text-text-primary hover:bg-surface-page disabled:opacity-50"
             >
               {suspendMutation.isPending ? t("suspending") : t("suspend")}

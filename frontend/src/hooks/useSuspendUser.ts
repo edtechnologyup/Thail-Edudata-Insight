@@ -3,13 +3,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/services/api";
 
-async function suspendUser(userId: string): Promise<void> {
-  await apiClient.post(`/admin/users/${userId}/suspend`);
+async function suspendUser({ userId, reason }: { userId: string; reason: string }): Promise<void> {
+  await apiClient.post(`/admin/users/${userId}/suspend`, { reason });
 }
 
-/** Backend ไม่มี /unsuspend — ใช้ PATCH status=active ตาม PATCH /admin/users/{id} */
 async function unsuspendUser(userId: string): Promise<void> {
-  await apiClient.patch(`/admin/users/${userId}`, { status: "active" });
+  await apiClient.post(`/admin/users/${userId}/unsuspend`);
 }
 
 export function useSuspendUser() {

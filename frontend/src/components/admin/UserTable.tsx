@@ -200,6 +200,7 @@ export default function UserTable({
                               onReject={() => setRejectTarget(user)}
                               onSuspend={() => setSuspendTarget(user)}
                               onUnsuspend={() => handleUnsuspend(user.id)}
+                              isUnsuspending={unsuspendMutation.isPending}
                               onViewReason={() => setReasonTarget(user)}
                               onDelete={() => setDeleteTarget(user)}
                               onChangeRole={() => setChangeRoleTarget(user)}
@@ -321,6 +322,7 @@ function UserRowActions({
   onViewReason,
   onDelete,
   onChangeRole,
+  isUnsuspending,
   approveLabel,
   rejectLabel,
   suspendLabel,
@@ -338,6 +340,7 @@ function UserRowActions({
   onViewReason: () => void;
   onDelete: () => void;
   onChangeRole: () => void;
+  isUnsuspending: boolean;
   approveLabel: string;
   rejectLabel: string;
   suspendLabel: string;
@@ -417,7 +420,8 @@ function UserRowActions({
         <button
           type="button"
           onClick={onUnsuspend}
-          className="rounded-full bg-blue-50 px-3.5 py-1.5 font-sarabun text-caption font-bold text-blue-700 transition-all hover:bg-blue-100"
+          disabled={isUnsuspending}
+          className="rounded-full bg-blue-50 px-3.5 py-1.5 font-sarabun text-caption font-bold text-blue-700 transition-all hover:bg-blue-100 disabled:opacity-50"
         >
           {unsuspendLabel}
         </button>

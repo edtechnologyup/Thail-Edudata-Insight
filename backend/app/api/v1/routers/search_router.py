@@ -19,8 +19,10 @@ router = APIRouter()
 
 
 def _get_es():
-    from elasticsearch import Elasticsearch
     from app.core.config import settings
+    if not settings.ELASTICSEARCH_URL:
+        return None
+    from elasticsearch import Elasticsearch
     return Elasticsearch(settings.ELASTICSEARCH_URL)
 
 
@@ -83,12 +85,15 @@ def search_datasets_endpoint(
 
 
 @router.get("/search/autocomplete", status_code=status.HTTP_200_OK)
-def autocomplete_endpoint(keyword: str | None = None):
+def autocomplete_endpoint(
+    keyword: str | None = None,
+    db: Session = Depends(get_db),
+):
     """
     Autocomplete ตาม #31
     - Auth ❌
     """
-    result = search_service.autocomplete(_get_es(), keyword=keyword)
+    result = search_service.autocomplete(_get_es(), keyword=keyword, db=db)
     return success_response(data=result.model_dump())
 
 

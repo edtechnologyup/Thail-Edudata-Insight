@@ -21,6 +21,7 @@ seed_demo.py — สร้างข้อมูล demo สำหรับนำ
 import csv
 import io
 import json
+import os
 import random
 import uuid
 from datetime import date, datetime, timedelta, timezone
@@ -30,11 +31,11 @@ from minio import Minio
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 
-DATABASE_URL = "postgresql://postgres:postgres@postgres:5432/datacatalog"
-MINIO_ENDPOINT = "minio:9000"
-MINIO_ACCESS_KEY = "minioadmin"
-MINIO_SECRET_KEY = "minioadmin"
-MINIO_BUCKET = "datacatalog"
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/datacatalog")
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT", "minio:9000")
+MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY", "minioadmin")
+MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY", "minioadmin")
+MINIO_BUCKET = os.environ.get("MINIO_BUCKET_NAME", "datacatalog")
 
 DEMO_MARKER = "demo_seed_2026"
 
@@ -511,6 +512,32 @@ def main():
         db.commit()
         print(f"    สร้าง {dataset_count} datasets (97 published + 3 draft)")
 
+        # ── 6.5 Index datasets เข้า Elasticsearch (ถ้ามี) ──
+        try:
+            from app.core.config import settings
+            if settings.ELASTICSEARCH_URL:
+                from elasticsearch import Elasticsearch
+                from app.services.dataset_service import _build_dataset_index_document
+                from app.utils.elasticsearch_utils import index_dataset
+                es = Elasticsearch(settings.ELASTICSEARCH_URL)
+                es_count = 0
+                for ds_id, status, *_ in dataset_ids:
+                    if status != "published":
+                        continue
+                    ds_obj = db.execute(text("SELECT * FROM datasets WHERE id = :id"), {"id": ds_id}).mappings().first()
+                    if ds_obj:
+                        from app.models.dataset_model import Dataset as DsModel
+                        ds_row = db.query(DsModel).filter(DsModel.id == ds_id).first()
+                        if ds_row:
+                            doc = _build_dataset_index_document(db, ds_row)
+                            index_dataset(es, doc)
+                            es_count += 1
+                print(f"    ✅ Indexed {es_count} datasets เข้า Elasticsearch")
+            else:
+                print("    ⏭️  ไม่มี Elasticsearch — ข้าม indexing")
+        except Exception as e:
+            print(f"    ⚠️  ES indexing ข้าม (ไม่กระทบข้อมูล): {e}")
+
         # ── 7. Download Logs กระจาย 2566-2568 ──
         print("\n📌 สร้าง download_logs...")
         log_count = 0
@@ -573,8 +600,13 @@ def main():
         for title, stype, level, amount, elig in SCHOLARSHIPS:
             sid = uuid.uuid4()
             creator = random.choice(all_agency_ids)
-            open_d = date(2025, random.randint(1, 6), random.randint(1, 28))
-            close_d = open_d + timedelta(days=random.randint(30, 120))
+            today = date.today()
+            if random.random() < 0.5:
+                open_d = today - timedelta(days=random.randint(10, 60))
+                close_d = today + timedelta(days=random.randint(30, 180))
+            else:
+                open_d = today - timedelta(days=random.randint(120, 365))
+                close_d = today - timedelta(days=random.randint(1, 60))
             db.execute(text("""
                 INSERT INTO scholarships (id, created_by, title, description, scholarship_type,
                     target_level, amount, eligibility, application_url,

@@ -11,20 +11,16 @@ revision = "c6d7e8f9a0b1"
 down_revision = "b5c6d7e8f9a0"
 branch_labels = None
 depends_on = None
-transaction = False
 
 
 def upgrade() -> None:
     connection = op.get_bind()
-
-    raw_conn = connection.connection
+    raw_conn = connection.connection.dbapi_connection
     old_isolation = raw_conn.isolation_level
     raw_conn.set_isolation_level(0)
-
-    raw_conn.cursor().execute(
-        "ALTER TYPE user_status ADD VALUE IF NOT EXISTS 'email_unverified'"
-    )
-
+    cur = raw_conn.cursor()
+    cur.execute("ALTER TYPE user_status ADD VALUE IF NOT EXISTS 'email_unverified'")
+    cur.close()
     raw_conn.set_isolation_level(old_isolation)
 
     op.execute(

@@ -196,8 +196,119 @@ def _expand_category_filter(db: Session | None, filters: dict) -> dict:
         return filters
 
     expanded = dict(filters)
-    expanded["category_ids"] = [str(item) for item in leaf_ids]
+    all_ids = [str(category_id)] + [str(item) for item in leaf_ids]
+    expanded["category_ids"] = all_ids
     return expanded
+
+
+def _pg_search(
+    db: Session,
+    keyword: str,
+    filters: dict,
+    pagination: PaginationParams,
+) -> tuple[list[SearchResponse], int]:
+    from sqlalchemy import or_
+
+    from app.models.dataset_model import Dataset
+    from app.models.user_model import User
+
+    query = (
+        db.query(Dataset, User)
+        .join(User, Dataset.user_id == User.id)
+        .filter(Dataset.status == "published", Dataset.is_deleted.is_(False))
+    )
+
+    if keyword:
+        like_pat = f"%{keyword}%"
+        query = query.filter(
+            or_(Dataset.title.ilike(like_pat), Dataset.description.ilike(like_pat))
+        )
+
+    if filters.get("category_ids"):
+        query = query.filter(Dataset.category_id.in_(filters["category_ids"]))
+    elif filters.get("category_id"):
+        query = query.filter(Dataset.category_id == filters["category_id"])
+
+    if filters.get("license"):
+        query = query.filter(Dataset.license == filters["license"])
+
+    if filters.get("agency_user_id"):
+        query = query.filter(Dataset.user_id == filters["agency_user_id"])
+
+    if filters.get("province"):
+        query = query.filter(
+            Dataset.dataset_metadata["province"].astext == filters["province"]
+        )
+
+    if filters.get("years"):
+        yr_conditions = []
+        for yr in filters["years"]:
+            yr_conditions.append(
+                Dataset.dataset_metadata["year_start"].astext == str(int(yr))
+            )
+        if yr_conditions:
+            query = query.filter(or_(*yr_conditions))
+
+    if filters.get("formats"):
+        from app.models.dataset_file_model import DatasetFile
+        sub = (
+            db.query(DatasetFile.dataset_id)
+            .filter(DatasetFile.file_format.in_(filters["formats"]))
+            .subquery()
+        )
+        query = query.filter(Dataset.id.in_(db.query(sub.c.dataset_id)))
+
+    if filters.get("tags"):
+        from sqlalchemy import table, column as sa_column
+        dt = table("dataset_tags", sa_column("dataset_id"), sa_column("tag_id"))
+        from app.models.tag_model import Tag
+        tag_ids_sub = db.query(Tag.id).filter(Tag.name.in_(filters["tags"])).subquery()
+        ds_with_tags = (
+            db.query(dt.c.dataset_id)
+            .filter(dt.c.tag_id.in_(db.query(tag_ids_sub)))
+            .subquery()
+        )
+        query = query.filter(Dataset.id.in_(db.query(ds_with_tags.c.dataset_id)))
+
+    total = query.count()
+
+    sort_map = {
+        "published_at": Dataset.published_at,
+        "download_count": Dataset.download_count,
+        "view_count": Dataset.view_count,
+        "quality_score": Dataset.quality_score,
+        "title": Dataset.title,
+    }
+    sort_col = sort_map.get(pagination.sort, Dataset.published_at)
+    order = sort_col.desc() if pagination.order == "desc" else sort_col.asc()
+
+    rows = (
+        query.order_by(order.nullslast())
+        .offset(pagination.offset)
+        .limit(pagination.page_size)
+        .all()
+    )
+
+    responses: list[SearchResponse] = []
+    for ds, user in rows:
+        from app.repositories import dataset_repository as dataset_repo
+        file_format = dataset_repo.get_latest_dataset_file_format(db, ds.id)
+        responses.append(
+            SearchResponse(
+                id=ds.id,
+                title=ds.title,
+                description=ds.description,
+                license=ds.license,
+                category_id=ds.category_id,
+                quality_score=ds.quality_score,
+                download_count=ds.download_count,
+                published_at=ds.published_at,
+                agency_name=user.agency_name if user else None,
+                agency_name_en=user.agency_name_en if user else None,
+                file_format=file_format,
+            )
+        )
+    return responses, total
 
 
 def search(
@@ -211,14 +322,16 @@ def search(
     validated_filters = _validate_filters(filters)
     validated_filters = _expand_category_filter(db, validated_filters)
 
-    # อนุญาตให้ค้นแบบ filter-only ได้ (ไม่ต้องมี keyword) ตาม #31
-    # แต่ถ้ามี keyword ต้องยาวอย่างน้อย 2 ตัวอักษร
     has_filters = bool(validated_filters)
     if len(kw) < 2 and not has_filters:
         raise_app_error("SEARCH_KEYWORD_TOO_SHORT")
 
-    # keyword สั้นเกินไปแต่มี filter → ค้นแบบ filter-only (ไม่ใช้ keyword)
     effective_keyword = kw if len(kw) >= 2 else ""
+
+    if es_client is None:
+        if db is None:
+            raise_app_error("INTERNAL_SERVER_ERROR")
+        return _pg_search(db, effective_keyword, validated_filters, pagination)
 
     result = search_datasets(
         es_client, effective_keyword, validated_filters, pagination
@@ -227,10 +340,27 @@ def search(
     return responses, result.total
 
 
-def autocomplete(es_client, keyword: str | None) -> AutocompleteResponse:
+def autocomplete(es_client, keyword: str | None, db: Session | None = None) -> AutocompleteResponse:
     kw = (keyword or "").strip()
     if len(kw) < 2:
         return AutocompleteResponse(suggestions=[])
+
+    if es_client is None:
+        if db is None:
+            return AutocompleteResponse(suggestions=[])
+        from app.models.dataset_model import Dataset
+        like_pat = f"%{kw}%"
+        rows = (
+            db.query(Dataset.title)
+            .filter(
+                Dataset.status == "published",
+                Dataset.is_deleted.is_(False),
+                Dataset.title.ilike(like_pat),
+            )
+            .limit(10)
+            .all()
+        )
+        return AutocompleteResponse(suggestions=[r[0] for r in rows])
 
     tokenized = _tokenize_thai(kw)
     suggestions = autocomplete_datasets(es_client, tokenized)

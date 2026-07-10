@@ -199,10 +199,14 @@ export default function AgencyCategoryTree({
     });
   };
 
-  const filteredNodes =
-    filterLevel === 2
-      ? nodes.flatMap((n) => n.children)
-      : nodes;
+  const filteredNodes = (() => {
+    if (!filterLevel || filterLevel === 1) return nodes;
+    let current = nodes;
+    for (let i = 1; i < filterLevel; i++) {
+      current = current.flatMap((n) => n.children);
+    }
+    return current;
+  })();
 
   if (isLoading) {
     return (

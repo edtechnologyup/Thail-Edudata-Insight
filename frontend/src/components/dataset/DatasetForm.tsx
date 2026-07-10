@@ -359,11 +359,11 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
     <div className="mx-auto max-w-[800px] space-y-8 pb-24">
       {/* Breadcrumb */}
       <nav className="flex flex-wrap items-center gap-2 font-sarabun text-caption uppercase tracking-wider text-text-muted">
-        <Link href={`${base}/dashboard`} className={isGreen ? "hover:text-[#0277bd]" : "hover:text-[#0081A7]"}>
+        <Link href={userRole === "admin" ? `${base}/admin` : `${base}/dashboard`} className={isGreen ? "hover:text-[#0277bd]" : "hover:text-[#0081A7]"}>
           {t("breadcrumbDashboard")}
         </Link>
         <span>›</span>
-        <Link href={`${base}/datasets`} className={isGreen ? "hover:text-[#0277bd]" : "hover:text-[#0081A7]"}>
+        <Link href={userRole === "admin" ? `${base}/admin/datasets` : `${base}/datasets`} className={isGreen ? "hover:text-[#0277bd]" : "hover:text-[#0081A7]"}>
           {t("breadcrumbDatasets")}
         </Link>
         <span>›</span>

@@ -238,6 +238,70 @@ def list_datasets(
 
 
 
+# ── Custom Data Types (must be before /datasets/{dataset_id}) ──
+
+
+@router.get("/datasets/data-types")
+def list_custom_data_types(
+    payload: dict = Depends(require_roles("agency", "admin")),
+    db: Session = Depends(get_db),
+):
+    from app.models.custom_data_type_model import CustomDataType
+
+    user_id = payload["sub"]
+    role = payload.get("role")
+    query = db.query(CustomDataType)
+    if role != "admin":
+        query = query.filter(CustomDataType.user_id == user_id)
+    rows = query.order_by(CustomDataType.name).all()
+    return success_response(data=[{"id": str(r.id), "name": r.name} for r in rows])
+
+
+@router.post("/datasets/data-types", status_code=status.HTTP_201_CREATED)
+def create_custom_data_type(
+    body: dict,
+    payload: dict = Depends(require_roles("agency", "admin")),
+    db: Session = Depends(get_db),
+):
+    from app.models.custom_data_type_model import CustomDataType
+
+    name = (body.get("name") or "").strip()
+    if not name:
+        raise_app_error("VALIDATION_ERROR")
+    user_id = payload["sub"]
+    exists = db.query(CustomDataType).filter(
+        CustomDataType.user_id == user_id,
+        CustomDataType.name == name,
+    ).first()
+    if exists:
+        return success_response(data={"id": str(exists.id), "name": exists.name})
+    row = CustomDataType(name=name, user_id=user_id)
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return success_response(data={"id": str(row.id), "name": row.name})
+
+
+@router.delete("/datasets/data-types/{type_id}")
+def delete_custom_data_type(
+    type_id: uuid.UUID,
+    payload: dict = Depends(require_roles("agency", "admin")),
+    db: Session = Depends(get_db),
+):
+    from app.models.custom_data_type_model import CustomDataType
+
+    user_id = payload["sub"]
+    role = payload.get("role")
+    row = db.query(CustomDataType).filter(CustomDataType.id == type_id).first()
+    if not row:
+        raise_app_error("NOT_FOUND")
+    if role != "admin" and str(row.user_id) != user_id:
+        raise_app_error("AUTH_PERMISSION_DENIED")
+    db.delete(row)
+    db.commit()
+    return success_response(message="deleted")
+
+
 @router.get("/datasets/{dataset_id}", status_code=status.HTTP_200_OK)
 def get_dataset(
     dataset_id: uuid.UUID,

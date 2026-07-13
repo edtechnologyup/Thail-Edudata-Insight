@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Controller, useForm } from "react-hook-form";
 import CategoryTreePicker from "@/components/dataset/CategoryTreePicker";
 import {
@@ -22,6 +23,7 @@ import { usePIIScan } from "@/hooks/usePIIScan";
 import { useUpdateDataset } from "@/hooks/useUpdateDataset";
 import { useUploadDataset } from "@/hooks/useUploadDataset";
 import apiClient from "@/services/api";
+import { useCustomDataTypes, useCreateCustomDataType, useDeleteCustomDataType } from "@/hooks/useCustomDataTypes";
 import { useAuthStore } from "@/stores/useAuthStore";
 import type { PIIFinding, PIIScanResult } from "@/types/pii";
 import { fetchDatasetFormInitial } from "@/utils/datasetFormApi";
@@ -52,6 +54,9 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
     ? `${inputClassBase} focus:border-[#0277bd] focus:ring-2 focus:ring-[#0277bd]/20`
     : `${inputClassBase} focus:border-[#0081A7] focus:ring-2 focus:ring-[#0081A7]/20`;
   const { scanFile } = usePIIScan();
+  const { data: customDataTypes = [] } = useCustomDataTypes();
+  const createDataType = useCreateCustomDataType();
+  const deleteDataType = useDeleteCustomDataType();
 
   const { data: initialFromApi, isLoading: isLoadingInitial } = useQuery({
     queryKey: ["datasets", datasetId, "form"],
@@ -76,6 +81,15 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
   );
   const submitStatusRef = useRef<"draft" | "published" | null>(null);
   const provinceWrapperRef = useRef<HTMLDivElement>(null);
+  const provinceInputRef = useRef<HTMLInputElement>(null);
+  const provinceDropdownRef = useRef<HTMLDivElement>(null);
+  const [provinceDropdownStyle, setProvinceDropdownStyle] = useState<React.CSSProperties>({});
+  const [dataTypeOpen, setDataTypeOpen] = useState(false);
+  const dataTypeWrapperRef = useRef<HTMLDivElement>(null);
+  const [dataTypeAdding, setDataTypeAdding] = useState(false);
+  const [dataTypeNewName, setDataTypeNewName] = useState("");
+  const [freqUnitOpen, setFreqUnitOpen] = useState(false);
+  const freqUnitWrapperRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -188,15 +202,59 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
         provinceWrapperRef.current &&
-        !provinceWrapperRef.current.contains(event.target as Node)
+        !provinceWrapperRef.current.contains(target) &&
+        provinceDropdownRef.current &&
+        !provinceDropdownRef.current.contains(target)
       ) {
         setProvinceDropdownOpen(false);
       }
+      if (
+        dataTypeWrapperRef.current &&
+        !dataTypeWrapperRef.current.contains(target)
+      ) {
+        setDataTypeOpen(false);
+        setDataTypeAdding(false);
+      }
+      if (
+        freqUnitWrapperRef.current &&
+        !freqUnitWrapperRef.current.contains(target)
+      ) {
+        setFreqUnitOpen(false);
+      }
+    };
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (
+        dataTypeWrapperRef.current?.contains(target) ||
+        freqUnitWrapperRef.current?.contains(target) ||
+        provinceDropdownRef.current?.contains(target)
+      ) return;
+      setProvinceDropdownOpen(false);
+      setDataTypeOpen(false);
+      setFreqUnitOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, []);
+
+  const updateProvinceDropdownPosition = useCallback(() => {
+    if (provinceInputRef.current) {
+      const rect = provinceInputRef.current.getBoundingClientRect();
+      setProvinceDropdownStyle({
+        position: "fixed",
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    }
   }, []);
 
   const fiscalYears = useMemo(() => {
@@ -512,7 +570,7 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
         })}
         className="space-y-8"
       >
-        <section className={`rounded-2xl border ${isGreen ? "border-[#0277bd]/8" : "border-[#0081A7]/8"} bg-white/95 p-8 shadow-xl shadow-black/5 backdrop-blur-sm`}>
+        <section className={`relative z-10 overflow-visible rounded-2xl border ${isGreen ? "border-[#0277bd]/8" : "border-[#0081A7]/8"} bg-white p-8 shadow-xl shadow-black/5`}>
           <div className="mb-6 flex items-center gap-3">
             <span className={`flex h-8 w-8 items-center justify-center rounded-full font-sarabun text-label font-bold text-white ${isGreen ? "bg-[#01579b]" : "bg-[#053F5C]"}`}>
               2
@@ -690,13 +748,18 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
               <div ref={provinceWrapperRef} className="relative">
                 <input type="hidden" {...register("province")} />
                 <input
+                  ref={provinceInputRef}
                   type="text"
                   className={inputClass}
                   placeholder={t("fieldProvinceSearchPlaceholder")}
                   value={provinceQuery}
-                  onFocus={() => setProvinceDropdownOpen(true)}
+                  onFocus={() => {
+                    updateProvinceDropdownPosition();
+                    setProvinceDropdownOpen(true);
+                  }}
                   onChange={(event) => {
                     setProvinceQuery(event.target.value);
+                    updateProvinceDropdownPosition();
                     setProvinceDropdownOpen(true);
                   }}
                 />
@@ -710,27 +773,34 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
                     <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></svg>
                   </button>
                 ) : null}
-                {provinceDropdownOpen ? (
-                  <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-border-default bg-surface-card shadow-level-2">
-                    <button
-                      type="button"
-                      onClick={() => handleSelectProvince(ALL_PROVINCES_VALUE)}
-                      className="block w-full px-4 py-2.5 text-left font-sarabun text-label text-text-primary hover:bg-surface-container"
-                    >
-                      {isThai ? t("provinceAllLabelTh") : t("provinceAllLabelEn")}
-                    </button>
-                    {filteredProvinceOptions.map((province) => (
-                      <button
-                        key={province.value}
-                        type="button"
-                        onClick={() => handleSelectProvince(province.value)}
-                        className="block w-full px-4 py-2.5 text-left font-sarabun text-label text-text-primary hover:bg-surface-container"
+                {provinceDropdownOpen && typeof document !== "undefined"
+                  ? createPortal(
+                      <div
+                        ref={provinceDropdownRef}
+                        className="max-h-60 overflow-y-auto rounded-xl border border-border-default bg-white shadow-level-2"
+                        style={provinceDropdownStyle}
                       >
-                        {province.label}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
+                        <button
+                          type="button"
+                          onClick={() => handleSelectProvince(ALL_PROVINCES_VALUE)}
+                          className="block w-full px-4 py-2.5 text-left font-sarabun text-label text-text-primary hover:bg-surface-container"
+                        >
+                          {isThai ? t("provinceAllLabelTh") : t("provinceAllLabelEn")}
+                        </button>
+                        {filteredProvinceOptions.map((province) => (
+                          <button
+                            key={province.value}
+                            type="button"
+                            onClick={() => handleSelectProvince(province.value)}
+                            className="block w-full px-4 py-2.5 text-left font-sarabun text-label text-text-primary hover:bg-surface-container"
+                          >
+                            {province.label}
+                          </button>
+                        ))}
+                      </div>,
+                      document.body
+                    )
+                  : null}
               </div>
             </div>
           </div>
@@ -752,14 +822,142 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
               <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
                 {t("fieldDataType")}
               </label>
-              <select className={inputClass} {...register("dataType")}>
-                <option value="">{t("fieldDataTypePlaceholder")}</option>
-                <option value="สถิติ">{t("dataTypeStatistic")}</option>
-                <option value="ระเบียน">{t("dataTypeRecord")}</option>
-                <option value="ภูมิสารสนเทศ">{t("dataTypeGeo")}</option>
-                <option value="หลายประเภท">{t("dataTypeMultiple")}</option>
-                <option value="อื่นๆ">{t("dataTypeOther")}</option>
-              </select>
+              <div ref={dataTypeWrapperRef} className="relative">
+                <input type="hidden" {...register("dataType")} />
+                <button
+                  type="button"
+                  onClick={() => { setDataTypeOpen((v) => !v); setDataTypeAdding(false); }}
+                  className={`${inputClass} flex cursor-pointer items-center justify-between pr-10 text-left`}
+                >
+                  <span className={watch("dataType") ? "text-text-primary" : "text-text-muted"}>
+                    {watch("dataType")
+                      ? [
+                          { value: "สถิติ", label: t("dataTypeStatistic") },
+                          { value: "ระเบียน", label: t("dataTypeRecord") },
+                          { value: "ภูมิสารสนเทศ", label: t("dataTypeGeo") },
+                          { value: "หลายประเภท", label: t("dataTypeMultiple") },
+                          { value: "อื่นๆ", label: t("dataTypeOther") },
+                          ...customDataTypes.map((ct) => ({ value: ct.name, label: ct.name })),
+                        ].find((o) => o.value === watch("dataType"))?.label ?? watch("dataType")
+                      : t("fieldDataTypePlaceholder")}
+                  </span>
+                  <svg className={`absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted transition-transform ${dataTypeOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" /></svg>
+                </button>
+                {dataTypeOpen && (
+                  <div className="absolute z-50 mt-1 max-h-72 w-full overflow-y-auto rounded-xl border border-border-default/60 bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                    {[
+                      { value: "", label: t("fieldDataTypePlaceholder") },
+                      { value: "สถิติ", label: t("dataTypeStatistic") },
+                      { value: "ระเบียน", label: t("dataTypeRecord") },
+                      { value: "ภูมิสารสนเทศ", label: t("dataTypeGeo") },
+                      { value: "หลายประเภท", label: t("dataTypeMultiple") },
+                      { value: "อื่นๆ", label: t("dataTypeOther") },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setValue("dataType", option.value, { shouldValidate: true, shouldDirty: true });
+                          setDataTypeOpen(false);
+                        }}
+                        className={`flex w-full items-center px-4 py-2.5 font-sarabun text-label transition-colors hover:bg-primary-light/50 ${
+                          watch("dataType") === option.value ? "font-semibold text-primary-dark" : "text-text-primary"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                    {customDataTypes.length > 0 && (
+                      <div className="border-t border-border-default/40 pt-1">
+                        {customDataTypes.map((ct) => (
+                          <div key={ct.id} className="flex items-center justify-between px-4 py-2.5 transition-colors hover:bg-primary-light/50">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setValue("dataType", ct.name, { shouldValidate: true, shouldDirty: true });
+                                setDataTypeOpen(false);
+                              }}
+                              className={`flex-1 text-left font-sarabun text-label ${
+                                watch("dataType") === ct.name ? "font-semibold text-primary-dark" : "text-text-primary"
+                              }`}
+                            >
+                              {ct.name}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteDataType.mutate(ct.id);
+                              }}
+                              className="ml-2 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-red-100 hover:text-red-500"
+                            >
+                              <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="border-t border-border-default/40 pt-1">
+                      {dataTypeAdding ? (
+                        <div className="flex items-center gap-2 px-4 py-2">
+                          <input
+                            type="text"
+                            autoFocus
+                            value={dataTypeNewName}
+                            onChange={(e) => setDataTypeNewName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && dataTypeNewName.trim()) {
+                                e.preventDefault();
+                                createDataType.mutate(dataTypeNewName.trim(), {
+                                  onSuccess: (data) => {
+                                    setValue("dataType", data.name, { shouldValidate: true, shouldDirty: true });
+                                    setDataTypeAdding(false);
+                                    setDataTypeNewName("");
+                                    setDataTypeOpen(false);
+                                  },
+                                });
+                              }
+                              if (e.key === "Escape") {
+                                setDataTypeAdding(false);
+                                setDataTypeNewName("");
+                              }
+                            }}
+                            placeholder={isThai ? "พิมพ์ชื่อประเภท..." : "Type name..."}
+                            className="flex-1 rounded-lg border border-border-default px-3 py-1.5 font-sarabun text-label outline-none focus:border-primary"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (dataTypeNewName.trim()) {
+                                createDataType.mutate(dataTypeNewName.trim(), {
+                                  onSuccess: (data) => {
+                                    setValue("dataType", data.name, { shouldValidate: true, shouldDirty: true });
+                                    setDataTypeAdding(false);
+                                    setDataTypeNewName("");
+                                    setDataTypeOpen(false);
+                                  },
+                                });
+                              }
+                            }}
+                            className="rounded-lg bg-primary px-3 py-1.5 font-sarabun text-label font-medium text-white transition-colors hover:bg-primary-dark"
+                          >
+                            {isThai ? "เพิ่ม" : "Add"}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setDataTypeAdding(true)}
+                          className="flex w-full items-center gap-2 px-4 py-2.5 font-sarabun text-label text-primary transition-colors hover:bg-primary-light/50"
+                        >
+                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+                          {isThai ? "เพิ่มประเภทใหม่" : "Add new type"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -810,13 +1008,51 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
                 <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
                   {t("fieldUpdateFrequencyUnit")}
                 </label>
-                <select className={inputClass} {...register("updateFrequencyUnit")}>
-                  <option value="">{t("fieldUpdateFrequencyUnitPlaceholder")}</option>
-                  <option value="วัน">{t("freqDay")}</option>
-                  <option value="สัปดาห์">{t("freqWeek")}</option>
-                  <option value="เดือน">{t("freqMonth")}</option>
-                  <option value="ปี">{t("freqYear")}</option>
-                </select>
+                <div ref={freqUnitWrapperRef} className="relative">
+                  <input type="hidden" {...register("updateFrequencyUnit")} />
+                  <button
+                    type="button"
+                    onClick={() => setFreqUnitOpen((v) => !v)}
+                    className={`${inputClass} flex cursor-pointer items-center justify-between pr-10 text-left`}
+                  >
+                    <span className={watch("updateFrequencyUnit") ? "text-text-primary" : "text-text-muted"}>
+                      {watch("updateFrequencyUnit")
+                        ? [
+                            { value: "วัน", label: t("freqDay") },
+                            { value: "สัปดาห์", label: t("freqWeek") },
+                            { value: "เดือน", label: t("freqMonth") },
+                            { value: "ปี", label: t("freqYear") },
+                          ].find((o) => o.value === watch("updateFrequencyUnit"))?.label ?? watch("updateFrequencyUnit")
+                        : t("fieldUpdateFrequencyUnitPlaceholder")}
+                    </span>
+                    <svg className={`absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted transition-transform ${freqUnitOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" /></svg>
+                  </button>
+                  {freqUnitOpen && (
+                    <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-border-default/60 bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                      {[
+                        { value: "", label: t("fieldUpdateFrequencyUnitPlaceholder") },
+                        { value: "วัน", label: t("freqDay") },
+                        { value: "สัปดาห์", label: t("freqWeek") },
+                        { value: "เดือน", label: t("freqMonth") },
+                        { value: "ปี", label: t("freqYear") },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => {
+                            setValue("updateFrequencyUnit", option.value, { shouldValidate: true, shouldDirty: true });
+                            setFreqUnitOpen(false);
+                          }}
+                          className={`flex w-full items-center px-4 py-2.5 font-sarabun text-label transition-colors hover:bg-primary-light/50 ${
+                            watch("updateFrequencyUnit") === option.value ? "font-semibold text-primary-dark" : "text-text-primary"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
@@ -868,7 +1104,7 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
         )}
 
         {/* Image upload (optional) */}
-        <section className={`rounded-2xl border ${isGreen ? "border-[#0277bd]/8" : "border-[#0081A7]/8"} bg-white/95 p-6 shadow-xl shadow-black/5 backdrop-blur-sm`}>
+        <section className={`relative z-0 rounded-2xl border ${isGreen ? "border-[#0277bd]/8" : "border-[#0081A7]/8"} bg-white/95 p-6 shadow-xl shadow-black/5 backdrop-blur-sm`}>
           <h3 className={`mb-4 flex items-center gap-2 font-kanit text-heading-3-mobile font-bold ${isGreen ? "text-[#01579b]" : "text-[#053F5C]"}`}>
             <svg className={`h-5 w-5 ${isGreen ? "text-[#0277bd]" : "text-[#0081A7]"}`} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />

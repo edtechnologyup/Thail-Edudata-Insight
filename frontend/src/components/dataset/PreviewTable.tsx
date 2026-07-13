@@ -66,9 +66,9 @@ export default function PreviewTable({ columns, rows }: PreviewTableProps) {
         </button>
       </div>
 
-      <div className="overflow-auto rounded-2xl border border-border-default/60 shadow-level-1">
+      <div className="overflow-auto rounded-2xl border border-border-default/60 shadow-level-1" style={fullscreen ? undefined : { maxHeight: 420 }}>
         <table className="w-full min-w-[640px] border-collapse text-left">
-          <thead>
+          <thead className="sticky top-0 z-10">
             <tr style={{ backgroundColor: "#eef0f3" }}>
               {columns.map((col) => {
                 const label = locale === "th" ? col.labelTh : col.labelEn;
@@ -76,6 +76,7 @@ export default function PreviewTable({ columns, rows }: PreviewTableProps) {
                   <th
                     key={col.key}
                     className="whitespace-nowrap px-5 py-3.5 font-sarabun text-label font-normal text-text-primary"
+                    style={{ backgroundColor: "#eef0f3" }}
                   >
                     <span className="inline-flex items-center gap-1">
                       {label}

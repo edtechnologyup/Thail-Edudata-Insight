@@ -170,9 +170,9 @@ function MetadataTooltip({ text }: { text: string }) {
         </svg>
       </button>
       {show && (
-        <span className="absolute bottom-full left-1/2 z-30 mb-2 w-64 -translate-x-1/2 rounded-lg bg-[#1565c0] px-3 py-2 font-sarabun text-caption text-white shadow-lg">
+        <span className="absolute bottom-full left-0 z-30 mb-2 w-64 rounded-lg bg-[#1565c0] px-3 py-2 font-sarabun text-caption text-white shadow-lg">
           {text}
-          <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-[#1565c0]" />
+          <span className="absolute left-3 top-full border-4 border-transparent border-t-[#1565c0]" />
         </span>
       )}
     </span>
@@ -182,41 +182,63 @@ function MetadataTooltip({ text }: { text: string }) {
 function MetadataStandardTable({
   metadata,
   locale,
+  detail,
+  publishedDateLabel,
+  isUpdated,
 }: {
   metadata?: Record<string, unknown> | null;
   locale: string;
+  detail: DatasetDetailView;
+  publishedDateLabel: string;
+  isUpdated: boolean;
 }) {
-  if (!metadata) return null;
-
+  const t = useTranslations("dataset");
   const isTh = locale === "th";
-  const rows = METADATA_FIELDS.map((field) => {
-    let value: string | null = null;
-    if (field.key === "update_frequency") {
-      const unit = metadata.update_frequency_unit;
-      const val = metadata.update_frequency_value;
-      if (unit && val) {
-        value = isTh ? `ทุก ${val} ${unit}` : `Every ${val} ${unit}`;
-      } else if (unit) {
-        value = String(unit);
-      }
-    } else {
-      const raw = metadata[field.key];
-      if (raw !== undefined && raw !== null && raw !== "") {
-        value = String(raw);
-      }
-    }
-    return { ...field, value };
-  }).filter((r) => r.value !== null);
 
-  if (rows.length === 0) return null;
+  const updatedDateLabel = isUpdated
+    ? new Date(detail.updatedAt).toLocaleDateString(
+        isTh ? "th-TH" : "en-US",
+        { year: "numeric", month: "long", day: "numeric" }
+      )
+    : publishedDateLabel;
+
+  const basicRows = [
+    { key: "category", label: isTh ? "หมวดหมู่" : "Category", value: `${detail.categoryLabel}${detail.subcategoryLabel ? ` › ${detail.subcategoryLabel}` : ""}`, tooltipTh: "หมวดหมู่หลักและหมวดหมู่ย่อยของชุดข้อมูล", tooltipEn: "Main category and sub-category of this dataset" },
+    { key: "year", label: isTh ? "ปีข้อมูล" : "Data year", value: detail.yearLabel ?? "—", tooltipTh: "ปี พ.ศ. ที่ข้อมูลอ้างอิง", tooltipEn: "Reference year of this dataset (Buddhist Era)" },
+    { key: "province", label: isTh ? "จังหวัด" : "Province", value: detail.province ?? (isTh ? "ทั่วประเทศ" : "Nationwide"), tooltipTh: "จังหวัดหรือพื้นที่ที่ข้อมูลครอบคลุม", tooltipEn: "Province or area covered by this dataset" },
+    { key: "license", label: isTh ? "สัญญาอนุญาต" : "License", value: detail.license === "open" ? "Open Data Commons" : licenseLabel(detail.license, t), tooltipTh: "ประเภทสัญญาอนุญาตการใช้ข้อมูล", tooltipEn: "License type for using this dataset" },
+    { key: "published", label: isTh ? "วันที่เผยแพร่" : "Published", value: publishedDateLabel, tooltipTh: "วันที่เผยแพร่ชุดข้อมูลครั้งแรก", tooltipEn: "Date this dataset was first published" },
+    { key: "updated", label: isTh ? "อัปเดตล่าสุด" : "Last updated", value: updatedDateLabel, tooltipTh: "วันที่มีการปรับปรุงข้อมูลครั้งล่าสุด", tooltipEn: "Date of the most recent update" },
+  ];
+
+  const standardRows = metadata
+    ? METADATA_FIELDS.map((field) => {
+        let value: string | null = null;
+        if (field.key === "update_frequency") {
+          const unit = metadata.update_frequency_unit;
+          const val = metadata.update_frequency_value;
+          if (unit && val) {
+            value = isTh ? `ทุก ${val} ${unit}` : `Every ${val} ${unit}`;
+          } else if (unit) {
+            value = String(unit);
+          }
+        } else {
+          const raw = metadata[field.key];
+          if (raw !== undefined && raw !== null && raw !== "") {
+            value = String(raw);
+          }
+        }
+        return { ...field, value };
+      }).filter((r) => r.value !== null)
+    : [];
 
   return (
     <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
       <h3 className="mb-4 flex items-center gap-2 font-kanit text-body-md font-bold text-primary">
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        {isTh ? "ข้อมูลเพิ่มเติม" : "Additional information"}
+        {isTh ? "ข้อมูลเมทาดาตา" : "Metadata"}
       </h3>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
@@ -231,7 +253,18 @@ function MetadataStandardTable({
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {basicRows.map((row) => (
+              <tr key={row.key} className="transition-colors hover:bg-surface-container/50">
+                <td className="border border-border-default/60 px-4 py-2.5 font-sarabun text-label text-text-primary">
+                  {row.label}
+                  <MetadataTooltip text={isTh ? row.tooltipTh : row.tooltipEn} />
+                </td>
+                <td className="border border-border-default/60 px-4 py-2.5 font-sarabun text-label text-text-secondary" suppressHydrationWarning>
+                  {row.value}
+                </td>
+              </tr>
+            ))}
+            {standardRows.map((row) => (
               <tr key={row.key} className="transition-colors hover:bg-surface-container/50">
                 <td className="border border-border-default/60 px-4 py-2.5 font-sarabun text-label text-text-primary">
                   {isTh ? row.labelTh : row.labelEn}
@@ -419,110 +452,22 @@ export default function DatasetDetail({
                 {detail.description}
               </p>
 
-              <div className="flex flex-wrap gap-3">
-                {availableFormats.map((fmt) => (
-                  <FileFormatBadge key={fmt} format={fmt} />
-                ))}
-              </div>
             </div>
 
-            <MetadataStandardTable metadata={metadata} locale={locale} />
+            <MetadataStandardTable
+              metadata={metadata}
+              locale={locale}
+              detail={detail}
+              publishedDateLabel={publishedDateLabel}
+              isUpdated={isUpdated}
+            />
 
-            {files && files.length > 0 && (
-              <DataDictionaryTable datasetId={datasetId} files={files} />
-            )}
-
-            <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
-              {hasMultipleFiles && files && (
-                <div className="mb-4">
-                  <h3 className="mb-3 flex items-center gap-2 font-kanit text-body-md font-bold text-primary">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    {locale === "th" ? `ไฟล์ทั้งหมด (${files.length})` : `All files (${files.length})`}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {files.map((file) => {
-                      const isActive = selectedFileId === file.id || (!selectedFileId && file.id === files[0].id);
-                      const colors = FORMAT_ICON_COLORS[file.file_format] ?? { bg: "#f5f5f5", text: "#616161" };
-                      return (
-                        <button
-                          key={file.id}
-                          type="button"
-                          onClick={() => setSelectedFileId(file.id)}
-                          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left transition-all ${
-                            isActive
-                              ? "border-primary bg-primary-light/40 shadow-sm"
-                              : "border-border-default hover:border-primary/50 hover:bg-surface-container"
-                          }`}
-                        >
-                          <span
-                            className="rounded px-1.5 py-0.5 text-[11px] font-bold uppercase"
-                            style={{ backgroundColor: colors.bg, color: colors.text }}
-                          >
-                            {file.file_format}
-                          </span>
-                          <span className="font-sarabun text-caption text-text-primary">{file.file_name}</span>
-                          <span className="font-sarabun text-caption text-text-muted">
-                            ({(file.file_size / 1024).toFixed(0)} KB)
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <hr className="mt-4 border-border-default/60" />
-                </div>
-              )}
-
-              {previewQuery.isLoading && (
-                <div className="animate-pulse">
-                  <div className="mb-4 h-6 w-48 rounded bg-surface-container" />
-                  <div className="space-y-2">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="h-8 rounded bg-surface-container" />
-                    ))}
-                  </div>
-                </div>
-              )}
-              {previewQuery.isError && (
-                <p className="font-sarabun text-body-md text-status-error" role="alert">
-                  {previewQuery.error?.message ?? tDetail("previewLoadError")}
-                </p>
-              )}
-              {previewQuery.isSuccess && (
-                <PreviewTable columns={previewTable.columns} rows={previewTable.rows} />
-              )}
-            </div>
           </div>
 
-          {/* Right: Metadata + Tags + API Button */}
+          {/* Right: Stats + Tags + Citation */}
           <div className="flex flex-col gap-6">
             <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
-              <h3 className="mb-4 flex items-center gap-2 font-kanit text-body-md font-bold text-primary">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {locale === "th" ? "ข้อมูลเมทาดาตา" : "Metadata"}
-              </h3>
-
               <div className="flex flex-col gap-4 font-sarabun">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-caption text-text-muted">{locale === "th" ? "หมวดหมู่" : "Category"}</span>
-                  <span className="text-label font-medium text-text-primary">
-                    {detail.categoryLabel}
-                    {detail.subcategoryLabel ? ` › ${detail.subcategoryLabel}` : ""}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-caption text-text-muted">{locale === "th" ? "ปีข้อมูล" : "Data year"}</span>
-                  <span className="text-label font-medium text-text-primary">{detail.yearLabel ?? "—"}</span>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-caption text-text-muted">{locale === "th" ? "จังหวัด" : "Province"}</span>
-                  <span className="text-label font-medium text-text-primary">
-                    {detail.province ?? (locale === "th" ? "ทั่วประเทศ" : "Nationwide")}
-                  </span>
-                </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-caption text-text-muted">{locale === "th" ? "รูปแบบไฟล์" : "File formats"}</span>
                   <div className="flex flex-wrap gap-1.5">
@@ -541,29 +486,6 @@ export default function DatasetDetail({
                   </div>
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-caption text-text-muted">{locale === "th" ? "สัญญาอนุญาต" : "License"}</span>
-                  <span className="text-label font-medium text-text-primary">
-                    {detail.license === "open"
-                      ? "Open Data Commons"
-                      : licenseLabel(detail.license, t)}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-caption text-text-muted">{locale === "th" ? "วันที่เผยแพร่" : "Published"}</span>
-                  <span className="text-label font-medium text-text-primary" suppressHydrationWarning>{publishedDateLabel}</span>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-caption text-text-muted">{locale === "th" ? "อัปเดตล่าสุด" : "Last updated"}</span>
-                  <span className="text-label font-medium text-text-primary" suppressHydrationWarning>
-                    {isUpdated
-                      ? new Date(detail.updatedAt).toLocaleDateString(
-                          locale === "th" ? "th-TH" : "en-US",
-                          { year: "numeric", month: "long", day: "numeric" }
-                        )
-                      : publishedDateLabel}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-0.5">
                   <span className="text-caption text-text-muted">{locale === "th" ? "คะแนนคุณภาพ" : "Quality score"}</span>
                   <span className="text-label font-medium text-text-primary">{detail.qualityScore}/100</span>
                   <div className="mt-1 h-1.5 w-full rounded-full bg-gray-200">
@@ -573,9 +495,7 @@ export default function DatasetDetail({
                     />
                   </div>
                 </div>
-
                 <hr className="border-border-default/60" />
-
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-caption text-text-muted">{locale === "th" ? "จำนวนดาวน์โหลด" : "Downloads"}</span>
@@ -613,6 +533,75 @@ export default function DatasetDetail({
                 }
               />
             </div>
+          </div>
+        </div>
+
+        {/* Full-width: Data Dictionary + Preview */}
+        <div className="mx-auto flex max-w-container-max flex-col gap-6">
+          {files && files.length > 0 && (
+            <DataDictionaryTable datasetId={datasetId} files={files} />
+          )}
+
+          <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
+            {hasMultipleFiles && files && (
+              <div className="mb-4">
+                <h3 className="mb-3 flex items-center gap-2 font-kanit text-body-md font-bold text-primary">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  {locale === "th" ? `ไฟล์ทั้งหมด (${files.length})` : `All files (${files.length})`}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {files.map((file) => {
+                    const isActive = selectedFileId === file.id || (!selectedFileId && file.id === files[0].id);
+                    const colors = FORMAT_ICON_COLORS[file.file_format] ?? { bg: "#f5f5f5", text: "#616161" };
+                    return (
+                      <button
+                        key={file.id}
+                        type="button"
+                        onClick={() => setSelectedFileId(file.id)}
+                        className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left transition-all ${
+                          isActive
+                            ? "border-primary bg-primary-light/40 shadow-sm"
+                            : "border-border-default hover:border-primary/50 hover:bg-surface-container"
+                        }`}
+                      >
+                        <span
+                          className="rounded px-1.5 py-0.5 text-[11px] font-bold uppercase"
+                          style={{ backgroundColor: colors.bg, color: colors.text }}
+                        >
+                          {file.file_format}
+                        </span>
+                        <span className="font-sarabun text-caption text-text-primary">{file.file_name}</span>
+                        <span className="font-sarabun text-caption text-text-muted">
+                          ({(file.file_size / 1024).toFixed(0)} KB)
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <hr className="mt-4 border-border-default/60" />
+              </div>
+            )}
+
+            {previewQuery.isLoading && (
+              <div className="animate-pulse">
+                <div className="mb-4 h-6 w-48 rounded bg-surface-container" />
+                <div className="space-y-2">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="h-8 rounded bg-surface-container" />
+                  ))}
+                </div>
+              </div>
+            )}
+            {previewQuery.isError && (
+              <p className="font-sarabun text-body-md text-status-error" role="alert">
+                {previewQuery.error?.message ?? tDetail("previewLoadError")}
+              </p>
+            )}
+            {previewQuery.isSuccess && (
+              <PreviewTable columns={previewTable.columns} rows={previewTable.rows} />
+            )}
           </div>
         </div>
       </section>

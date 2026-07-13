@@ -42,10 +42,10 @@ def main():
             return
 
         marker = json.loads(row[0])
-        demo_agency_ids = marker["demo_agency_ids"]
-        fake_user_ids = marker["fake_user_ids"]
+        demo_agency_ids = [uuid.UUID(x) for x in marker["demo_agency_ids"]]
+        fake_user_ids = [uuid.UUID(x) for x in marker["fake_user_ids"]]
         pending_emails = marker["pending_emails"]
-        dataset_ids = marker["dataset_ids"]
+        dataset_ids = [uuid.UUID(x) for x in marker["dataset_ids"]]
         all_demo_user_ids = demo_agency_ids + fake_user_ids
 
         print(f"📋 Marker พบ: {len(dataset_ids)} datasets, {len(demo_agency_ids)} agencies, {len(fake_user_ids)} visitors")
@@ -67,6 +67,12 @@ def main():
             "DELETE FROM dataset_tags WHERE dataset_id = ANY(:ids)"
         ), {"ids": dataset_ids})
         print(f"  ✓ dataset_tags: {r.rowcount}")
+
+        # ── 3.5 ลบ data_dictionaries ──
+        r = db.execute(text(
+            "DELETE FROM data_dictionaries WHERE dataset_id = ANY(:ids)"
+        ), {"ids": dataset_ids})
+        print(f"  ✓ data_dictionaries: {r.rowcount}")
 
         # ── 4. ลบ dataset_files + MinIO ──
         files = db.execute(text(

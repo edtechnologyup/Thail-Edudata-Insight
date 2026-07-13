@@ -176,6 +176,54 @@ SCHOLARSHIPS = [
 
 PURPOSES = ["วิจัย", "การศึกษา", "วิเคราะห์ข้อมูล", "รายงาน", "ประกอบการตัดสินใจ", "วิทยานิพนธ์"]
 
+DATA_TYPES = ["สถิติ", "ระเบียน", "ภูมิสารสนเทศ", "หลายประเภท", "อื่นๆ"]
+
+CONTACT_UNITS = [
+    "กองสถิติการศึกษา", "กลุ่มวิจัยและพัฒนา", "ศูนย์เทคโนโลยีสารสนเทศ",
+    "กองนโยบายและแผน", "สำนักทดสอบทางการศึกษา", "กลุ่มงานข้อมูลสารสนเทศ",
+    "ฝ่ายวิเคราะห์ข้อมูล", "กองประเมินผลการจัดการศึกษา", "สำนักบริหารงานการศึกษาพิเศษ",
+    "กลุ่มพัฒนาระบบบริหาร",
+]
+
+CONTACT_EMAILS = [
+    "stat@edu.go.th", "data@obec.go.th", "info@niets.or.th",
+    "research@moe.go.th", "ict@moe.go.th", "plan@vec.go.th",
+    "stat@onec.go.th", "info@onesqa.or.th", "data@dpl.go.th",
+    "opendata@moe.go.th",
+]
+
+OBJECTIVES = [
+    "เพื่อวิเคราะห์สถานการณ์การศึกษาในแต่ละจังหวัด",
+    "เพื่อวางแผนจัดสรรงบประมาณด้านการศึกษา",
+    "เพื่อติดตามคุณภาพการจัดการศึกษาของสถานศึกษา",
+    "เพื่อเป็นข้อมูลประกอบการตัดสินใจเชิงนโยบาย",
+    "เพื่อรายงานผลการดำเนินงานประจำปี",
+    "เพื่อเผยแพร่ข้อมูลสาธารณะตาม พ.ร.บ. ข้อมูลข่าวสาร",
+    "เพื่อสนับสนุนงานวิจัยและพัฒนาการศึกษา",
+    "เพื่อเปรียบเทียบผลสัมฤทธิ์ทางการเรียนระหว่างพื้นที่",
+]
+
+FREQ_UNITS = ["ปี", "ภาคเรียน", "เดือน"]
+FREQ_VALUES = [1, 1, 2, 6]
+
+GEO_SCOPES = [
+    "ระดับจังหวัด", "ระดับประเทศ", "ระดับภูมิภาค", "ระดับอำเภอ",
+    "ระดับสถานศึกษา", "ระดับเขตพื้นที่การศึกษา",
+]
+
+DATA_SOURCES = [
+    "สำนักงานคณะกรรมการการศึกษาขั้นพื้นฐาน (สพฐ.)",
+    "สถาบันทดสอบทางการศึกษาแห่งชาติ (สทศ.)",
+    "สำนักงานเลขาธิการสภาการศึกษา (สกศ.)",
+    "สำนักงานปลัดกระทรวงศึกษาธิการ",
+    "สำนักงานคณะกรรมการการอาชีวศึกษา (สอศ.)",
+    "กรมส่งเสริมการเรียนรู้",
+    "สำนักงานรับรองมาตรฐานฯ (สมศ.)",
+    "สำนักงบประมาณ",
+    "สำนักงานสถิติแห่งชาติ",
+    "ระบบสารสนเทศเพื่อการบริหารการศึกษา (EMIS)",
+]
+
 # ---------------------------------------------------------------------------
 
 
@@ -463,7 +511,18 @@ def main():
                 "id": str(ds_id), "uid": owner_id, "cid": cat_id,
                 "title": title, "desc": desc, "status": status,
                 "lic": random.choice(LICENSES),
-                "meta": json.dumps({"year_start": by, "province": random.choice(PROVINCES)}),
+                "meta": json.dumps({
+                    "year_start": by,
+                    "province": random.choice(PROVINCES),
+                    "data_type": random.choice(DATA_TYPES),
+                    "contact_unit": random.choice(CONTACT_UNITS),
+                    "contact_email": random.choice(CONTACT_EMAILS),
+                    "objective": random.choice(OBJECTIVES),
+                    "update_frequency_unit": random.choice(FREQ_UNITS),
+                    "update_frequency_value": random.choice(FREQ_VALUES),
+                    "geographic_scope": random.choice(GEO_SCOPES),
+                    "data_source": random.choice(DATA_SOURCES),
+                }),
                 "qs": quality, "dl": dl_count, "api_dl": api_dl_count, "vc": view_count,
                 "pub": pub_date if status == "published" else None,
                 "ts": pub_date if status == "published" else now,
@@ -478,6 +537,33 @@ def main():
                 "fname": f"{title[:60]}{ext}", "fpath": file_path,
                 "fsize": len(file_bytes), "fmt": fmt, "ts": pub_date or now,
             })
+
+            # Data Dictionary สำหรับไฟล์หลัก
+            if fmt == "json":
+                dd_columns = [
+                    ("id", "รหัสลำดับข้อมูล", "number", "1, 2, 3"),
+                    ("province", "ชื่อจังหวัด", "text", "กรุงเทพฯ, เชียงใหม่"),
+                    ("value", "ค่าตัวเลข (จำนวน)", "number", "1523, 845200"),
+                    ("year", "ปีการศึกษา (พ.ศ.)", "number", "2567, 2568"),
+                    ("note", "หมายเหตุ", "text", title[:30]),
+                ]
+            else:
+                dd_columns = [
+                    ("ลำดับ", "รหัสลำดับข้อมูล", "number", "1, 2, 3"),
+                    ("จังหวัด", "ชื่อจังหวัด", "text", "กรุงเทพฯ, เชียงใหม่"),
+                    ("จำนวน", "ค่าตัวเลข (จำนวน)", "number", "1523, 845200"),
+                    ("ปี_พศ", "ปีการศึกษา (พ.ศ.)", "number", "2567, 2568"),
+                    ("หมายเหตุ", "หมายเหตุ", "text", title[:30]),
+                ]
+            for col_idx, (col_name, col_desc, col_type, col_sample) in enumerate(dd_columns):
+                db.execute(text("""
+                    INSERT INTO data_dictionaries (id, dataset_id, file_id, column_name, description, data_type, sample_value, column_order, created_at, updated_at)
+                    VALUES (:id, :did, :fid, :cname, :cdesc, :ctype, :csample, :corder, :ts, :ts)
+                """), {
+                    "id": str(uuid.uuid4()), "did": str(ds_id), "fid": str(file_id),
+                    "cname": col_name, "cdesc": col_desc, "ctype": col_type,
+                    "csample": col_sample, "corder": col_idx, "ts": pub_date or now,
+                })
 
             # บาง dataset ให้มี 2 ไฟล์
             if random.random() < 0.2 and status == "published":
@@ -496,6 +582,32 @@ def main():
                     "fname": f"{title[:60]}{f2_ext}", "fpath": f2_path,
                     "fsize": len(f2_bytes), "fmt": f2_fmt, "ts": pub_date,
                 })
+                # Data Dictionary สำหรับไฟล์ที่ 2
+                if f2_fmt == "json":
+                    dd2_cols = [
+                        ("id", "รหัสลำดับข้อมูล", "number", "1, 2, 3"),
+                        ("province", "ชื่อจังหวัด", "text", "กรุงเทพฯ, เชียงใหม่"),
+                        ("value", "ค่าตัวเลข (จำนวน)", "number", "1523, 845200"),
+                        ("year", "ปีการศึกษา (พ.ศ.)", "number", "2567, 2568"),
+                        ("note", "หมายเหตุ", "text", title[:30]),
+                    ]
+                else:
+                    dd2_cols = [
+                        ("ลำดับ", "รหัสลำดับข้อมูล", "number", "1, 2, 3"),
+                        ("จังหวัด", "ชื่อจังหวัด", "text", "กรุงเทพฯ, เชียงใหม่"),
+                        ("จำนวน", "ค่าตัวเลข (จำนวน)", "number", "1523, 845200"),
+                        ("ปี_พศ", "ปีการศึกษา (พ.ศ.)", "number", "2567, 2568"),
+                        ("หมายเหตุ", "หมายเหตุ", "text", title[:30]),
+                    ]
+                for ci, (cn, cd, ct, cs) in enumerate(dd2_cols):
+                    db.execute(text("""
+                        INSERT INTO data_dictionaries (id, dataset_id, file_id, column_name, description, data_type, sample_value, column_order, created_at, updated_at)
+                        VALUES (:id, :did, :fid, :cname, :cdesc, :ctype, :csample, :corder, :ts, :ts)
+                    """), {
+                        "id": str(uuid.uuid4()), "did": str(ds_id), "fid": str(f2_id),
+                        "cname": cn, "cdesc": cd, "ctype": ct,
+                        "csample": cs, "corder": ci, "ts": pub_date,
+                    })
 
             # Tags (2-4 per dataset)
             chosen_tags = random.sample(tag_ids, min(random.randint(2, 4), len(tag_ids)))

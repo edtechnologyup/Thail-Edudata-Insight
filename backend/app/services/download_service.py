@@ -114,7 +114,7 @@ def _get_source_format(
         stored = dataset_repo.get_latest_dataset_file_format(db, dataset_id)
     if stored:
         fmt = stored.strip().lower()
-        if fmt in {"csv", "excel", "json", "pdf", "sql"}:
+        if fmt in {"csv", "excel", "json", "pdf", "sql", "xml"}:
             return fmt
     return _infer_source_format_from_path(file_path)
 
@@ -329,14 +329,14 @@ def preview(
             masked_columns=[],
             file_type="sql",
         )
-    elif source_format == "pdf":
+    elif source_format in ("pdf", "xml"):
         response = PreviewResponse(
             rows=[],
             total_rows=0,
             columns=[],
             masked_columns=[],
-            file_type="pdf",
-            preview_note="PDF preview is not available. Please download the file.",
+            file_type=source_format,
+            preview_note=f"{source_format.upper()} preview is not available. Please download the file.",
         )
     else:
         df = _read_dataframe(content, source_format)

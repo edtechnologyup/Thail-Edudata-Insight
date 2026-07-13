@@ -13,6 +13,7 @@ type ApiDataset = {
   tags?: string[];
   tag_names?: string[];
   file_info?: { file_name: string; file_size: number; file_format: string } | null;
+  files?: Array<{ id: string; file_name: string; file_size: number; file_format: string }>;
   image_url?: string | null;
   status: string;
 };
@@ -150,6 +151,7 @@ export async function fetchDatasetFormInitial(
       province:
         typeof meta.province === "string" ? meta.province : "all",
       fileInfo: ds.file_info ?? undefined,
+      files: ds.files ?? [],
       image_url: ds.image_url ?? null,
       dataType: typeof meta.data_type === "string" ? meta.data_type : undefined,
       contactUnit: typeof meta.contact_unit === "string" ? meta.contact_unit : undefined,

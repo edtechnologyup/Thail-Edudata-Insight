@@ -25,6 +25,7 @@ import apiClient from "@/services/api";
 import { useAuthStore } from "@/stores/useAuthStore";
 import type { PIIFinding, PIIScanResult } from "@/types/pii";
 import { fetchDatasetFormInitial } from "@/utils/datasetFormApi";
+import DataDictionaryEditor from "@/components/dataset/DataDictionaryEditor";
 
 type DatasetFormProps = {
   mode: "create" | "edit";
@@ -856,6 +857,15 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
             </div>
           </div>
         </section>
+
+        {/* Step 4 — Data Dictionary (edit mode only) */}
+        {mode === "edit" && datasetId && initialData?.files && initialData.files.length > 0 && (
+          <DataDictionaryEditor
+            datasetId={datasetId}
+            files={initialData.files}
+            theme={theme}
+          />
+        )}
 
         {/* Image upload (optional) */}
         <section className={`rounded-2xl border ${isGreen ? "border-[#0277bd]/8" : "border-[#0081A7]/8"} bg-white/95 p-6 shadow-xl shadow-black/5 backdrop-blur-sm`}>

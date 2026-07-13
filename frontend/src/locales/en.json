@@ -793,7 +793,10 @@
       "apiAccess": "API Access",
       "quote": "Citation",
       "openDataCommon": "Open Data Common",
-      "loadError": "Could not load dataset details. Please try again."
+      "loadError": "Could not load dataset details. Please try again.",
+      "dataDictionary": "Data Dictionary",
+      "ddNotFilled": "— not filled —",
+      "ddOtherFiles": "Other files:"
     },
     "download": {
       "title": "Select file format and purpose",
@@ -1161,7 +1164,30 @@
       "fieldGeographicScope": "Geographic scope",
       "fieldGeographicScopePlaceholder": "e.g. Nationwide, Northern region, Bangkok",
       "fieldDataSource": "Data source",
-      "fieldDataSourcePlaceholder": "Method/project/activity that produced this dataset"
+      "fieldDataSourcePlaceholder": "Method/project/activity that produced this dataset",
+      "ddSection": "Data Dictionary",
+      "ddOptional": "optional",
+      "ddAutoDetect": "Auto-detect columns",
+      "ddAutoDetectHint": "Read file and fill column names + samples",
+      "ddAutoDetecting": "Reading file...",
+      "ddColOrder": "#",
+      "ddColName": "Column name",
+      "ddColSample": "Sample data",
+      "ddColDescription": "Description",
+      "ddColType": "Type",
+      "ddDescPlaceholder": "Enter description...",
+      "ddTypePlaceholder": "Select",
+      "ddTypeText": "text",
+      "ddTypeNumber": "number",
+      "ddTypeDate": "date",
+      "ddTypeBoolean": "boolean",
+      "ddTypeOther": "other",
+      "ddSave": "Save Data Dictionary",
+      "ddSaving": "Saving...",
+      "ddSaveSuccess": "Data Dictionary saved",
+      "ddNoFile": "Please select a file first",
+      "ddNoColumns": "No columns yet — click auto-detect",
+      "ddUnsupported": "This file type does not support Data Dictionary"
     },
     "bulk": {
       "title": "Bulk upload",

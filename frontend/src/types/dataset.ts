@@ -109,6 +109,7 @@ export type AgencyDatasetFormInitial = {
   yearEnd?: number;
   province?: string;
   fileInfo?: { file_name: string; file_size: number; file_format: string };
+  files?: Array<{ id: string; file_name: string; file_size: number; file_format: string }>;
   image_url?: string | null;
   dataType?: string;
   contactUnit?: string;

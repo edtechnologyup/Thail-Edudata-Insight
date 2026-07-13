@@ -796,7 +796,10 @@
       "apiAccess": "API Access",
       "quote": "อ้างอิง",
       "openDataCommon": "Open Data Common",
-      "loadError": "โหลดข้อมูล Dataset ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"
+      "loadError": "โหลดข้อมูล Dataset ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
+      "dataDictionary": "Data Dictionary",
+      "ddNotFilled": "— ยังไม่ได้กรอก —",
+      "ddOtherFiles": "ไฟล์อื่น:"
     },
     "download": {
       "title": "เลือกรูปแบบไฟล์และวัตถุประสงค์",
@@ -1164,7 +1167,30 @@
       "fieldGeographicScope": "ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่",
       "fieldGeographicScopePlaceholder": "เช่น ทั่วประเทศ, ภาคเหนือ, กรุงเทพมหานคร",
       "fieldDataSource": "แหล่งที่มา",
-      "fieldDataSourcePlaceholder": "วิธีการ/โครงการ/กิจกรรมที่เป็นที่มาของชุดข้อมูล"
+      "fieldDataSourcePlaceholder": "วิธีการ/โครงการ/กิจกรรมที่เป็นที่มาของชุดข้อมูล",
+      "ddSection": "Data Dictionary",
+      "ddOptional": "ไม่บังคับ",
+      "ddAutoDetect": "ตรวจจับ column อัตโนมัติ",
+      "ddAutoDetectHint": "อ่านจากไฟล์แล้วเติมชื่อ column + ตัวอย่างให้",
+      "ddAutoDetecting": "กำลังอ่านไฟล์...",
+      "ddColOrder": "#",
+      "ddColName": "ชื่อ column",
+      "ddColSample": "ตัวอย่างข้อมูล",
+      "ddColDescription": "คำอธิบาย",
+      "ddColType": "ประเภท",
+      "ddDescPlaceholder": "กรอกคำอธิบาย...",
+      "ddTypePlaceholder": "เลือก",
+      "ddTypeText": "text",
+      "ddTypeNumber": "number",
+      "ddTypeDate": "date",
+      "ddTypeBoolean": "boolean",
+      "ddTypeOther": "อื่นๆ",
+      "ddSave": "บันทึก Data Dictionary",
+      "ddSaving": "กำลังบันทึก...",
+      "ddSaveSuccess": "บันทึก Data Dictionary สำเร็จ",
+      "ddNoFile": "กรุณาเลือกไฟล์ก่อน",
+      "ddNoColumns": "ยังไม่มีข้อมูล column — กดปุ่มตรวจจับอัตโนมัติ",
+      "ddUnsupported": "ไฟล์ประเภทนี้ไม่รองรับ Data Dictionary"
     },
     "bulk": {
       "title": "Bulk Upload",

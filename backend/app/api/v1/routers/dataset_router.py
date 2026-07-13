@@ -25,6 +25,7 @@ from app.core.security import (
     validate_token_in_redis,
     validate_user_status,
 )
+from app.schemas.data_dictionary_schema import DataDictionaryPutRequest
 from app.schemas.dataset_schema import DatasetCreateRequest, DatasetUpdateRequest, RateRequest
 
 router = APIRouter()
@@ -584,3 +585,56 @@ def get_dataset_image(
             continue
 
     raise_app_error("FILE_NOT_FOUND", "ไม่พบรูปภาพ")
+
+
+# ── Data Dictionary ──────────────────────────────────────────────
+
+@router.get(
+    "/datasets/{dataset_id}/files/{file_id}/dictionary",
+    status_code=status.HTTP_200_OK,
+)
+def get_data_dictionary(
+    dataset_id: uuid.UUID,
+    file_id: uuid.UUID,
+    db: Session = Depends(get_db),
+):
+    """ดึง Data Dictionary ของไฟล์ — Auth ❌"""
+    import app.services.data_dictionary_service as dd_service
+
+    result = dd_service.get_dictionary(db, dataset_id, file_id)
+    return success_response(data=result.model_dump(mode="json"))
+
+
+@router.put(
+    "/datasets/{dataset_id}/files/{file_id}/dictionary",
+    status_code=status.HTTP_200_OK,
+)
+def save_data_dictionary(
+    dataset_id: uuid.UUID,
+    file_id: uuid.UUID,
+    body: DataDictionaryPutRequest,
+    payload: dict = Depends(require_roles("agency", "admin")),
+    db: Session = Depends(get_db),
+):
+    """บันทึก/อัปเดต Data Dictionary — Auth ✅ Agency/Admin"""
+    import app.services.data_dictionary_service as dd_service
+
+    result = dd_service.save_dictionary(db, dataset_id, file_id, body, payload)
+    return success_response(data=result.model_dump(mode="json"))
+
+
+@router.post(
+    "/datasets/{dataset_id}/files/{file_id}/dictionary/auto-detect",
+    status_code=status.HTTP_200_OK,
+)
+def auto_detect_dictionary(
+    dataset_id: uuid.UUID,
+    file_id: uuid.UUID,
+    payload: dict = Depends(require_roles("agency", "admin")),
+    db: Session = Depends(get_db),
+):
+    """อ่าน column จากไฟล์อัตโนมัติ + merge กับ dictionary เดิม — Auth ✅ Agency/Admin"""
+    import app.services.data_dictionary_service as dd_service
+
+    result = dd_service.auto_detect(db, _get_minio(), dataset_id, file_id, payload)
+    return success_response(data=result.model_dump(mode="json"))

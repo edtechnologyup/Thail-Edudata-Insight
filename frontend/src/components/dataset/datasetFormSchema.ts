@@ -12,6 +12,17 @@ export const datasetFormSchema = z.object({
     z.coerce.number().min(2500).max(2600).optional()
   ),
   province: z.string().optional(),
+  dataType: z.string().optional(),
+  contactUnit: z.string().max(150).optional(),
+  contactEmail: z.string().email().optional().or(z.literal("")),
+  objective: z.string().optional(),
+  updateFrequencyUnit: z.string().optional(),
+  updateFrequencyValue: z.preprocess(
+    (value) => (value === "" || value === null ? undefined : value),
+    z.coerce.number().min(1).optional()
+  ),
+  geographicScope: z.string().optional(),
+  dataSource: z.string().optional(),
 }).superRefine((values, ctx) => {
   if (
     values.yearEnd !== undefined &&

@@ -33,6 +33,7 @@ type DatasetDetailProps = {
   isPublished?: boolean;
   tagNames?: string[];
   files?: Array<{ id: string; file_name: string; file_size: number; file_format: string }>;
+  metadata?: Record<string, unknown> | null;
 };
 
 type DetailTab = "preview" | "citation";
@@ -91,6 +92,162 @@ function FileFormatBadge({ format }: { format: string }) {
   );
 }
 
+type MetadataField = {
+  key: string;
+  labelTh: string;
+  labelEn: string;
+  tooltipTh: string;
+  tooltipEn: string;
+};
+
+const METADATA_FIELDS: MetadataField[] = [
+  {
+    key: "data_type",
+    labelTh: "ประเภทชุดข้อมูล",
+    labelEn: "Data type",
+    tooltipTh: "ระบุประเภทข้อมูล เช่น ข้อมูลสถิติ ข้อมูลระเบียน ข้อมูลภูมิสารสนเทศ",
+    tooltipEn: "Type of dataset: statistical, record, geospatial, etc.",
+  },
+  {
+    key: "contact_unit",
+    labelTh: "ชื่อฝ่ายงานสำหรับติดต่อ",
+    labelEn: "Contact department",
+    tooltipTh: "ชื่อกอง สำนัก หรือฝ่ายที่รับผิดชอบข้อมูล (ไม่เกิน 150 ตัวอักษร)",
+    tooltipEn: "Department or division responsible for this dataset (max 150 chars)",
+  },
+  {
+    key: "contact_email",
+    labelTh: "อีเมลสำหรับติดต่อ",
+    labelEn: "Contact email",
+    tooltipTh: "อีเมลฝ่ายของหน่วยงาน สามารถใช้อีเมลหน่วยงาน ไม่จำเป็นต้องเป็นอีเมลส่วนตัว",
+    tooltipEn: "Organization email for inquiries about this dataset",
+  },
+  {
+    key: "objective",
+    labelTh: "วัตถุประสงค์",
+    labelEn: "Objective",
+    tooltipTh: "อธิบายวัตถุประสงค์ของการจัดทำชุดข้อมูล เช่น พันธกิจหน่วยงาน กฎหมาย ภารกิจ",
+    tooltipEn: "Purpose of this dataset: mission, legal requirement, etc.",
+  },
+  {
+    key: "update_frequency",
+    labelTh: "ความถี่การปรับปรุงข้อมูล",
+    labelEn: "Update frequency",
+    tooltipTh: "หน่วยความถี่ของการปรับปรุงข้อมูล เช่น ทุก 1 ปี",
+    tooltipEn: "How often this dataset is updated, e.g. every 1 year",
+  },
+  {
+    key: "geographic_scope",
+    labelTh: "ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่",
+    labelEn: "Geographic scope",
+    tooltipTh: "ขอบเขตพื้นที่ที่ข้อมูลครอบคลุม เช่น ทั่วประเทศ ภาคเหนือ",
+    tooltipEn: "Geographic area covered by this dataset",
+  },
+  {
+    key: "data_source",
+    labelTh: "แหล่งที่มา",
+    labelEn: "Data source",
+    tooltipTh: "วิธีการ/โครงการ/กิจกรรมที่เป็นที่มาของชุดข้อมูล",
+    tooltipEn: "Method, project, or activity that produced this dataset",
+  },
+];
+
+function MetadataTooltip({ text }: { text: string }) {
+  const [show, setShow] = useState(false);
+  return (
+    <span className="relative inline-flex">
+      <button
+        type="button"
+        className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        onClick={() => setShow((v) => !v)}
+        aria-label="info"
+      >
+        <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+        </svg>
+      </button>
+      {show && (
+        <span className="absolute bottom-full left-1/2 z-30 mb-2 w-64 -translate-x-1/2 rounded-lg bg-[#1565c0] px-3 py-2 font-sarabun text-caption text-white shadow-lg">
+          {text}
+          <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-[#1565c0]" />
+        </span>
+      )}
+    </span>
+  );
+}
+
+function MetadataStandardTable({
+  metadata,
+  locale,
+}: {
+  metadata?: Record<string, unknown> | null;
+  locale: string;
+}) {
+  if (!metadata) return null;
+
+  const isTh = locale === "th";
+  const rows = METADATA_FIELDS.map((field) => {
+    let value: string | null = null;
+    if (field.key === "update_frequency") {
+      const unit = metadata.update_frequency_unit;
+      const val = metadata.update_frequency_value;
+      if (unit && val) {
+        value = isTh ? `ทุก ${val} ${unit}` : `Every ${val} ${unit}`;
+      } else if (unit) {
+        value = String(unit);
+      }
+    } else {
+      const raw = metadata[field.key];
+      if (raw !== undefined && raw !== null && raw !== "") {
+        value = String(raw);
+      }
+    }
+    return { ...field, value };
+  }).filter((r) => r.value !== null);
+
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
+      <h3 className="mb-4 flex items-center gap-2 font-kanit text-body-md font-bold text-primary">
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        {isTh ? "ข้อมูลเพิ่มเติม" : "Additional information"}
+      </h3>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-primary/5">
+              <th className="border border-border-default/60 px-4 py-2.5 text-left font-kanit text-label font-bold text-primary">
+                {isTh ? "ฟิลด์" : "Field"}
+              </th>
+              <th className="border border-border-default/60 px-4 py-2.5 text-left font-kanit text-label font-bold text-primary">
+                {isTh ? "ค่า" : "Value"}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.key} className="transition-colors hover:bg-surface-container/50">
+                <td className="border border-border-default/60 px-4 py-2.5 font-sarabun text-label text-text-primary">
+                  {isTh ? row.labelTh : row.labelEn}
+                  <MetadataTooltip text={isTh ? row.tooltipTh : row.tooltipEn} />
+                </td>
+                <td className="border border-border-default/60 px-4 py-2.5 font-sarabun text-label text-text-secondary">
+                  {row.value}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export default function DatasetDetail({
   datasetId,
   detail,
@@ -106,6 +263,7 @@ export default function DatasetDetail({
   isPublished,
   tagNames,
   files,
+  metadata,
 }: DatasetDetailProps) {
   const t = useTranslations("dataset");
   const tDetail = useTranslations("dataset.detail");
@@ -266,6 +424,8 @@ export default function DatasetDetail({
                 ))}
               </div>
             </div>
+
+            <MetadataStandardTable metadata={metadata} locale={locale} />
 
             <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
               {hasMultipleFiles && files && (

@@ -110,6 +110,14 @@ export type AgencyDatasetFormInitial = {
   province?: string;
   fileInfo?: { file_name: string; file_size: number; file_format: string };
   image_url?: string | null;
+  dataType?: string;
+  contactUnit?: string;
+  contactEmail?: string;
+  objective?: string;
+  updateFrequencyUnit?: string;
+  updateFrequencyValue?: number;
+  geographicScope?: string;
+  dataSource?: string;
 };
 
 export type FileAnalysisResult = {

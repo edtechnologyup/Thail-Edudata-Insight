@@ -271,7 +271,12 @@ def _delete_from_minio(minio_client, object_name: str) -> None:
         )
 
 
-_SAFE_METADATA_KEYS = frozenset({"year", "year_start", "year_end", "province", "agency"})
+_SAFE_METADATA_KEYS = frozenset({
+    "year", "year_start", "year_end", "province", "agency",
+    "data_type", "contact_unit", "contact_email", "objective",
+    "update_frequency_unit", "update_frequency_value",
+    "geographic_scope", "data_source",
+})
 
 
 def _metadata_for_search(metadata: dict | None) -> dict | None:

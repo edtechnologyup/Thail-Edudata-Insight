@@ -17,6 +17,16 @@ type ApiDataset = {
   status: string;
 };
 
+const METADATA_STRING_KEYS = [
+  "data_type",
+  "contact_unit",
+  "contact_email",
+  "objective",
+  "update_frequency_unit",
+  "geographic_scope",
+  "data_source",
+] as const;
+
 function buildMetadata(formData: FormData): Record<string, unknown> | null {
   const meta: Record<string, unknown> = {};
   const yearStart = formData.get("year_start");
@@ -31,6 +41,12 @@ function buildMetadata(formData: FormData): Record<string, unknown> | null {
   if (province && province !== "all") {
     meta.province = String(province);
   }
+  for (const key of METADATA_STRING_KEYS) {
+    const val = formData.get(key);
+    if (val) meta[key] = String(val);
+  }
+  const freqVal = formData.get("update_frequency_value");
+  if (freqVal) meta.update_frequency_value = Number(freqVal);
   return Object.keys(meta).length > 0 ? meta : null;
 }
 
@@ -135,6 +151,14 @@ export async function fetchDatasetFormInitial(
         typeof meta.province === "string" ? meta.province : "all",
       fileInfo: ds.file_info ?? undefined,
       image_url: ds.image_url ?? null,
+      dataType: typeof meta.data_type === "string" ? meta.data_type : undefined,
+      contactUnit: typeof meta.contact_unit === "string" ? meta.contact_unit : undefined,
+      contactEmail: typeof meta.contact_email === "string" ? meta.contact_email : undefined,
+      objective: typeof meta.objective === "string" ? meta.objective : undefined,
+      updateFrequencyUnit: typeof meta.update_frequency_unit === "string" ? meta.update_frequency_unit : undefined,
+      updateFrequencyValue: typeof meta.update_frequency_value === "number" ? meta.update_frequency_value : undefined,
+      geographicScope: typeof meta.geographic_scope === "string" ? meta.geographic_scope : undefined,
+      dataSource: typeof meta.data_source === "string" ? meta.data_source : undefined,
     };
   } catch {
     return null;

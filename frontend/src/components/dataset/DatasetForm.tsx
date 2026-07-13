@@ -120,6 +120,14 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
     yearStart: new Date().getFullYear() + 543,
     yearEnd: undefined,
     province: ALL_PROVINCES_VALUE,
+    dataType: "",
+    contactUnit: "",
+    contactEmail: "",
+    objective: "",
+    updateFrequencyUnit: "",
+    updateFrequencyValue: undefined,
+    geographicScope: "",
+    dataSource: "",
   };
 
   const {
@@ -295,6 +303,14 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
     if (values.province) {
       formData.append("province", values.province);
     }
+    if (values.dataType) formData.append("data_type", values.dataType);
+    if (values.contactUnit) formData.append("contact_unit", values.contactUnit);
+    if (values.contactEmail) formData.append("contact_email", values.contactEmail);
+    if (values.objective) formData.append("objective", values.objective);
+    if (values.updateFrequencyUnit) formData.append("update_frequency_unit", values.updateFrequencyUnit);
+    if (values.updateFrequencyValue !== undefined) formData.append("update_frequency_value", String(values.updateFrequencyValue));
+    if (values.geographicScope) formData.append("geographic_scope", values.geographicScope);
+    if (values.dataSource) formData.append("data_source", values.dataSource);
     for (const { file } of selectedFiles) {
       formData.append("file", file);
     }
@@ -715,6 +731,128 @@ export default function DatasetForm({ mode, datasetId, theme }: DatasetFormProps
                   </div>
                 ) : null}
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Step 3 — Metadata Standard (gdcatalog) */}
+        <section className={`rounded-2xl border ${isGreen ? "border-[#0277bd]/8" : "border-[#0081A7]/8"} bg-white/95 p-8 shadow-xl shadow-black/5 backdrop-blur-sm`}>
+          <div className="mb-6 flex items-center gap-3">
+            <span className={`flex h-8 w-8 items-center justify-center rounded-full font-sarabun text-label font-bold text-white ${isGreen ? "bg-[#01579b]" : "bg-[#053F5C]"}`}>
+              3
+            </span>
+            <h2 className={`font-kanit text-heading-3-mobile font-semibold ${isGreen ? "text-[#01579b]" : "text-[#053F5C]"}`}>
+              {t("metadataSection")}
+            </h2>
+            <span className="font-sarabun text-caption text-text-muted">({t("metadataOptional")})</span>
+          </div>
+          <div className="space-y-6">
+            <div>
+              <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
+                {t("fieldDataType")}
+              </label>
+              <select className={inputClass} {...register("dataType")}>
+                <option value="">{t("fieldDataTypePlaceholder")}</option>
+                <option value="สถิติ">{t("dataTypeStatistic")}</option>
+                <option value="ระเบียน">{t("dataTypeRecord")}</option>
+                <option value="ภูมิสารสนเทศ">{t("dataTypeGeo")}</option>
+                <option value="หลายประเภท">{t("dataTypeMultiple")}</option>
+                <option value="อื่นๆ">{t("dataTypeOther")}</option>
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
+                  {t("fieldContactUnit")}
+                </label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  placeholder={t("fieldContactUnitPlaceholder")}
+                  maxLength={150}
+                  {...register("contactUnit")}
+                />
+              </div>
+              <div>
+                <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
+                  {t("fieldContactEmail")}
+                </label>
+                <input
+                  type="email"
+                  className={inputClass}
+                  placeholder={t("fieldContactEmailPlaceholder")}
+                  {...register("contactEmail")}
+                />
+                {errors.contactEmail && (
+                  <p className="mt-1 font-sarabun text-caption text-status-error">
+                    {t("fieldContactEmailError")}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
+                {t("fieldObjective")}
+              </label>
+              <input
+                type="text"
+                className={inputClass}
+                placeholder={t("fieldObjectivePlaceholder")}
+                {...register("objective")}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
+                  {t("fieldUpdateFrequencyUnit")}
+                </label>
+                <select className={inputClass} {...register("updateFrequencyUnit")}>
+                  <option value="">{t("fieldUpdateFrequencyUnitPlaceholder")}</option>
+                  <option value="วัน">{t("freqDay")}</option>
+                  <option value="สัปดาห์">{t("freqWeek")}</option>
+                  <option value="เดือน">{t("freqMonth")}</option>
+                  <option value="ปี">{t("freqYear")}</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
+                  {t("fieldUpdateFrequencyValue")}
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  className={inputClass}
+                  placeholder={t("fieldUpdateFrequencyValuePlaceholder")}
+                  {...register("updateFrequencyValue")}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
+                {t("fieldGeographicScope")}
+              </label>
+              <input
+                type="text"
+                className={inputClass}
+                placeholder={t("fieldGeographicScopePlaceholder")}
+                {...register("geographicScope")}
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block font-sarabun text-label font-medium text-text-secondary">
+                {t("fieldDataSource")}
+              </label>
+              <textarea
+                rows={3}
+                className={`${inputClass} resize-y min-h-[80px]`}
+                placeholder={t("fieldDataSourcePlaceholder")}
+                {...register("dataSource")}
+              />
             </div>
           </div>
         </section>

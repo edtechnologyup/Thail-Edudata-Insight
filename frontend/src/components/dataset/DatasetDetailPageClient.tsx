@@ -120,6 +120,7 @@ export default function DatasetDetailPageClient({
       isPublished={apiDataset.status === "published"}
       tagNames={apiDataset.tag_names ?? []}
       files={apiDataset.files ?? []}
+      metadata={apiDataset.metadata ?? null}
     />
   );
 }

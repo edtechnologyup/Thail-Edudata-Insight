@@ -13,16 +13,17 @@ cleanup_demo.py — ลบข้อมูล demo ทั้งหมดที่
 """
 
 import json
+import os
 import uuid
 
 from minio import Minio
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 
-DATABASE_URL = "postgresql://postgres:postgres@postgres:5432/datacatalog"
-MINIO_ENDPOINT = "minio:9000"
-MINIO_ACCESS_KEY = "minioadmin"
-MINIO_SECRET_KEY = "minioadmin"
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/datacatalog")
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT", "minio:9000")
+MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY", "minioadmin")
+MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY", "minioadmin")
 MINIO_BUCKET = "datacatalog"
 
 DEMO_MARKER = "demo_seed_2026"

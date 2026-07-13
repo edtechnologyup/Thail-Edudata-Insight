@@ -186,6 +186,19 @@ def get_latest_dataset_file_format(db: Session, dataset_id: uuid.UUID) -> str | 
     return row[0] if row else None
 
 
+def get_file_format_by_id(db: Session, dataset_id: uuid.UUID, file_id: uuid.UUID) -> str | None:
+    row = (
+        db.query(DatasetFile.file_format)
+        .filter(
+            DatasetFile.id == file_id,
+            DatasetFile.dataset_id == dataset_id,
+            DatasetFile.is_deleted.is_(False),
+        )
+        .first()
+    )
+    return row[0] if row else None
+
+
 def get_latest_dataset_file_info(db: Session, dataset_id: uuid.UUID) -> dict | None:
     row = (
         db.query(DatasetFile.file_name, DatasetFile.file_size, DatasetFile.file_format)

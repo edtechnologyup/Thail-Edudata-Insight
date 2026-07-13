@@ -105,9 +105,13 @@ def _get_source_format(
     db: Session,
     dataset_id: uuid.UUID,
     file_path: str,
+    file_id: uuid.UUID | None = None,
 ) -> str:
     """ใช้ file_format จาก DB เป็นหลัก — ไม่เดาจาก path ถ้ามีค่าใน DB"""
-    stored = dataset_repo.get_latest_dataset_file_format(db, dataset_id)
+    if file_id:
+        stored = dataset_repo.get_file_format_by_id(db, dataset_id, file_id)
+    else:
+        stored = dataset_repo.get_latest_dataset_file_format(db, dataset_id)
     if stored:
         fmt = stored.strip().lower()
         if fmt in {"csv", "excel", "json", "pdf", "sql"}:
@@ -240,7 +244,7 @@ def download(
         if file_id
         else _get_latest_file_path(db, dataset_id)
     )
-    source_format = _get_source_format(db, dataset_id, file_path)
+    source_format = _get_source_format(db, dataset_id, file_path, file_id)
 
     if source_format in ("pdf", "sql"):
         if target_format != source_format:
@@ -310,7 +314,7 @@ def preview(
         else _get_latest_file_path(db, dataset_id)
     )
     content = _fetch_file_content(minio_client, file_path)
-    source_format = _get_source_format(db, dataset_id, file_path)
+    source_format = _get_source_format(db, dataset_id, file_path, file_id)
 
     if source_format == "sql":
         lines = content.decode("utf-8", errors="replace").splitlines()

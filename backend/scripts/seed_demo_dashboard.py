@@ -24,7 +24,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sqlalchemy import func
 from app.core.database import SessionLocal
 from app.models.user_model import User
+from app.models.category_model import Category  # noqa: F401 — FK resolve
 from app.models.dataset_model import Dataset
+from app.models.dataset_file_model import DatasetFile  # noqa: F401 — FK resolve
 from app.models.download_log_model import DownloadLog
 from app.models.audit_log_model import AuditLog
 

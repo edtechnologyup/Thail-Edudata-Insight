@@ -87,18 +87,18 @@ def _prepare_data(
     for col in feature_columns:
         if not pd.api.types.is_numeric_dtype(df_work[col]):
             le = LabelEncoder()
-            df_work.loc[:, col] = le.fit_transform(df_work[col].astype(str))
+            encoded = le.fit_transform(df_work[col].astype(str))
+            df_work[col] = encoded
             label_encoders[col] = le
 
     if not pd.api.types.is_numeric_dtype(df_work[target_column]):
         le = LabelEncoder()
-        df_work.loc[:, target_column] = le.fit_transform(
-            df_work[target_column].astype(str)
-        )
+        encoded = le.fit_transform(df_work[target_column].astype(str))
+        df_work[target_column] = encoded
         label_encoders[target_column] = le
 
-    X = df_work[feature_columns].values.astype(float)
-    y = df_work[target_column].values.astype(float)
+    X = df_work[feature_columns].to_numpy(dtype=float)
+    y = df_work[target_column].to_numpy(dtype=float)
 
     return X, y, label_encoders
 

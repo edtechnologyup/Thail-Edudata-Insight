@@ -16,8 +16,8 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.execute("CREATE TYPE ml_model_status AS ENUM ('training', 'ready', 'failed')")
-    op.execute("CREATE TYPE ml_model_type AS ENUM ('regression', 'classification')")
+    op.execute("DO $$ BEGIN CREATE TYPE ml_model_status AS ENUM ('training', 'ready', 'failed'); EXCEPTION WHEN duplicate_object THEN NULL; END $$")
+    op.execute("DO $$ BEGIN CREATE TYPE ml_model_type AS ENUM ('regression', 'classification'); EXCEPTION WHEN duplicate_object THEN NULL; END $$")
 
     op.create_table(
         "ml_models",

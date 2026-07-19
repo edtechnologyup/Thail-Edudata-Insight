@@ -16,8 +16,18 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.execute("DO $$ BEGIN CREATE TYPE ml_model_status AS ENUM ('training', 'ready', 'failed'); EXCEPTION WHEN duplicate_object THEN NULL; END $$")
-    op.execute("DO $$ BEGIN CREATE TYPE ml_model_type AS ENUM ('regression', 'classification'); EXCEPTION WHEN duplicate_object THEN NULL; END $$")
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE ml_model_status AS ENUM ('training', 'ready', 'failed');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$
+    """)
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE ml_model_type AS ENUM ('regression', 'classification');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$
+    """)
 
     op.create_table(
         "ml_models",
@@ -26,8 +36,8 @@ def upgrade() -> None:
         sa.Column("dataset_id", UUID(as_uuid=True), sa.ForeignKey("datasets.id", name="fk_ml_models_datasets"), nullable=False),
         sa.Column("name", sa.String(500), nullable=False),
         sa.Column("description", sa.Text, nullable=True),
-        sa.Column("status", sa.Enum("training", "ready", "failed", name="ml_model_status", create_type=False), nullable=False, server_default="training"),
-        sa.Column("model_type", sa.Enum("regression", "classification", name="ml_model_type", create_type=False), nullable=False, server_default="regression"),
+        sa.Column("status", sa.String(20), nullable=False, server_default="training"),
+        sa.Column("model_type", sa.String(20), nullable=False, server_default="regression"),
         sa.Column("target_column", sa.String(255), nullable=False),
         sa.Column("feature_columns", JSONB, nullable=True),
         sa.Column("metrics", JSONB, nullable=True),

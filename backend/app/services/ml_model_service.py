@@ -17,6 +17,7 @@ from app.ml_engine.predictor import predict
 
 
 TRAINABLE_FORMATS = {"csv", "excel", "json", "xml"}
+MAX_MODELS_PER_DATASET = 2
 
 
 def _get_minio() -> Minio:
@@ -26,6 +27,16 @@ def _get_minio() -> Minio:
         secret_key=settings.MINIO_SECRET_KEY,
         secure=False,
     )
+
+
+def _delete_model_file(file_path: str | None) -> None:
+    if not file_path:
+        return
+    try:
+        client = _get_minio()
+        client.remove_object(settings.MINIO_BUCKET_NAME, file_path)
+    except Exception:
+        pass
 
 
 def get_dataset_columns(
@@ -109,6 +120,21 @@ def create_and_train(
     )
     if not dataset:
         raise_app_error("NOT_FOUND", "ไม่พบ dataset")
+
+    model_count = (
+        db.query(MLModel)
+        .filter(
+            MLModel.dataset_id == dataset_id,
+            MLModel.user_id == user_id,
+            MLModel.is_deleted.is_(False),
+        )
+        .count()
+    )
+    if model_count >= MAX_MODELS_PER_DATASET:
+        raise_app_error(
+            "VALIDATION_ERROR",
+            f"สร้างโมเดลได้ไม่เกิน {MAX_MODELS_PER_DATASET} ตัวต่อ dataset",
+        )
 
     file = (
         db.query(DatasetFile)
@@ -233,12 +259,17 @@ def delete_model(
     if role != "admin" and str(ml_model.user_id) != str(user_id):
         raise_app_error("AUTH_PERMISSION_DENIED")
 
+    _delete_model_file(ml_model.file_path)
     ml_model.is_deleted = True
     db.commit()
 
 
 def predict_model(
-    db: Session, model_id: uuid.UUID, input_data: dict
+    db: Session,
+    model_id: uuid.UUID,
+    input_data: dict,
+    user_id: uuid.UUID | None = None,
+    user_role: str | None = None,
 ) -> dict:
     ml_model = get_model(db, model_id)
 
@@ -247,6 +278,13 @@ def predict_model(
 
     if not ml_model.file_path:
         raise_app_error("VALIDATION_ERROR", "ไม่พบไฟล์โมเดล")
+
+    if not ml_model.is_public:
+        if not user_id:
+            raise_app_error("AUTH_PERMISSION_DENIED", "โมเดลนี้ยังไม่เปิดให้สาธารณะใช้งาน")
+        is_owner = str(ml_model.user_id) == str(user_id)
+        if not is_owner and user_role != "admin":
+            raise_app_error("AUTH_PERMISSION_DENIED", "โมเดลนี้ยังไม่เปิดให้สาธารณะใช้งาน")
 
     result = predict(
         file_path=ml_model.file_path,

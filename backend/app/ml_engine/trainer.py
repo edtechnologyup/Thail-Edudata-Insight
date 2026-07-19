@@ -77,7 +77,7 @@ def _prepare_data(
     target_column: str,
     feature_columns: list[str],
 ) -> tuple[np.ndarray, np.ndarray, dict[str, LabelEncoder]]:
-    df_work = df[feature_columns + [target_column]].dropna()
+    df_work = df[feature_columns + [target_column]].dropna().copy()
 
     if len(df_work) < 10:
         raise ValueError("ข้อมูลน้อยเกินไป (ต้องมีอย่างน้อย 10 แถว)")
@@ -87,18 +87,18 @@ def _prepare_data(
     for col in feature_columns:
         if df_work[col].dtype == "object":
             le = LabelEncoder()
-            df_work[col] = le.fit_transform(df_work[col].astype(str))
+            df_work.loc[:, col] = le.fit_transform(df_work[col].astype(str))
             label_encoders[col] = le
 
     if df_work[target_column].dtype == "object":
         le = LabelEncoder()
-        df_work[target_column] = le.fit_transform(
+        df_work.loc[:, target_column] = le.fit_transform(
             df_work[target_column].astype(str)
         )
         label_encoders[target_column] = le
 
-    X = df_work[feature_columns].values
-    y = df_work[target_column].values
+    X = df_work[feature_columns].values.astype(float)
+    y = df_work[target_column].values.astype(float)
 
     return X, y, label_encoders
 

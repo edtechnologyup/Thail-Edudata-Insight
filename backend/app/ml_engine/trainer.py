@@ -85,12 +85,12 @@ def _prepare_data(
     label_encoders: dict[str, LabelEncoder] = {}
 
     for col in feature_columns:
-        if df_work[col].dtype == "object":
+        if not pd.api.types.is_numeric_dtype(df_work[col]):
             le = LabelEncoder()
             df_work.loc[:, col] = le.fit_transform(df_work[col].astype(str))
             label_encoders[col] = le
 
-    if df_work[target_column].dtype == "object":
+    if not pd.api.types.is_numeric_dtype(df_work[target_column]):
         le = LabelEncoder()
         df_work.loc[:, target_column] = le.fit_transform(
             df_work[target_column].astype(str)

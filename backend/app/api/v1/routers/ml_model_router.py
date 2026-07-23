@@ -1,6 +1,9 @@
+import io
 import uuid
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
@@ -31,8 +34,14 @@ PREDICT_RATE_LIMIT = 60
 PREDICT_RATE_WINDOW = 60
 
 
-def _model_to_dict(m) -> dict:
-    return MLModelResponse.model_validate(m).model_dump()
+def _model_to_dict(m, db: Session | None = None) -> dict:
+    data = MLModelResponse.model_validate(m).model_dump()
+    if db and not data.get("dataset_title"):
+        from app.models.dataset_model import Dataset
+        ds = db.query(Dataset.title).filter(Dataset.id == m.dataset_id).first()
+        if ds:
+            data["dataset_title"] = ds.title
+    return data
 
 
 def _check_predict_rate_limit(ip: str) -> None:
@@ -48,6 +57,26 @@ def _check_predict_rate_limit(ip: str) -> None:
     pipe.incr(key)
     pipe.expire(key, PREDICT_RATE_WINDOW)
     pipe.execute()
+
+
+@router.get("/datasets/{dataset_id}/models")
+def list_dataset_models(
+    dataset_id: uuid.UUID,
+    db: Session = Depends(get_db),
+):
+    models, total = ml_model_service.list_models(
+        db=db,
+        page=1,
+        page_size=100,
+        public_only=True,
+        dataset_id=dataset_id,
+    )
+    return list_response(
+        [_model_to_dict(m, db) for m in models],
+        1,
+        100,
+        total,
+    )
 
 
 @router.get("/datasets/{dataset_id}/columns")
@@ -112,7 +141,7 @@ def get_model(
     db: Session = Depends(get_db),
 ):
     ml_model = ml_model_service.get_model(db, model_id)
-    return success_response(_model_to_dict(ml_model))
+    return success_response(_model_to_dict(ml_model, db))
 
 
 @router.put("/ml-models/{model_id}")
@@ -130,7 +159,7 @@ def update_model(
         description=body.description,
         is_public=body.is_public,
     )
-    return success_response(_model_to_dict(ml_model))
+    return success_response(_model_to_dict(ml_model, db))
 
 
 @router.delete("/ml-models/{model_id}")
@@ -194,3 +223,59 @@ def retrain_model(
         user_id=uuid.UUID(payload["sub"]),
     )
     return success_response(_model_to_dict(ml_model))
+
+
+@router.get("/ml-models/{model_id}/feature-info")
+def get_feature_info(
+    model_id: uuid.UUID,
+    db: Session = Depends(get_db),
+):
+    info = ml_model_service.get_model_feature_info(db, model_id)
+    return success_response(info)
+
+
+@router.get("/ml-models/{model_id}/predictions")
+def get_prediction_logs(
+    model_id: uuid.UUID,
+    db: Session = Depends(get_db),
+):
+    ml_model = ml_model_service.get_model(db, model_id)
+    if not ml_model.is_public:
+        raise_app_error("AUTH_PERMISSION_DENIED", "โมเดลนี้ยังไม่เปิดให้สาธารณะ")
+
+    logs = ml_model_service.get_prediction_logs(db, model_id)
+    return success_response([
+        {
+            "id": str(log.id),
+            "input_data": log.input_data,
+            "result": log.result,
+            "created_at": log.created_at.isoformat(),
+        }
+        for log in logs
+    ])
+
+
+@router.get("/ml-models/{model_id}/download")
+def download_model(
+    model_id: uuid.UUID,
+    db: Session = Depends(get_db),
+):
+    ml_model = ml_model_service.get_model(db, model_id)
+
+    if not ml_model.is_public:
+        raise_app_error("AUTH_PERMISSION_DENIED", "โมเดลนี้ยังไม่เปิดให้สาธารณะ")
+
+    if not ml_model.file_path:
+        raise_app_error("NOT_FOUND", "ไม่พบไฟล์โมเดล")
+
+    file_bytes = ml_model_service.download_model_file(ml_model.file_path)
+    safe_name = ml_model.name.replace(" ", "_")
+    encoded_name = quote(f"{safe_name}.pkl")
+
+    return StreamingResponse(
+        io.BytesIO(file_bytes),
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": f"attachment; filename=\"model.pkl\"; filename*=UTF-8''{encoded_name}",
+        },
+    )

@@ -12,6 +12,7 @@ from app.core.errors import raise_app_error
 from app.models.dataset_model import Dataset
 from app.models.dataset_file_model import DatasetFile
 from app.models.ml_model_model import MLModel
+from app.models.ml_prediction_log_model import MLPredictionLog
 from app.ml_engine.trainer import train_model
 from app.ml_engine.predictor import predict
 
@@ -194,6 +195,7 @@ def list_models(
     page_size: int,
     user_id: uuid.UUID | None = None,
     public_only: bool = False,
+    dataset_id: uuid.UUID | None = None,
 ) -> tuple[list[MLModel], int]:
     q = db.query(MLModel).filter(MLModel.is_deleted.is_(False))
 
@@ -201,6 +203,8 @@ def list_models(
         q = q.filter(MLModel.user_id == user_id)
     if public_only:
         q = q.filter(MLModel.is_public.is_(True), MLModel.status == "ready")
+    if dataset_id:
+        q = q.filter(MLModel.dataset_id == dataset_id)
 
     total = q.count()
     models = (
@@ -260,7 +264,7 @@ def delete_model(
         raise_app_error("AUTH_PERMISSION_DENIED")
 
     _delete_model_file(ml_model.file_path)
-    ml_model.is_deleted = True
+    db.delete(ml_model)
     db.commit()
 
 
@@ -293,6 +297,16 @@ def predict_model(
     )
 
     ml_model.predict_count = (ml_model.predict_count or 0) + 1
+
+    if user_id and user_role in ("agency", "admin"):
+        log = MLPredictionLog(
+            model_id=model_id,
+            user_id=user_id,
+            input_data=input_data,
+            result={"prediction": result},
+        )
+        db.add(log)
+
     db.commit()
 
     return {
@@ -300,6 +314,84 @@ def predict_model(
         "model_name": ml_model.name,
         "model_type": ml_model.model_type,
     }
+
+
+def get_model_feature_info(
+    db: Session, model_id: uuid.UUID
+) -> list[dict]:
+    ml_model = get_model(db, model_id)
+    if not ml_model.is_public:
+        raise_app_error("AUTH_PERMISSION_DENIED", "โมเดลนี้ยังไม่เปิดให้สาธารณะ")
+
+    file = (
+        db.query(DatasetFile)
+        .filter(
+            DatasetFile.dataset_id == ml_model.dataset_id,
+            DatasetFile.is_deleted.is_(False),
+        )
+        .first()
+    )
+    if not file:
+        return []
+
+    client = _get_minio()
+    response = client.get_object(settings.MINIO_BUCKET_NAME, file.file_path)
+    content = response.read()
+    response.close()
+    response.release_conn()
+
+    if file.file_format == "csv":
+        df = pd.read_csv(io.BytesIO(content))
+    elif file.file_format == "excel":
+        df = pd.read_excel(io.BytesIO(content))
+    elif file.file_format == "json":
+        df = pd.read_json(io.BytesIO(content))
+    elif file.file_format == "xml":
+        df = pd.read_xml(io.BytesIO(content))
+    else:
+        return []
+
+    features = ml_model.feature_columns or []
+    result = []
+    for col in features:
+        if col not in df.columns:
+            continue
+        series = df[col].dropna()
+        is_numeric = pd.api.types.is_numeric_dtype(series)
+        info: dict = {
+            "column_name": col,
+            "dtype": "number" if is_numeric else "text",
+        }
+        if is_numeric:
+            info["min"] = round(float(series.min()), 2)
+            info["max"] = round(float(series.max()), 2)
+            info["mean"] = round(float(series.mean()), 2)
+        else:
+            unique = series.unique().tolist()
+            info["options"] = [str(v) for v in unique[:50]]
+        result.append(info)
+    return result
+
+
+def get_prediction_logs(
+    db: Session, model_id: uuid.UUID
+) -> list[MLPredictionLog]:
+    return (
+        db.query(MLPredictionLog)
+        .filter(MLPredictionLog.model_id == model_id)
+        .order_by(MLPredictionLog.created_at.desc())
+        .limit(50)
+        .all()
+    )
+
+
+def download_model_file(file_path: str) -> bytes:
+    client = _get_minio()
+    response = client.get_object(settings.MINIO_BUCKET_NAME, file_path)
+    data = response.read()
+    response.close()
+    response.release_conn()
+    return data
 
 
 def retrain_model(

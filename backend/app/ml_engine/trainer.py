@@ -11,7 +11,10 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, r2_score, mean_absolute_error
+from sklearn.metrics import (
+    accuracy_score, r2_score, mean_absolute_error,
+    precision_score, recall_score, f1_score, confusion_matrix,
+)
 from sklearn.preprocessing import LabelEncoder
 from xgboost import XGBClassifier, XGBRegressor
 from minio import Minio
@@ -107,6 +110,7 @@ def _train_and_evaluate(
     X: np.ndarray,
     y: np.ndarray,
     model_type: str,
+    feature_columns: list[str],
 ) -> tuple[str, Any, dict]:
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
@@ -116,6 +120,7 @@ def _train_and_evaluate(
     best_model = None
     best_score = -999.0
     best_metrics: dict = {}
+    best_y_pred = None
 
     for name, ModelClass in ALGORITHMS[model_type]:
         model = ModelClass(random_state=42)
@@ -131,8 +136,12 @@ def _train_and_evaluate(
             }
         else:
             score = accuracy_score(y_test, y_pred)
+            avg = "binary" if len(set(y)) == 2 else "weighted"
             metrics = {
                 "accuracy": round(float(score), 4),
+                "precision": round(float(precision_score(y_test, y_pred, average=avg, zero_division=0)), 4),
+                "recall": round(float(recall_score(y_test, y_pred, average=avg, zero_division=0)), 4),
+                "f1": round(float(f1_score(y_test, y_pred, average=avg, zero_division=0)), 4),
             }
 
         if score > best_score:
@@ -140,10 +149,37 @@ def _train_and_evaluate(
             best_name = name
             best_model = model
             best_metrics = metrics
+            best_y_pred = y_pred
 
         del model
 
     best_metrics["algorithm"] = best_name
+    best_metrics["data_rows"] = int(len(y))
+    best_metrics["train_rows"] = int(len(y_train))
+    best_metrics["test_rows"] = int(len(y_test))
+
+    importances = getattr(best_model, "feature_importances_", None)
+    if importances is not None:
+        fi = sorted(
+            zip(feature_columns, importances.tolist()),
+            key=lambda x: x[1],
+            reverse=True,
+        )
+        best_metrics["feature_importance"] = [
+            {"column": col, "importance": round(imp, 4)} for col, imp in fi
+        ]
+
+    if best_y_pred is not None:
+        sample_limit = 200
+        if model_type == "regression":
+            best_metrics["actual_vs_predicted"] = {
+                "actual": [round(float(v), 4) for v in y_test[:sample_limit]],
+                "predicted": [round(float(v), 4) for v in best_y_pred[:sample_limit]],
+            }
+        else:
+            cm = confusion_matrix(y_test, best_y_pred)
+            best_metrics["confusion_matrix"] = cm.tolist()
+
     return best_name, best_model, best_metrics
 
 
@@ -196,7 +232,7 @@ def train_model(
 
     model_type = _detect_model_type(df[target_column])
     X, y, label_encoders = _prepare_data(df, target_column, feature_columns)
-    algo_name, model, metrics = _train_and_evaluate(X, y, model_type)
+    algo_name, model, metrics = _train_and_evaluate(X, y, model_type, feature_columns)
     file_path = _save_model_to_minio(client, model_id, model, label_encoders)
     duration = round(time.time() - start_time, 2)
 

@@ -23,6 +23,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   { label: { th: "สมัครสมาชิก", en: "Register" }, href: "/register" },
   { label: { th: "ทุนการศึกษา", en: "Scholarships" }, href: "/scholarship" },
   { label: { th: "เครื่องมือ API", en: "API Docs" }, href: "/api-docs" },
+  { label: { th: "โมเดล ML", en: "ML Models" }, href: "/search" },
 ];
 
 export const FAQ_CATEGORIES: FaqCategory[] = [
@@ -235,6 +236,109 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
           th: "ไม่เสียเงิน API เปิดให้ใช้งานฟรีสำหรับทุกคน",
           en: "No, the API is free to use for everyone.",
         },
+      },
+    ],
+  },
+  {
+    id: "ml-model",
+    title: { th: "โมเดล ML", en: "ML Models" },
+    icon: "ml-model",
+    items: [
+      {
+        id: "ml-1",
+        question: {
+          th: "โมเดล ML คืออะไร?",
+          en: "What is an ML model?",
+        },
+        answer: {
+          th: "โมเดล ML (Machine Learning) คือเครื่องมือที่เรียนรู้จากข้อมูลเดิม แล้วสามารถ \"ทำนาย\" ค่าใหม่ได้\n\nตัวอย่าง: ถ้ามีข้อมูลจำนวนนักเรียน งบประมาณ จำนวนครู ของโรงเรียนหลายแห่ง โมเดลจะเรียนรู้ความสัมพันธ์ แล้วพอใส่ข้อมูลโรงเรียนใหม่เข้าไป มันจะทำนายได้ว่าจะมีนักเรียนกี่คน",
+          en: "An ML (Machine Learning) model is a tool that learns from existing data and can predict new values.\n\nExample: If you have data on student numbers, budgets, and teacher counts from many schools, the model learns patterns and can predict student count for a new school.",
+        },
+        related: ["ml-2", "ml-3"],
+      },
+      {
+        id: "ml-2",
+        question: {
+          th: "ลองทำนายยังไง?",
+          en: "How do I try a prediction?",
+        },
+        answer: {
+          th: "1. เข้าไปที่หน้า Dataset ที่ต้องการ\n2. เลื่อนลงมาดูส่วน \"โมเดล ML\" แล้วกดเลือกโมเดล\n3. ในหน้าโมเดล เลื่อนไปส่วน \"ลองทำนาย\"\n4. กรอกค่าในแต่ละช่อง (เช่น จำนวนห้องเรียน งบประมาณ)\n5. กดปุ่ม \"ทำนาย\" รอสักครู่ ผลจะแสดงด้านล่าง\n\nทำนายได้กี่ครั้งก็ได้ ไม่จำกัด แต่ผลจะหายเมื่อปิดหน้าเว็บ",
+          en: "1. Go to the dataset page\n2. Scroll to the \"ML Models\" section and select a model\n3. Scroll to \"Try prediction\"\n4. Fill in the values (e.g., classrooms, budget)\n5. Click \"Predict\" and wait for the result\n\nYou can predict as many times as you want. Results disappear when you close the page.",
+        },
+        related: ["ml-1", "ml-4"],
+      },
+      {
+        id: "ml-3",
+        question: {
+          th: "ค่า R² Score / Accuracy แปลว่าอะไร?",
+          en: "What do R² Score / Accuracy mean?",
+        },
+        answer: {
+          th: "R² Score (สำหรับโมเดลพยากรณ์ค่า):\n• 80-100% = ดีมาก ทำนายใกล้เคียงค่าจริง\n• 50-80% = ใช้ได้ แต่ยังมีความคลาดเคลื่อน\n• ต่ำกว่า 50% = ยังไม่น่าเชื่อถือ\n\nAccuracy (สำหรับโมเดลจำแนกประเภท):\n• 80-100% = ดีมาก จำแนกถูกเป็นส่วนใหญ่\n• 50-80% = พอใช้ได้\n• ต่ำกว่า 50% = ไม่ค่อยแม่นยำ\n\nค่ายิ่งสูงยิ่งดี แต่ไม่มีโมเดลไหนแม่นยำ 100% ควรใช้เป็นข้อมูลประกอบการตัดสินใจ ไม่ใช่คำตอบสุดท้าย",
+          en: "R² Score (for regression models):\n• 80-100% = Very good, predictions close to actual values\n• 50-80% = Usable but with some error margin\n• Below 50% = Not reliable\n\nAccuracy (for classification models):\n• 80-100% = Very good\n• 50-80% = Acceptable\n• Below 50% = Not very accurate\n\nHigher is better, but no model is 100% accurate. Use results as supporting information, not final answers.",
+        },
+        related: ["ml-1", "ml-5"],
+      },
+      {
+        id: "ml-4",
+        question: {
+          th: "ผลทำนายเอาไปใช้ทำอะไรได้?",
+          en: "What can I do with prediction results?",
+        },
+        answer: {
+          th: "ผลทำนายสามารถนำไปใช้ได้หลายอย่าง เช่น:\n\n• วางแผนงบประมาณ — ทำนายจำนวนนักเรียนปีหน้า เพื่อเตรียมงบ\n• วิเคราะห์แนวโน้ม — ดูว่าตัวแปรไหนส่งผลต่อผลลัพธ์มากสุด\n• ตัดสินใจเชิงนโยบาย — ใช้ข้อมูลประกอบการตัดสินใจ\n• เปรียบเทียบสมมติฐาน — ลองเปลี่ยนค่าต่างๆ ดูว่าผลเปลี่ยนยังไง\n\n⚠️ คำเตือน: ผลทำนายเป็นการประมาณจากข้อมูลเดิม ไม่ใช่ความจริงแน่นอน ควรใช้ประกอบกับข้อมูลอื่นๆ ด้วย",
+          en: "Prediction results can be used for:\n\n• Budget planning — predict next year's student numbers\n• Trend analysis — see which variables matter most\n• Policy decisions — use data to inform choices\n• Hypothesis testing — try different values and see effects\n\n⚠️ Warning: Predictions are estimates from existing data, not certainties. Use them alongside other information.",
+        },
+        related: ["ml-2", "ml-5"],
+      },
+      {
+        id: "ml-5",
+        question: {
+          th: "ทำไมค่า Score ถึงต่ำ? แก้ยังไง?",
+          en: "Why is the score low? How to fix it?",
+        },
+        answer: {
+          th: "สาเหตุที่ค่า Score ต่ำ:\n• ข้อมูลน้อยเกินไป — ยิ่งมีข้อมูลมาก โมเดลยิ่งเรียนรู้ได้ดี\n• คอลัมน์ที่เลือกไม่เกี่ยวข้อง — เช่น ใช้ \"ชื่อโรงเรียน\" ทำนายจำนวนนักเรียน\n• ข้อมูลมีค่าว่างเยอะ — โมเดลเรียนรู้จากข้อมูลที่ไม่สมบูรณ์\n• ข้อมูลซ้ำกันมาก — ไม่มีความหลากหลายพอ\n\nวิธีแก้:\n• เพิ่มข้อมูลให้มากขึ้น (อย่างน้อย 500+ แถว)\n• เลือกคอลัมน์ที่เกี่ยวข้องกับสิ่งที่จะทำนาย\n• ตรวจสอบและทำความสะอาดข้อมูลก่อน\n• ลองสร้างโมเดลใหม่ด้วยคอลัมน์ชุดอื่น",
+          en: "Reasons for low score:\n• Too little data — more data helps the model learn better\n• Irrelevant columns selected\n• Too many missing values\n• Data lacks variety\n\nHow to fix:\n• Add more data (at least 500+ rows)\n• Choose columns relevant to the target\n• Clean the data first\n• Try creating a new model with different columns",
+        },
+        related: ["ml-3", "ml-6"],
+      },
+      {
+        id: "ml-6",
+        question: {
+          th: "ดาวน์โหลดโมเดลไปใช้เองได้ไหม?",
+          en: "Can I download the model for my own use?",
+        },
+        answer: {
+          th: "ได้ ในหน้าโมเดลจะมีส่วน \"ดาวน์โหลดโมเดล\" สามารถ:\n\n1. ดาวน์โหลดไฟล์ .pkl ไปใช้ใน Python\n2. ใช้โค้ดตัวอย่างที่ให้มารันได้เลย\n3. ต้องมี Python 3.9+ และ scikit-learn\n\nหรือจะใช้ผ่าน API ก็ได้ มีโค้ดตัวอย่าง curl และ Python ให้ copy ไปใช้เลย ไม่ต้องดาวน์โหลดไฟล์",
+          en: "Yes, each model page has a \"Download model\" section where you can:\n\n1. Download the .pkl file for Python\n2. Use the provided sample code\n3. Requires Python 3.9+ and scikit-learn\n\nAlternatively, use the API — sample code for curl and Python is provided.",
+        },
+        related: ["ml-2", "ml-7"],
+      },
+      {
+        id: "ml-7",
+        question: {
+          th: "ผลทำนายของผู้ใช้ทั่วไปกับหน่วยงานต่างกันยังไง?",
+          en: "How do public and agency predictions differ?",
+        },
+        answer: {
+          th: "ผลทำนายของหน่วยงาน (agency):\n• ถูกบันทึกไว้ในระบบ\n• ทุกคนเห็นได้ (เป็นตัวอย่างสาธารณะ)\n• ไม่หายแม้ปิดเว็บ\n\nผลทำนายของผู้ใช้ทั่วไป:\n• ไม่ถูกบันทึก เก็บแค่ในหน้าเว็บ\n• เห็นแค่ตัวเอง คนอื่นไม่เห็น\n• ปิดเว็บ / รีเฟรช = หายไป\n\nผู้ใช้ทั่วไปสามารถทำนายได้ไม่จำกัดครั้ง และจะเห็นผลที่หน่วยงานทำนายไว้เป็นตัวอย่างด้วย",
+          en: "Agency predictions:\n• Saved in the system\n• Visible to everyone (public examples)\n• Persistent\n\nPublic user predictions:\n• Not saved, only kept in the browser\n• Only visible to the user\n• Disappear when the page is closed\n\nPublic users can predict unlimited times and can see agency predictions as examples.",
+        },
+        related: ["ml-2", "ml-4"],
+      },
+      {
+        id: "ml-8",
+        question: {
+          th: "โมเดลมีกี่ประเภท ต่างกันยังไง?",
+          en: "What types of models are there?",
+        },
+        answer: {
+          th: "มี 2 ประเภท:\n\n1. พยากรณ์ค่า (Regression) — ทำนายตัวเลข เช่น จำนวนนักเรียน งบประมาณ คะแนนสอบ\n   วัดผลด้วย R² Score\n\n2. จำแนกประเภท (Classification) — ทำนายกลุ่ม/ประเภท เช่น ผ่าน/ไม่ผ่าน ระดับผลการเรียน\n   วัดผลด้วย Accuracy\n\nระบบจะเลือกประเภทให้อัตโนมัติตามลักษณะข้อมูลเป้าหมาย",
+          en: "There are 2 types:\n\n1. Regression — predicts numbers (e.g., student count, budget, test scores)\n   Measured by R² Score\n\n2. Classification — predicts categories (e.g., pass/fail, grade level)\n   Measured by Accuracy\n\nThe system automatically selects the type based on the target data.",
+        },
+        related: ["ml-1", "ml-3"],
       },
     ],
   },

@@ -49,6 +49,12 @@ function NavIcon({ name }: { name: string }) {
           <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
         </svg>
       );
+    case "models":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.36.2-.8.2-1.14 0l-7.9-4.44A.994.994 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.36-.2.8-.2 1.14 0l7.9 4.44c.32.17.53.5.53.88v9zM12 4.15L5 8.09v7.82l7 3.94 7-3.94V8.09l-7-3.94z" />
+        </svg>
+      );
     case "activity":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -202,6 +208,12 @@ export default function AgencySidebar() {
       labelKey: "upload",
       icon: "upload",
       match: (p) => p.startsWith(`${base}/datasets/create`),
+    },
+    {
+      href: `${base}/models`,
+      labelKey: "models",
+      icon: "models",
+      match: (p) => p.startsWith(`${base}/models`),
     },
     {
       href: `${base}/manage/categories`,

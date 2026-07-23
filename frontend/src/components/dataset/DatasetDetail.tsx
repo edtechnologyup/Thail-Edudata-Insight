@@ -17,6 +17,7 @@ import DatasetRating from "./DatasetRating";
 import DatasetTags from "./DatasetTags";
 import DownloadModal from "./DownloadModal";
 import DataDictionaryTable from "./DataDictionaryTable";
+import DatasetMLModels from "./DatasetMLModels";
 import PreviewTable from "./PreviewTable";
 
 type DatasetDetailProps = {
@@ -541,6 +542,8 @@ export default function DatasetDetail({
           {files && files.length > 0 && (
             <DataDictionaryTable datasetId={datasetId} files={files} />
           )}
+
+          <DatasetMLModels datasetId={datasetId} />
 
           <div className="rounded-2xl border border-border-default/60 bg-white p-6 shadow-level-1">
             {hasMultipleFiles && files && (

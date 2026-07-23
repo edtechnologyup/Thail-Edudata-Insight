@@ -108,6 +108,12 @@ function CategoryIcon({ name }: { name: string }) {
           <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4Zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4Z" />
         </svg>
       );
+    case "ml-model":
+      return (
+        <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.36.2-.8.2-1.14 0l-7.9-4.44A.994.994 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.36-.2.8-.2 1.14 0l7.9 4.44c.32.17.53.5.53.88v9z" />
+        </svg>
+      );
     default:
       return (
         <svg className={cls} viewBox="0 0 24 24" fill="currentColor" aria-hidden>

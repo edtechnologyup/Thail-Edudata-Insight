@@ -50,14 +50,17 @@ export default function ModelDetailPage() {
     );
   }
 
-  const metrics = model.metrics ?? {};
+  const metrics = (model.metrics ?? {}) as Record<string, unknown>;
   const isRegression = model.model_type === "regression";
-  const featureImportance: FeatureImportance[] = metrics.feature_importance ?? [];
-  const actualVsPredicted: ActualVsPredicted | null = metrics.actual_vs_predicted ?? null;
-  const confusionMatrix: number[][] | null = metrics.confusion_matrix ?? null;
-  const mainScore = isRegression
-    ? metrics.r2_score
-    : metrics.accuracy;
+  const featureImportance: FeatureImportance[] =
+    (metrics.feature_importance as FeatureImportance[]) ?? [];
+  const actualVsPredicted: ActualVsPredicted | null =
+    (metrics.actual_vs_predicted as ActualVsPredicted) ?? null;
+  const confusionMatrix: number[][] | null =
+    (metrics.confusion_matrix as number[][]) ?? null;
+  const mainScore = (
+    isRegression ? metrics.r2_score : metrics.accuracy
+  ) as number | undefined;
 
   const handleTogglePublic = () => {
     updateMutation.mutate(
@@ -121,7 +124,7 @@ export default function ModelDetailPage() {
       {/* Info cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <InfoCard label="ประเภท" value={isRegression ? "พยากรณ์ค่า" : "จำแนกประเภท"} />
-        <InfoCard label="อัลกอริทึม" value={metrics.algorithm ?? "-"} />
+        <InfoCard label="อัลกอริทึม" value={(metrics.algorithm as string) ?? "-"} />
         <InfoCard
           label="เวลาเทรน"
           value={model.training_duration ? `${model.training_duration} วินาที` : "-"}
@@ -164,7 +167,7 @@ export default function ModelDetailPage() {
           {metrics.data_rows != null && (
             <div className="md:col-span-2">
               <p className="font-sarabun text-caption text-text-muted">
-                ข้อมูลทั้งหมด {metrics.data_rows} แถว — ใช้เทรน {metrics.train_rows} แถว, ทดสอบ {metrics.test_rows} แถว
+                ข้อมูลทั้งหมด {String(metrics.data_rows)} แถว — ใช้เทรน {String(metrics.train_rows)} แถว, ทดสอบ {String(metrics.test_rows)} แถว
               </p>
             </div>
           )}
@@ -201,15 +204,15 @@ export default function ModelDetailPage() {
           <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-2">
             {isRegression ? (
               <>
-                <MetricCard label="R² Score" value={fmtPct(metrics.r2_score)} hint="ยิ่งใกล้ 100% ยิ่งดี — แปลว่าโมเดลอธิบายข้อมูลได้มากแค่ไหน" />
-                <MetricCard label="MAE" value={metrics.mae?.toFixed(2) ?? "-"} hint="ค่าเฉลี่ยที่ทำนายผิด — ยิ่งน้อยยิ่งดี" />
+                <MetricCard label="R² Score" value={fmtPct(metrics.r2_score as number | undefined)} hint="ยิ่งใกล้ 100% ยิ่งดี — แปลว่าโมเดลอธิบายข้อมูลได้มากแค่ไหน" />
+                <MetricCard label="MAE" value={(metrics.mae as number)?.toFixed(2) ?? "-"} hint="ค่าเฉลี่ยที่ทำนายผิด — ยิ่งน้อยยิ่งดี" />
               </>
             ) : (
               <>
-                <MetricCard label="Accuracy" value={fmtPct(metrics.accuracy)} hint="ทำนายถูกกี่เปอร์เซ็นต์จากทั้งหมด" />
-                <MetricCard label="Precision" value={fmtPct(metrics.precision)} hint="ตอบว่า 'ใช่' แล้วถูกจริงกี่ %" />
-                <MetricCard label="Recall" value={fmtPct(metrics.recall)} hint="ของจริงที่เป็น 'ใช่' หาเจอกี่ %" />
-                <MetricCard label="F1 Score" value={fmtPct(metrics.f1)} hint="ค่าเฉลี่ยของ Precision กับ Recall" />
+                <MetricCard label="Accuracy" value={fmtPct(metrics.accuracy as number | undefined)} hint="ทำนายถูกกี่เปอร์เซ็นต์จากทั้งหมด" />
+                <MetricCard label="Precision" value={fmtPct(metrics.precision as number | undefined)} hint="ตอบว่า 'ใช่' แล้วถูกจริงกี่ %" />
+                <MetricCard label="Recall" value={fmtPct(metrics.recall as number | undefined)} hint="ของจริงที่เป็น 'ใช่' หาเจอกี่ %" />
+                <MetricCard label="F1 Score" value={fmtPct(metrics.f1 as number | undefined)} hint="ค่าเฉลี่ยของ Precision กับ Recall" />
               </>
             )}
           </div>
